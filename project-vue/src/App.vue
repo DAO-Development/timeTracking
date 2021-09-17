@@ -11,9 +11,11 @@
 
 <script>
 import $ from 'jquery';
+import Vue from 'vue';
 
 global.jQuery = global.$ = $;
-global.url = "http://localhost:8080/";
+global.appUrl = "http://localhost:8080/";
+Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 
 export default {
   name: 'App',

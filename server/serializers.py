@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class GropSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     """Сериализация групп"""
 
     class Meta:

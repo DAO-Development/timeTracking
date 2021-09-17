@@ -9,12 +9,22 @@ import datetime
 from server.serializers import *
 
 
+class GroupView(APIView):
+    """Группа пользователя"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = UserSerializer(request.user)
+        group = Group.objects.filter(user=user.data["id"])
+        serializer = GroupSerializer(group, many=True)
+        return Response({"data": serializer.data})
+
+
 class GroupsView(APIView):
     """Группы"""
-    permission_classes = [permissions.AllowAny
-                          ]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         groups = Group.objects.all()
-        serializer = GropSerializer(groups, many=True)
+        serializer = GroupSerializer(groups, many=True)
         return Response({"data": serializer.data})
