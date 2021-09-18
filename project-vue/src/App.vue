@@ -23,6 +23,8 @@ export default {
   created() {
     if (localStorage.getItem('auth_token')) {
       this.auth = true
+    } else if (sessionStorage.getItem(('auth_token'))) {
+      this.auth = true
     }
   },
   data() {
@@ -39,5 +41,6 @@ export default {
 </script>
 
 <style>
-/*@import "assets/css/style.css";*/
+@import "assets/css/main.css";
+@import "assets/css/authorization.css";
 </style>

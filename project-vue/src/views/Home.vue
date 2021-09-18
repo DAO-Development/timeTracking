@@ -1,8 +1,14 @@
 <template>
-  <div>Привет, {{ groups }}</div>
-  <!--  <v-list v-for="group in groups" :key="group.id">-->
-  <!--    <v-list-item>{{ group.name }}</v-list-item>-->
-  <!--  </v-list>-->
+  <v-container>
+    <div>Привет, {{ groups }}</div>
+    <!--  <v-list v-for="group in groups" :key="group.id">-->
+    <!--    <v-list-item>{{ group.name }}</v-list-item>-->
+    <!--  </v-list>-->
+    <v-btn color="primary" @click="logout">Выход</v-btn>
+    <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
+      {{ alertMsg }}
+    </v-alert>
+  </v-container>
 </template>
 
 <script>
@@ -14,6 +20,8 @@ export default {
     return {
       page: 'home',
       groups: [],
+      alertError: false,
+      alertMsg: "",
     }
   },
   created() {
@@ -23,11 +31,33 @@ export default {
         headers: {"Authorization": "Token " + localStorage.getItem("auth_token")}
       })
       this.loadData()
+    } else if (sessionStorage.getItem('auth_token')) {
+      this.$emit('set-auth')
+      $.ajaxSetup({
+        headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
+      })
+      this.loadData()
     } else {
       this.$router.push({name: "Login"})
     }
   },
   methods: {
+    logout() {
+      $.ajax({
+        url: this.$hostname + "auth/token/logout/",
+        type: "POST",
+        success: () => {
+          localStorage.clear()
+          sessionStorage.clear()
+          window.location = '/'
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/group",

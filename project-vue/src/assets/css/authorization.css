@@ -1,0 +1,130 @@
+.login {
+    margin: 90px auto 0;
+    width: 520px;
+}
+
+.login .logo {
+    margin: 0 auto 40px;
+    width: 130px;
+    height: 130px;
+    background-color: #3D6FB6;
+    color: white;
+    font-size: 36px;
+    text-align: center;
+    line-height: 130px;
+    vertical-align: middle;
+}
+
+.login .v-form {
+    margin: 0 auto;
+    padding: 50px;
+    width: 520px;
+    border: 2px solid #616161;
+    border-radius: 40px;
+    text-align: center;
+}
+
+.login .v-form .v-text-field fieldset, .v-text-field .v-input__control, .v-text-field .v-input__slot {
+    border-radius: 20px;
+}
+
+.v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot {
+    padding: 25px 30px !important;
+}
+
+.login .v-form .v-input--selection-controls {
+    margin-top: 0;
+}
+
+.login .v-form .v-label {
+    font-size: 14px;
+}
+
+.login .v-form .v-input {
+    font-size: 24px;
+}
+
+.login .v-form .v-input__append-inner {
+    margin-top: 0 !important;
+}
+
+.login .v-form .v-input__append-inner .v-input__icon {
+    width: 40px;
+    height: 40px;
+}
+
+.login .v-form .v-icon__component {
+    width: 100%;
+    height: auto;
+}
+
+.login .v-form .v-btn:not(.v-btn--round).v-size--default {
+    height: 80px;
+    width: 100%;
+    font-size: 20px;
+    font-weight: 400;
+    border-radius: 20px;
+
+}
+
+.login .v-form .v-input--checkbox {
+    margin-left: 20px;
+}
+
+.login .login__recover-btn {
+    margin-top: 30px;
+    margin-left: 70px;
+    font-size: 14px;
+    text-decoration: underline;
+    color: #616161;
+}
+
+.login .login__recover-btn:hover {
+    text-decoration: none;
+}
+
+@media screen and (max-width: 1025px) {
+    .login .login__recover-btn {
+        font-size: 24px;
+    }
+}
+
+@media screen and (max-width: 568px) {
+    .login {
+        width: 100%;
+        margin-top: 40px;
+    }
+
+    .login .logo {
+        margin-bottom: 30px;
+        width: 60px;
+        height: 60px;
+        font-size: 14px;
+        line-height: 60px;
+    }
+
+    .login .v-form {
+        margin: 0 auto;
+        padding: 20px 0;
+        width: 100%;
+        border: none;
+    }
+
+    .login .v-form .v-label {
+        font-size: 16px;
+    }
+
+    .login .v-form .v-input {
+        font-size: 18px;
+    }
+
+    .v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot {
+        padding: 25px 20px !important;
+    }
+
+    .login .login__recover-btn {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+}
