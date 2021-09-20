@@ -9,7 +9,7 @@ class UserProfile(models.Model):
     lastname = models.CharField(verbose_name='Фамилия', max_length=45)
     phone = models.CharField(verbose_name='Телефон', max_length=45)
     position = models.CharField(verbose_name='Должность', max_length=60)
-    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250)
+    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True)
     active = models.BooleanField(verbose_name='Работает')
 
     class Meta:

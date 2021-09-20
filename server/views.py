@@ -41,13 +41,12 @@ class NewsView(APIView):
 
     def post(self, request):
         user = UserSerializer(request.user)
+        user_profile = UserProfileSerializer(get_object_or_404(UserProfile.objects.all(), auth_user_id=user.data["id"]))
         serializer = NewsPostSerializer(data={
             "title": request.data["title"],
             "text": request.data["text"],
-            "author": user.data["id"]
+            "author": user_profile.data["id"]
         })
-        # @todo Автор -  UserProfile, а не User (сделать ЛК)
-        return Response({"data": serializer.is_valid()})
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

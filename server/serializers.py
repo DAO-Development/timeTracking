@@ -25,6 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    """Сериализация профилей пользователей"""
+
+    auth_user_id = UserSerializer()
+
+    class Meta:
+        model = UserProfile
+        fields = ('id', 'auth_user_id', 'name', 'lastname', 'phone', 'position', 'photo_path', 'active')
+
+
 class GroupSerializer(serializers.ModelSerializer):
     """Сериализация групп"""
 

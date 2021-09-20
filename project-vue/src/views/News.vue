@@ -1,6 +1,8 @@
 <template>
   <div class="news">
-    <div></div>
+    <div>
+      {{ news }}
+    </div>
     <div>
       <v-text-field label="Заголовок" v-model="newNew.title" :rules="titleRules" required outlined></v-text-field>
       <v-textarea label="Текст новости" v-model="newNew.text" outlined></v-textarea>
@@ -16,7 +18,8 @@ export default {
   name: "News",
   data() {
     return {
-      page: 'home',
+      page: 'news',
+      news: '',
       newNew: {
         title: '',
         text: ''
@@ -49,7 +52,18 @@ export default {
   ,
   methods: {
     loadData() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/news",
+        type: "GET",
+        success: (response) => {
+          this.news = response.data
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
     }
     ,
     openAdd() {
