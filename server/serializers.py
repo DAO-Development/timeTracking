@@ -31,3 +31,19 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name')
+
+
+class NewsSerializer(serializers.ModelSerializer):
+    """Сериализация новостей"""
+
+    class Meta:
+        model = News
+        fields = ('id', 'title', 'text', 'author')
+
+
+class NewsPostSerializer(serializers.ModelSerializer):
+    """Сериализация новостей для POST"""
+
+    class Meta:
+        model = News
+        fields = ('title', 'text', 'author')

@@ -28,3 +28,43 @@ class GroupsView(APIView):
         groups = Group.objects.all()
         serializer = GroupSerializer(groups, many=True)
         return Response({"data": serializer.data})
+
+
+class NewsView(APIView):
+    """Новости"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        news = News.objects.all()
+        serializer = NewsSerializer(news, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        user = UserSerializer(request.user)
+        serializer = NewsPostSerializer(data={
+            "title": request.data["title"],
+            "text": request.data["text"],
+            "author": user.data["id"]
+        })
+        # @todo Автор -  UserProfile, а не User (сделать ЛК)
+        return Response({"data": serializer.is_valid()})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request, id):
+        saved_news = get_object_or_404(News.objects.all(), id=id)
+        data = request.data
+        serializer = NewsSerializer(saved_news, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request, id):
+        news = get_object_or_404(News.objects.all(), id=id)
+        news.delete()
+        return Response(status=204)
