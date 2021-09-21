@@ -74,7 +74,13 @@ class ObjectsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        user = UserSerializer(request.user)
         objects = Objects.objects.all()
+        if not user.data["is_staff"]:
+            user_profile = UserProfileSerializer(UserProfile.objects.get(auth_user_id=user.data["id"]))
+            objects_user = ObjectUser.objects.filter(user_profile_id=user_profile.data["id"]).values_list('objects_id',
+                                                                                                          flat=True)
+            objects = Objects.objects.filter(pk__in=objects_user)
         serializer = ObjectsSerializer(objects, many=True)
         return Response({"data": serializer.data})
 
@@ -86,19 +92,47 @@ class ObjectsView(APIView):
         else:
             return Response(status=400)
 
+    def put(self, request, id):
+        saved_object = get_object_or_404(Objects.objects.all(), id=id)
+        data = request.data
+        serializer = ObjectsSerializer(saved_object, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
 
-def put(self, request, id):
-    saved_object = get_object_or_404(Objects.objects.all(), id=id)
-    data = request.data
-    serializer = ObjectsSerializer(saved_object, data=data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(status=201)
-    else:
-        return Response(status=400)
+    def delete(self, request, id):
+        object = get_object_or_404(Objects.objects.all(), id=id)
+        object.delete()
+        return Response(status=204)
 
 
-def delete(self, request, id):
-    object = get_object_or_404(Objects.objects.all(), id=id)
-    object.delete()
-    return Response(status=204)
+class ObjectUserView(APIView):
+    """Рабочие на объектах"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, objects_id):
+        objects = Objects.objects.all().filter(objects_id=objects_id)
+        serializer = ObjectsSerializer(objects, many=True)
+        return Response({"data": serializer.data})
+
+    def put(self, request):
+        if request.data['id'] != '':
+            saved_object = ObjectUser.objects.get(pk=request.data['id'])
+            serializer = ObjectUserSerializer(saved_object, data=request.data, partial=True)
+        else:
+            serializer = ObjectUserPostSerializer(data={
+                "user_profile_id": request.data['user_profile_id'],
+                "objects_id": request.data['objects_id'],
+            })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        object_user = get_object_or_404(Objects.objects.all(), id=request.data['id'])
+        object_user.delete()
+        return Response(status=204)

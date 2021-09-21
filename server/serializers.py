@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password')
+        fields = ('id', 'username', 'email', 'password', 'is_staff')
 
     def create(self, validated_data):
         user = User(
@@ -63,7 +63,7 @@ class ClientSerializer(serializers.ModelSerializer):
     """Сериализация клиентов"""
 
     class Meta:
-        model = News
+        model = Client
         fields = ('id', 'name', 'ogrn', 'logo_path')
 
 
@@ -71,7 +71,7 @@ class ClientPostSerializer(serializers.ModelSerializer):
     """Сериализация клиентов для POST"""
 
     class Meta:
-        model = News
+        model = Client
         fields = ('name', 'ogrn', 'logo_path')
 
 
@@ -93,3 +93,19 @@ class ObjectsPostSerializer(serializers.ModelSerializer):
         model = Objects
         fields = ('index', 'city', 'street', 'house', 'entrance', 'flat', 'date_start', 'date_end',
                   'active', 'client_id')
+
+
+class ObjectUserSerializer(serializers.ModelSerializer):
+    """Сериализация рабочих на объектах"""
+
+    class Meta:
+        model = ObjectUser
+        fields = ('id', 'user_profile_id', 'objects_id')
+
+
+class ObjectUserPostSerializer(serializers.ModelSerializer):
+    """Сериализация рабочих на объектах"""
+
+    class Meta:
+        model = ObjectUser
+        fields = ('user_profile_id', 'objects_id')

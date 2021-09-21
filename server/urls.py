@@ -10,6 +10,8 @@ urlpatterns = [
     path('groups', GroupsView.as_view()),
     path('news', NewsView.as_view()),
     path('news/<int:id>', NewsView.as_view()),
-    path('news', ObjectsView.as_view()),
-    path('news/<int:id>', ObjectsView.as_view()),
+    path('objects', ObjectsView.as_view()),
+    path('objects/<int:id>', ObjectsView.as_view()),
+    # path('user/objects', UserObjectView.as_view()),
+    path('objects/employees/<int:objects_id>', ObjectUserView.as_view()),
 ]
