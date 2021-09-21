@@ -17,6 +17,18 @@ class GroupFunctionsAdmin(admin.ModelAdmin):
     list_display = ('group_id', 'functions_id')
 
 
+class ClientsAdmin(admin.ModelAdmin):
+    """Клиенты"""
+    list_display = ('name', 'phone', 'email')
+
+
+class ObjectsAdmin(admin.ModelAdmin):
+    """Клиенты"""
+    list_display = ('index', 'date_start', 'date_end', 'client_id')
+
+
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Functions, FunctionsAdmin)
 admin.site.register(GroupFunctions, GroupFunctionsAdmin)
+admin.site.register(Client, ClientsAdmin)
+admin.site.register(Objects, ObjectsAdmin)

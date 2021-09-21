@@ -67,3 +67,38 @@ class NewsView(APIView):
         news = get_object_or_404(News.objects.all(), id=id)
         news.delete()
         return Response(status=204)
+
+
+class ObjectsView(APIView):
+    """Объекты"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        objects = Objects.objects.all()
+        serializer = ObjectsSerializer(objects, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = ObjectsPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+
+def put(self, request, id):
+    saved_object = get_object_or_404(Objects.objects.all(), id=id)
+    data = request.data
+    serializer = ObjectsSerializer(saved_object, data=data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(status=201)
+    else:
+        return Response(status=400)
+
+
+def delete(self, request, id):
+    object = get_object_or_404(Objects.objects.all(), id=id)
+    object.delete()
+    return Response(status=204)

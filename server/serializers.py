@@ -57,3 +57,39 @@ class NewsPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ('title', 'text', 'author')
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    """Сериализация клиентов"""
+
+    class Meta:
+        model = News
+        fields = ('id', 'name', 'ogrn', 'logo_path')
+
+
+class ClientPostSerializer(serializers.ModelSerializer):
+    """Сериализация клиентов для POST"""
+
+    class Meta:
+        model = News
+        fields = ('name', 'ogrn', 'logo_path')
+
+
+class ObjectsSerializer(serializers.ModelSerializer):
+    """Сериализация объектов"""
+
+    client_id = ClientSerializer()
+
+    class Meta:
+        model = Objects
+        fields = ('id', 'index', 'city', 'street', 'house', 'entrance', 'flat', 'date_start', 'date_end',
+                  'active', 'client_id')
+
+
+class ObjectsPostSerializer(serializers.ModelSerializer):
+    """Сериализация объектов для POST"""
+
+    class Meta:
+        model = Objects
+        fields = ('index', 'city', 'street', 'house', 'entrance', 'flat', 'date_start', 'date_end',
+                  'active', 'client_id')

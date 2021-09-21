@@ -9,7 +9,7 @@ class UserProfile(models.Model):
     lastname = models.CharField(verbose_name='Фамилия', max_length=45)
     phone = models.CharField(verbose_name='Телефон', max_length=45)
     position = models.CharField(verbose_name='Должность', max_length=60)
-    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True)
+    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
     active = models.BooleanField(verbose_name='Работает')
 
     class Meta:
@@ -43,7 +43,7 @@ class UserContracts(models.Model):
     """Контракты рабочих"""
     create_date = models.DateField(verbose_name='Дата создания')
     path = models.CharField(verbose_name='Путь к файлу', max_length=250)
-    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True)
+    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
     user_profile_id = models.ForeignKey('UserProfile', models.CASCADE, verbose_name='Сотрудник')
 
     class Meta:
@@ -55,7 +55,7 @@ class UserDocuments(models.Model):
     name = models.CharField(verbose_name='Название документа', max_length=100)
     create_date = models.DateField(verbose_name='Дата создания')
     path = models.CharField(verbose_name='Путь к файлу', max_length=250)
-    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True)
+    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
     user_profile_id = models.ForeignKey('UserProfile', models.CASCADE, verbose_name='Сотрудник')
 
     class Meta:
@@ -79,10 +79,12 @@ class Client(models.Model):
     warehouse_address = models.CharField(verbose_name='Адрес склада', max_length=250)
     phone = models.CharField(verbose_name='Телефон', max_length=45)
     email = models.CharField(verbose_name='Email', max_length=100)
-    logo_path = models.CharField(verbose_name='Путь к логотипу', max_length=250)
+    logo_path = models.CharField(verbose_name='Путь к логотипу', max_length=250, null=True, blank=True)
 
     class Meta:
         db_table = "client"
+        verbose_name = "Клиент"
+        verbose_name_plural = "Клиенты"
 
 
 class ClientEmployees(models.Model):
@@ -103,8 +105,8 @@ class Objects(models.Model):
     city = models.CharField(verbose_name='Город', max_length=45)
     street = models.CharField(verbose_name='Улица', max_length=150)
     house = models.CharField(verbose_name='Дом', max_length=10)
-    entrance = models.IntegerField(verbose_name='Подъезд', null=True)
-    flat = models.CharField(verbose_name='Квартира', max_length=10)
+    entrance = models.IntegerField(verbose_name='Подъезд', null=True, blank=True)
+    flat = models.CharField(verbose_name='Квартира', max_length=10, null=True, blank=True)
     date_start = models.DateField(verbose_name='Дата начала')
     date_end = models.DateField(verbose_name='Дата завершения')
     active = models.BooleanField(verbose_name='Объект сдан')
@@ -112,6 +114,8 @@ class Objects(models.Model):
 
     class Meta:
         db_table = "objects"
+        verbose_name = "Объект"
+        verbose_name_plural = "Объекты"
 
 
 class ObjectUser(models.Model):
@@ -138,7 +142,7 @@ class ObjectComments(models.Model):
     user_profile_id = models.ForeignKey("UserProfile", models.CASCADE, verbose_name='Пользователь')
     objects_id = models.ForeignKey("Objects", models.CASCADE, verbose_name='Объект')
     object_comments_id = models.ForeignKey("ObjectComments", models.CASCADE, verbose_name='Родительский комментарий',
-                                           null=True)
+                                           null=True, blank=True)
 
     class Meta:
         db_table = "object_comments"

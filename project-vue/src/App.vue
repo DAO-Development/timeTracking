@@ -41,6 +41,10 @@ export default {
 </script>
 
 <style>
+@import "assets/css/style.css";
+@import "assets/css/fotorama.css";
+@import "assets/css/datepicker.min.css";
+@import "assets/css/selectize.default.css";
 @import "assets/css/main.css";
 @import "assets/css/authorization.css";
 </style>

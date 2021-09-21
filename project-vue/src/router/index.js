@@ -4,6 +4,7 @@ import Home from "../views/Home"
 import Login from "../views/Login.vue"
 import RecoverPassword from "../views/RecoverPassword";
 import News from "../views/News";
+import Objects from "../views/Objects";
 
 Vue.use(VueRouter)
 
@@ -27,6 +28,11 @@ const routes = [
         path: '/news',
         name: 'News',
         component: News
+    },
+    {
+        path: '/objects',
+        name: 'Objects',
+        component: Objects
     },
 ]
 

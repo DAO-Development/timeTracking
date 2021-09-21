@@ -4,7 +4,8 @@
     <!--  <v-list v-for="group in groups" :key="group.id">-->
     <!--    <v-list-item>{{ group.name }}</v-list-item>-->
     <!--  </v-list>-->
-    <v-btn color="primary" @click="goPage">News</v-btn>
+    <v-btn color="primary" @click="goPage('News')">News</v-btn>
+    <v-btn color="primary" @click="goPage('Objects')">Objects</v-btn>
     <v-btn color="primary" @click="logout">Выход</v-btn>
     <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
       {{ alertMsg }}
@@ -59,8 +60,8 @@ export default {
         },
       })
     },
-    goPage() {
-      this.$router.push({name: "News"});
+    goPage(str) {
+      this.$router.push({name: str});
     },
     loadData() {
       $.ajax({

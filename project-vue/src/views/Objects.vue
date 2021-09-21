@@ -1,7 +1,7 @@
 <template>
-  <div class="news flex-main">
+  <div class="objects flex-main">
     <div class="flex-sidebar">
-      {{ news }}
+      {{ }}
     </div>
     <div class="flex-content">
       <v-text-field label="Заголовок" v-model="newNew.title" :rules="titleRules" required outlined></v-text-field>
@@ -12,18 +12,15 @@
 </template>
 
 <script>
-import $ from "jquery";
+import $ from 'jquery'
 
 export default {
-  name: "News",
+  name: "Objects",
   data() {
     return {
-      page: 'news',
-      news: '',
-      newNew: {
-        title: '',
-        text: ''
-      },
+      page: 'objects',
+      objects: '',
+      newObject: {},
       titleRules: [
         v => !!v || 'Необходимо ввести заголовок'
       ],
@@ -53,10 +50,10 @@ export default {
   methods: {
     loadData() {
       $.ajax({
-        url: this.$hostname + "time-tracking/news",
+        url: this.$hostname + "time-tracking/objects",
         type: "GET",
         success: (response) => {
-          this.news = response.data
+          this.objects = response.data
         },
         error: (response) => {
           this.alertError = true
