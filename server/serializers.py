@@ -109,3 +109,19 @@ class ObjectUserPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjectUser
         fields = ('user_profile_id', 'objects_id')
+
+
+class ObjectPhotoSerializer(serializers.ModelSerializer):
+    """Сериализация рабочих на объектах"""
+
+    class Meta:
+        model = ObjectUser
+        fields = ('id', 'photo_path', 'objects_id')
+
+
+class ObjectPhotoPostSerializer(serializers.ModelSerializer):
+    """Сериализация рабочих на объектах"""
+
+    class Meta:
+        model = ObjectUser
+        fields = ('photo_path', 'objects_id')

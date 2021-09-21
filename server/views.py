@@ -136,3 +136,33 @@ class ObjectUserView(APIView):
         object_user = get_object_or_404(Objects.objects.all(), id=request.data['id'])
         object_user.delete()
         return Response(status=204)
+
+
+class ObjectPhotoView(APIView):
+    """Фото объектов"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, objects_id):
+        object_photo = ObjectPhoto.objects.filter(objects_id=objects_id)
+        serializer = ObjectPhotoSerializer(object_photo, many=True)
+        return Response({"data": serializer.data})
+
+    def put(self, request):
+        if request.data['id'] != '':
+            saved_object = ObjectPhoto.objects.get(pk=request.data['id'])
+            serializer = ObjectPhoto(saved_object, data=request.data, partial=True)
+        else:
+            serializer = ObjectPhotoPostSerializer(data={
+                "photo_path": request.data['photo_path'],
+                "objects_id": request.data['objects_id'],
+            })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request, id):
+        object_photo = get_object_or_404(Objects.objects.all(), id=id)
+        object_photo.delete()
+        return Response(status=204)
