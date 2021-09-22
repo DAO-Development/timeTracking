@@ -1,26 +1,63 @@
 <template>
-  <v-container>
-    <div>Привет, {{ groups }}</div>
+  <div class="flex-main">
+    <Menu class="flex-sidebar"/>
+    <!--    <div>Привет, {{ groups }}</div>-->
     <!--  <v-list v-for="group in groups" :key="group.id">-->
     <!--    <v-list-item>{{ group.name }}</v-list-item>-->
     <!--  </v-list>-->
-    <v-btn color="primary" @click="goPage('News')">News</v-btn>
-    <v-btn color="primary" @click="goPage('Objects')">Objects</v-btn>
-    <v-btn color="primary" @click="logout">Выход</v-btn>
+    <div class="profile flex-content">
+      <div class="summary-box">
+        <div class="profile__image">
+          <v-img :lazy-src="require('../../../media'+user.photo_path)"
+                 :src="require('../../../media'+user.photo_path)"></v-img>
+          <div class="profile__change-photo">Сменить фото</div>
+        </div>
+        <div class="profile__info">
+          <h3>Личная информация</h3>
+          <ul>
+            <li>
+              <span class="profile__info-title">Имя</span>
+              <span class="profile__info-content">{{ user.name }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Фамилия</span>
+              <span class="profile__info-content">{{ user.lastname }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Должность</span>
+              <span class="profile__info-content">{{ user.position }}</span></li>
+          </ul>
+          <h3>Контакты</h3>
+          <ul>
+            <li>
+              <span class="profile__info-title">Телефон</span>
+              <span class="profile__info-content">{{ user.phone }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">E-mail</span>
+              <span class="profile__info-content">{{ user.auth_user_id.email }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
       {{ alertMsg }}
     </v-alert>
-  </v-container>
+  </div>
 </template>
 
 <script>
 import $ from 'jquery'
+import Menu from "../components/Menu";
 
 export default {
   name: 'Home',
+  components: {Menu},
   data() {
     return {
       page: 'home',
+      user: {},
       groups: [],
       alertError: false,
       alertMsg: "",
@@ -60,18 +97,22 @@ export default {
         },
       })
     },
-    goPage(str) {
-      this.$router.push({name: str});
-    },
     loadData() {
       $.ajax({
-        url: this.$hostname + "time-tracking/group",
+        url: this.$hostname + "time-tracking/users",
         type: "GET",
         success: (response) => {
-          this.groups = response.data.data[0].name
+          this.user = response.data.data
+          // this.user.photo_path = "../../../media" + this.user.photo_path
         },
         error: (response) => {
           console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
         }
       })
     },

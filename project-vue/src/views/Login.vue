@@ -2,7 +2,7 @@
   <div class="login">
     <div class="logo">logo</div>
     <v-form ref="form" :model="authForm" class="mu-demo-form">
-      <h2>Авторизация</h2>
+      <h1>Авторизация</h1>
       <v-text-field placeholder="Логин" v-model="authForm.login" :rules="usernameRules" required
                     append-icon="$login" outlined></v-text-field>
       <v-text-field placeholder="Пароль" type="password" v-model="authForm.password" :rules="passwordRules"

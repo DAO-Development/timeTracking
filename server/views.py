@@ -9,6 +9,17 @@ import datetime
 from server.serializers import *
 
 
+class UserProfileView(APIView):
+    """Профиль пользователя"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"])
+        serializer = UserProfileSerializer(user_profile)
+        return Response({"data": serializer.data})
+
+
 class GroupView(APIView):
     """Группа пользователя"""
     permission_classes = [permissions.IsAuthenticated]
