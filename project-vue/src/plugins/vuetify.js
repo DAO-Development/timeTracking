@@ -3,6 +3,7 @@ import Vuetify from 'vuetify/lib/framework';
 import loginIcon from "../components/icons/loginIcon";
 import passwordIcon from "../components/icons/passwordIcon";
 import deleteIcon from "../components/icons/deleteIcon";
+import pdfIcon from "../components/icons/pdfIcon";
 
 Vue.use(Vuetify);
 
@@ -38,6 +39,9 @@ export default new Vuetify({
             },
             deleteIcon: {
                 component: deleteIcon
+            },
+            pdf: {
+                component: pdfIcon
             },
         }
     }
