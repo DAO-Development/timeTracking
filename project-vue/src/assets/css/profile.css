@@ -1,12 +1,5 @@
-.profile {
-    margin-top: 60px;
-}
-
 .profile .summary-box {
     display: flex;
-    width: 100%;
-    max-width: 800px;
-    padding: 50px 40px;
 }
 
 .profile .summary-box .profile__image {

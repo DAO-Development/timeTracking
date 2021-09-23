@@ -1,8 +1,6 @@
 <template>
   <div class="objects flex-main">
-    <div class="flex-sidebar">
-      {{ objects }}
-    </div>
+    <Menu class="flex-sidebar"/>
     <div class="flex-content">
       <v-text-field label="Индекс" v-model="newObject.index" :rules="reqRules" required outlined></v-text-field>
       <v-text-field label="Город" v-model="newObject.city" :rules="reqRules" required outlined></v-text-field>
@@ -13,9 +11,11 @@
 
 <script>
 import $ from 'jquery'
+import Menu from "../components/Menu";
 
 export default {
   name: "Objects",
+  components: {Menu},
   data() {
     return {
       page: 'objects',

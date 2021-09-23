@@ -5,12 +5,14 @@
 
 .v-application {
     font-family: 'icomoon', sans-serif !important;
+    font-size: 24px;
     line-height: 1;
 }
 
 .v-application .container {
     width: 100% !important;
     max-width: 100% !important;
+    padding: 0
 }
 
 .v-application h1 {
@@ -31,6 +33,13 @@
     font-weight: 400;
 }
 
+.summary-box {
+    margin-top: 60px;
+    width: 90%;
+    max-width: 90%;
+    padding: 50px 40px;
+}
+
 .menu.flex-sidebar {
     max-width: 485px;
     color: #FFFFFF !important;
@@ -38,7 +47,7 @@
     padding: 110px 90px 0 125px;
 }
 
-.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+.menu .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
     color: #FFFFFF !important;
 }
 
@@ -59,6 +68,19 @@
 
 .menu .v-list-item--link:before {
     background-color: transparent !important;
+}
+
+.menu .spacer {
+    border-top: 1px #FFFFFF solid;
+}
+
+.list__image {
+    width: 75px !important;
+    height: 75px !important;
+}
+
+.content-list .v-list-item__title {
+    font-size: 18px;
 }
 
 @media screen and (max-width: 425px) {

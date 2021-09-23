@@ -48,4 +48,5 @@ export default {
 @import "assets/css/main.css";
 @import "assets/css/authorization.css";
 @import "assets/css/profile.css";
+@import "assets/css/workers.css";
 </style>

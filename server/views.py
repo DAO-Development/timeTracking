@@ -19,6 +19,46 @@ class UserProfileView(APIView):
         serializer = UserProfileSerializer(user_profile)
         return Response({"data": serializer.data})
 
+    def post(self, request):
+        serializer = UserSerializer(data={
+            "username": request.data["username"],
+            "password": request.data["password"],
+            "email": request.data["email"],
+            "is_staff": request.data["is_staff"],
+        })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved_user = get_object_or_404(User.objects.all(), email=request.data['email'])
+        serializer = UserSerializer(saved_user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+
+class ProfilesView(APIView):
+    """Получение списка работника"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user_profile = UserProfile.objects.all()
+        serializer = UserProfileSerializer(user_profile, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = UserProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
 
 class GroupView(APIView):
     """Группа пользователя"""

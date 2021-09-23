@@ -1,10 +1,6 @@
 <template>
   <div class="flex-main">
     <Menu class="flex-sidebar"/>
-    <!--    <div>Привет, {{ groups }}</div>-->
-    <!--  <v-list v-for="group in groups" :key="group.id">-->
-    <!--    <v-list-item>{{ group.name }}</v-list-item>-->
-    <!--  </v-list>-->
     <div class="profile flex-content">
       <div class="summary-box">
         <div class="profile__image">
@@ -81,25 +77,9 @@ export default {
     }
   },
   methods: {
-    logout() {
-      $.ajax({
-        url: this.$hostname + "auth/token/logout/",
-        type: "POST",
-        success: () => {
-          localStorage.clear()
-          sessionStorage.clear()
-          window.location = '/'
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
-    },
     loadData() {
       $.ajax({
-        url: this.$hostname + "time-tracking/users",
+        url: this.$hostname + "time-tracking/user",
         type: "GET",
         success: (response) => {
           this.user = response.data.data

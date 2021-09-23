@@ -125,6 +125,8 @@ class ObjectUser(models.Model):
 
     class Meta:
         db_table = "object_user"
+        verbose_name = "Рабочие на объектах"
+        verbose_name_plural = "Рабочие на объектах"
 
 
 class ObjectPhoto(models.Model):
