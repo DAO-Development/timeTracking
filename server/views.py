@@ -9,8 +9,8 @@ import datetime
 from server.serializers import *
 
 
-class UserProfileView(APIView):
-    """Профиль пользователя"""
+class UserView(APIView):
+    """Пользователи"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -28,7 +28,7 @@ class UserProfileView(APIView):
         })
         if serializer.is_valid():
             serializer.save()
-            return Response(status=201)
+            return Response({"data": serializer.data}, status=201)
         else:
             return Response(status=400)
 
@@ -43,7 +43,7 @@ class UserProfileView(APIView):
 
 
 class ProfilesView(APIView):
-    """Получение списка работника"""
+    """Получение списка работников, профили"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -52,10 +52,10 @@ class ProfilesView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = UserProfileSerializer(data=request.data)
+        serializer = UserProfilePostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=201)
+            return Response({"data": serializer.data}, status=201)
         else:
             return Response(status=400)
 

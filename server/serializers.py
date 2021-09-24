@@ -9,11 +9,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'is_staff')
+        fields = ('id', 'username', 'email', 'password', 'is_staff', 'last_login')
 
     def create(self, validated_data):
         user = User(
+            username=validated_data['username'],
             email=validated_data['email'],
+            is_staff=validated_data['is_staff'],
         )
         user.set_password(validated_data['password'])
         user.save()
@@ -33,6 +35,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('id', 'auth_user_id', 'name', 'lastname', 'phone', 'position', 'photo_path', 'active')
+
+
+class UserProfilePostSerializer(serializers.ModelSerializer):
+    """Сериализация профилей пользователей"""
+
+    class Meta:
+        model = UserProfile
+        fields = ('auth_user_id', 'name', 'lastname', 'phone', 'position', 'photo_path', 'active')
 
 
 class GroupSerializer(serializers.ModelSerializer):

@@ -162,8 +162,16 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+# smtp
+EMAIL_USE_TLS: True
+EMAIL_HOST: 'smtp.gmail.com'
+EMAIL_HOST_USER: 'polya.bagrowa@gmail.com'
+EMAIL_HOST_PASSWORD: '070801pol'
+EMAIL_PORT: 587
+
 DJOSER = {
-    'LOGIN_FIELD': 'email'
+    'LOGIN_FIELD': 'email',
+    'SEND_ACTIVATION_EMAIL': True,
 }
 
 try:
