@@ -18,7 +18,7 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-icon color="grey lighten-1">$deleteIcon</v-icon>
+                <v-icon color="grey lighten-1" @click="deleteUser(profile.auth_user_id.email)">$deleteIcon</v-icon>
               </v-list-item-action>
             </v-list-item>
           </template>
@@ -139,7 +139,6 @@ export default {
       })
     },
     addUser() {
-      console.log(this.newProfile.position === "Администратор")
       if (this.newProfile.position === "Администратор") {
         this.newProfile.is_staff = true
       }
@@ -175,8 +174,27 @@ export default {
           active: true
         },
         success: () => {
-          console.log("Profile is added")
           this.alertMsg = "Пользователь добавлен"
+          this.loadData()
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    deleteUser(email) {
+      console.log(email)
+      $.ajax({
+        url: this.$hostname + "time-tracking/user",
+        type: "DELETE",
+        data: {
+          email: email,
+        },
+        success: () => {
+          this.alertMsg = "Пользователь удален"
+          this.loadData()
         },
         error: (response) => {
           this.alertError = true

@@ -41,6 +41,11 @@ class UserView(APIView):
         else:
             return Response(status=400)
 
+    def delete(self, request):
+        user = get_object_or_404(User.objects.all(), email=request.data['email'])
+        user.delete()
+        return Response(status=204)
+
 
 class ProfilesView(APIView):
     """Получение списка работников, профили"""
