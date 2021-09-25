@@ -1,21 +1,56 @@
 <template>
-  <div class="news flex-main">
-    <div class="flex-sidebar">
-      {{ news }}
+  <div class="flex-main">
+    <Menu class="flex-sidebar"/>
+    <div class="news flex-content">
+      <div class="summary-box">
+        <template v-for="item in news">
+          <v-card class="news-single" :key="item.id" color="primary">
+            <div class="news-single__title">{{ item.title }}</div>
+            <div class="news-single__text">{{ item.text }}</div>
+          </v-card>
+        </template>
+        <v-card class="news-single news-single-add" @click="addForm = true">
+          <add-new-icon/>
+          <div class="news-single-add__text">Добавить новость</div>
+        </v-card>
+      </div>
     </div>
-    <div class="flex-content">
-      <v-text-field label="Заголовок" v-model="newNew.title" :rules="titleRules" required outlined></v-text-field>
-      <v-textarea label="Текст новости" v-model="newNew.text" outlined></v-textarea>
-      <v-btn @click="openAdd">Добавить новость</v-btn>
-    </div>
+    <v-dialog v-model="addForm" persistent>
+      <v-card>
+        <v-toolbar flat>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="closeForm">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <h3>Добавление новости</h3>
+        <v-card-text>
+          <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
+                        outlined></v-text-field>
+          <v-textarea placeholder="Текст новости" v-model="newNew.text" outlined></v-textarea>
+        </v-card-text>
+        <v-card-actions>
+          <div class="addition-btn">
+            <add-photo-icon/>
+            Загрузить обложку
+          </div>
+          <v-spacer></v-spacer>
+          <v-btn class="action-btn" color="primary" @click="addNew">Добавить новость</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import $ from "jquery";
+import Menu from "../components/Menu";
+import AddPhotoIcon from "../components/icons/addPhotoIcon";
+import AddNewIcon from "../components/icons/addNewIcon";
 
 export default {
   name: "News",
+  components: {AddNewIcon, AddPhotoIcon, Menu},
   data() {
     return {
       page: 'news',
@@ -27,6 +62,7 @@ export default {
       titleRules: [
         v => !!v || 'Необходимо ввести заголовок'
       ],
+      addForm: false,
       alertError: false,
       alertSuccess: false,
       alertMsg: '',
@@ -56,7 +92,7 @@ export default {
         url: this.$hostname + "time-tracking/news",
         type: "GET",
         success: (response) => {
-          this.news = response.data
+          this.news = response.data.data
         },
         error: (response) => {
           this.alertError = true
@@ -64,11 +100,69 @@ export default {
           console.log(response.data)
         },
       })
-    }
-    ,
-    openAdd() {
-
-    }
+    },
+    addNew() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/news",
+        type: "POST",
+        data: this.newNew,
+        success: () => {
+          this.alertMsg = "Новость добавлена"
+          this.loadData()
+          this.addForm = false
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    editNew(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/news",
+        type: "PUT",
+        data: {
+          id: id,
+          title: this.newNew.title,
+          text: this.newNew.text
+        },
+        success: () => {
+          this.alertMsg = "Новость изменена"
+          this.loadData()
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    deleteNew(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/news",
+        type: "DELETE",
+        data: {
+          id: id,
+        },
+        success: () => {
+          this.alertMsg = "Новость удалена"
+          this.loadData()
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    closeForm() {
+      this.addForm = false
+      this.newNew = {
+        title: "",
+        text: "",
+      }
+    },
   }
 }
 </script>

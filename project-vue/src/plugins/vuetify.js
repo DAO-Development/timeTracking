@@ -4,6 +4,8 @@ import loginIcon from "../components/icons/loginIcon";
 import passwordIcon from "../components/icons/passwordIcon";
 import deleteIcon from "../components/icons/deleteIcon";
 import pdfIcon from "../components/icons/pdfIcon";
+import addPhotoIcon from "../components/icons/addPhotoIcon";
+import addNewIcon from "../components/icons/addNewIcon";
 
 Vue.use(Vuetify);
 
@@ -42,6 +44,12 @@ export default new Vuetify({
             },
             pdf: {
                 component: pdfIcon
+            },
+            addPhoto: {
+                component: addPhotoIcon
+            },
+            addNew: {
+                component: addNewIcon
             },
         }
     }
