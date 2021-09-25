@@ -5,11 +5,15 @@
       <div class="summary-box">
         <template v-for="item in news">
           <v-card class="news-single" :key="item.id" color="primary">
+            <div class="news-single__actions">
+              <waste-icon @click="deleteNew(item.id)"/>
+              <v-icon @click="openEditForm">$edit</v-icon>
+            </div>
             <div class="news-single__title">{{ item.title }}</div>
             <div class="news-single__text">{{ item.text }}</div>
           </v-card>
         </template>
-        <v-card class="news-single news-single-add" @click="addForm = true">
+        <v-card class="news-single news-single-add" @click="openAddForm">
           <add-new-icon/>
           <div class="news-single-add__text">Добавить новость</div>
         </v-card>
@@ -23,7 +27,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <h3>Добавление новости</h3>
+        <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
                         outlined></v-text-field>
@@ -47,10 +51,11 @@ import $ from "jquery";
 import Menu from "../components/Menu";
 import AddPhotoIcon from "../components/icons/addPhotoIcon";
 import AddNewIcon from "../components/icons/addNewIcon";
+import WasteIcon from "../components/icons/wasteIcon";
 
 export default {
   name: "News",
-  components: {AddNewIcon, AddPhotoIcon, Menu},
+  components: {WasteIcon, AddNewIcon, AddPhotoIcon, Menu},
   data() {
     return {
       page: 'news',
@@ -62,6 +67,7 @@ export default {
       titleRules: [
         v => !!v || 'Необходимо ввести заголовок'
       ],
+      formTitle: "Добавление новости",
       addForm: false,
       alertError: false,
       alertSuccess: false,
@@ -155,6 +161,14 @@ export default {
           console.log(response.data)
         },
       })
+    },
+    openAddForm() {
+      this.formTitle = "Добавление новости"
+      this.addForm = true
+    },
+    openEditForm() {
+      this.formTitle = "Редактирование новости"
+      this.addForm = true
     },
     closeForm() {
       this.addForm = false

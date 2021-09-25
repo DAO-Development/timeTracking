@@ -6,6 +6,8 @@ import deleteIcon from "../components/icons/deleteIcon";
 import pdfIcon from "../components/icons/pdfIcon";
 import addPhotoIcon from "../components/icons/addPhotoIcon";
 import addNewIcon from "../components/icons/addNewIcon";
+import wasteIcon from "../components/icons/wasteIcon";
+import editIcon from "../components/icons/editIcon";
 
 Vue.use(Vuetify);
 
@@ -50,6 +52,12 @@ export default new Vuetify({
             },
             addNew: {
                 component: addNewIcon
+            },
+            waste: {
+                component: wasteIcon
+            },
+            edit: {
+                component: editIcon
             },
         }
     }
