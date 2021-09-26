@@ -1,6 +1,6 @@
 <template>
   <v-list dense nav class="menu" color="primary">
-    <h2>{{ page }}</h2>
+    <h2>Главная</h2>
     <v-list-item-group v-model="selectedItem">
       <v-list-item @click="goPage(0)">
         <v-list-item-content>

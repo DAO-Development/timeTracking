@@ -32,6 +32,11 @@
     font-size: 32px;
     font-weight: 400;
 }
+.v-application h4 {
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: 400;
+}
 
 .v-application .action-btn {
     width: 255px !important;

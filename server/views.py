@@ -110,7 +110,6 @@ class NewsView(APIView):
             return Response(status=400)
 
     def put(self, request):
-        return Response({"data": request.data["id"]})
         saved_news = get_object_or_404(News.objects.all(), id=request.data["id"])
         data = request.data
         serializer = NewsSerializer(saved_news, data=data, partial=True)
@@ -121,7 +120,6 @@ class NewsView(APIView):
             return Response(status=400)
 
     def delete(self, request):
-        return Response({"data": request.data["id"]})
         news = get_object_or_404(News.objects.all(), id=request.data["id"])
         news.delete()
         return Response(status=204)

@@ -1,10 +1,11 @@
-.news .summary-box {
+.news .summary-box .news-all {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 30px;
 }
 
 .news .summary-box .news-single {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -39,3 +40,43 @@
     color: #616161;
     border: 2px solid #616161;
 }
+
+.news .summary-box .news-single__actions {
+    position: absolute;
+    opacity: 0;
+    top: 14px;
+    right: 14px;
+    transition: 0.3s ease-in-out;
+}
+
+.news .summary-box .news-single:hover .news-single__actions {
+    opacity: 1;
+}
+
+.news .summary-box .news-single__actions .v-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.news .summary-box .news-open__text {
+    font-size: 16px;
+    line-height: 110%;
+}
+
+.news .summary-box .news-open__actions {
+    display: flex;
+    gap: 35px;
+    margin-top: 30px;
+}
+
+.news .summary-box .news-open__actions svg {
+    margin-right: 10px;
+}
+
+.news .summary-box .news-open__actions svg > path {
+    fill: #616161;
+}
+
+/*.news__dialog--text .v-input__slot {*/
+/*    min-height: 345px !important;*/
+/*}*/
