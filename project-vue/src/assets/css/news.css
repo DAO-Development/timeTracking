@@ -59,6 +59,7 @@
 }
 
 .news .summary-box .news-open__text {
+    font-family: "icomoon", sans-serif;
     font-size: 16px;
     line-height: 110%;
 }

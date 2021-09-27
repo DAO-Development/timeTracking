@@ -3,7 +3,13 @@
     <Menu class="flex-sidebar"/>
     <div class="news flex-content">
       <div class="summary-box">
-        <h3>Новости</h3>
+        <div class="summary-box__title">
+          <h3>Новости</h3>
+          <div class="addition-btn" @click="all = true" v-if="!all">
+            К списку новостей
+            <back-icon/>
+          </div>
+        </div>
         <div class="news-all" v-if="all">
           <template v-for="item in news">
             <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)">
@@ -12,7 +18,7 @@
                 <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
               </div>
               <div class="news-single__title">{{ item.title }}</div>
-              <div class="news-single__text">{{ item.text }}</div>
+              <pre class="news-single__text">{{ item.text }}</pre>
             </v-card>
           </template>
           <v-card class="news-single news-single-add" @click="openAddForm">
@@ -22,7 +28,7 @@
         </div>
         <div class="news-open" v-else>
           <h4>{{ currentNew.title }}</h4>
-          <div class="news-open__text">{{ currentNew.text }}</div>
+          <pre class="news-open__text">{{ currentNew.text }}</pre>
           <div class="news-open__actions">
             <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
               <edit-icon/>
@@ -51,12 +57,12 @@
                         outlined></v-textarea>
           </v-card-text>
           <v-card-actions>
-            <div class="addition-btn">
-              <add-photo-icon/>
-              Загрузить обложку
-            </div>
+            <!--            <div class="addition-btn">-->
+            <!--              <add-photo-icon/>-->
+            <!--              Загрузить обложку-->
+            <!--            </div>-->
             <v-spacer></v-spacer>
-            <v-btn class="action-btn" color="primary" @click="addNew">Добавить новость</v-btn>
+            <v-btn class="action-btn" color="primary" @click="addNew">{{ formBtnText }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -67,14 +73,14 @@
 <script>
 import $ from "jquery";
 import Menu from "../components/Menu";
-import AddPhotoIcon from "../components/icons/addPhotoIcon";
 import AddNewIcon from "../components/icons/addNewIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
+import BackIcon from "../components/icons/backIcon";
 
 export default {
   name: "News",
-  components: {EditIcon, WasteIcon, AddNewIcon, AddPhotoIcon, Menu},
+  components: {BackIcon, EditIcon, WasteIcon, AddNewIcon, /*AddPhotoIcon, */Menu},
   data() {
     return {
       page: 'news',
@@ -90,6 +96,7 @@ export default {
         v => !!v || 'Необходимо ввести заголовок'
       ],
       formTitle: "Добавление новости",
+      formBtnText: "Добавить новость",
       addForm: false,
       alertError: false,
       alertSuccess: false,
@@ -165,6 +172,11 @@ export default {
         success: () => {
           this.alertMsg = "Новость изменена"
           this.loadData()
+          this.currentNew = {
+            id: this.newNew.id,
+            title: this.newNew.title,
+            text: this.newNew.text
+          }
           this.closeForm()
         },
         error: (response) => {
@@ -195,10 +207,12 @@ export default {
     },
     openAddForm() {
       this.formTitle = "Добавление новости"
+      this.formBtnText = "Добавить новость"
       this.addForm = true
     },
     openEditForm(id, title, text) {
       this.formTitle = "Редактирование новости"
+      this.formBtnText = "Сохранить новость"
       this.newNew = {
         id: id,
         title: title,

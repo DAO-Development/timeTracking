@@ -3,10 +3,16 @@
     <Menu class="flex-sidebar"/>
     <div class="objects flex-content">
       <div class="summary-box">
-        <h3>Объекты</h3>
+        <div class="summary-box__title">
+          <h3>Объекты</h3>
+          <div class="addition-btn" @click="all = true" v-if="!all">
+            К списку объектов
+            <back-icon/>
+          </div>
+        </div>
         <v-list three-line class="workers__list content-list" v-if="all">
           <template v-for="object in objects">
-            <v-list-item :key="object.id" v-if="!object.active">
+            <v-list-item :key="object.id" v-if="!object.active" @click="all = false">
               <v-list-item-content>
                 <v-list-item-title>{{ object.city }} {{ object.street }} {{ object.house }}</v-list-item-title>
                 <v-list-item-subtitle>
@@ -28,6 +34,9 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
+        <div class="objects-open" v-else>
+
+        </div>
       </div>
       <v-dialog v-model="addForm" persistent>
         <v-card>
@@ -70,10 +79,11 @@
 import $ from 'jquery'
 import Menu from "../components/Menu";
 import AddPhotoIcon from "../components/icons/addPhotoIcon";
+import BackIcon from "../components/icons/backIcon";
 
 export default {
   name: "Objects",
-  components: {AddPhotoIcon, Menu},
+  components: {BackIcon, AddPhotoIcon, Menu},
   data() {
     return {
       page: 'objects',
@@ -91,9 +101,11 @@ export default {
         active: true,
         client_id: ''
       },
+      currentObject: {},
       clients: "",
       all: true,
       formTitle: "Добавление объекта",
+      formBtnText: "Добавить объект",
       addForm: false,
       reqRules: [
         v => !!v || 'Необходимо заполнить поле'
@@ -135,10 +147,6 @@ export default {
           console.log(response.data)
         },
       })
-    },
-    openEditForm(item) {
-      this.newObject = item
-      this.addForm = true
     },
     addObject() {
       if (this.newObject.id === 0)
@@ -200,8 +208,34 @@ export default {
         },
       })
     },
-    deleteObject() {
-
+    deleteObject(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects",
+        type: "DELETE",
+        data: {
+          id: id
+        },
+        success: () => {
+          console.log("Объект удален")
+          this.loadData()
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    openAddForm() {
+      this.formTitle = "Добавление объекта"
+      this.formBtnText = "Добавить объект"
+      this.addForm = true
+    },
+    openEditForm(item) {
+      this.formTitle = "Редактирование объекта"
+      this.formBtnText = "Сохранить объект"
+      this.newObject = item
+      this.addForm = true
     },
     closeForm() {
       this.addForm = false
@@ -219,6 +253,10 @@ export default {
         client_id: ''
       }
     },
+    openObject(item) {
+      this.currentObject = item
+      this.all = false
+    }
   }
 }
 </script>

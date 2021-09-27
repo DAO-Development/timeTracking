@@ -176,6 +176,7 @@ export default {
         success: () => {
           this.alertMsg = "Пользователь добавлен"
           this.loadData()
+          this.closeForm()
         },
         error: (response) => {
           this.alertError = true
