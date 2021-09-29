@@ -8,6 +8,7 @@ import addPhotoIcon from "../components/icons/addPhotoIcon";
 import addNewIcon from "../components/icons/addNewIcon";
 import wasteIcon from "../components/icons/wasteIcon";
 import editIcon from "../components/icons/editIcon";
+import archiveIcon from "../components/icons/archiveIcon";
 
 Vue.use(Vuetify);
 
@@ -35,29 +36,32 @@ export default new Vuetify({
     },
     icons: {
         values: {
+            addNew: {
+                component: addNewIcon
+            },
+            addPhoto: {
+                component: addPhotoIcon
+            },
+            archive: {
+                component: archiveIcon
+            },
+            deleteIcon: {
+                component: deleteIcon
+            },
+            edit: {
+                component: editIcon
+            },
             login: {
                 component: loginIcon
             },
             password: {
                 component: passwordIcon
             },
-            deleteIcon: {
-                component: deleteIcon
-            },
             pdf: {
                 component: pdfIcon
             },
-            addPhoto: {
-                component: addPhotoIcon
-            },
-            addNew: {
-                component: addNewIcon
-            },
             waste: {
                 component: wasteIcon
-            },
-            edit: {
-                component: editIcon
             },
         }
     }

@@ -1,8 +1,10 @@
-.profile .summary-box {
+.profile .summary-box,
+.workers-open {
     display: flex;
 }
 
-.profile .summary-box .profile__image {
+.profile .summary-box .profile__image,
+.workers-open .profile__image {
     margin-right: 90px;
 }
 

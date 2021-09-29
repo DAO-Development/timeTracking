@@ -3,34 +3,93 @@
     <Menu class="flex-sidebar"/>
     <div class="workers flex-content">
       <div class="summary-box">
-        <h3>Работники</h3>
-        <v-list three-line class="workers__list content-list">
-          <template v-for="profile in profiles">
-            <v-list-item :key="profile.id" v-if="profile.active">
-              <v-list-item-avatar class="content-list__image">
-                <v-img v-if="profile.photo_path != null" :src="require('../../../media'+profile.photo_path)"></v-img>
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>{{ profile.name }} {{ profile.lastname }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  <span>{{ profile.position }}</span><br>
-                  <span>{{ profile.auth_user_id.email }}</span>
-                </v-list-item-subtitle>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-icon color="grey lighten-1" @click="deleteUser(profile.auth_user_id.email)">$deleteIcon</v-icon>
-              </v-list-item-action>
-            </v-list-item>
-          </template>
-          <v-list-item class="content-list__add" @click="addForm=true">
-            <v-list-item-icon>
-              <v-icon>mdi-plus</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Добавить работника</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+        <div class="summary-box__title">
+          <h3>Работники</h3>
+          <div class="addition-btn" @click="all = true" v-if="!all">
+            К списку работников
+            <back-icon/>
+          </div>
+        </div>
+        <div class="workers-all" v-if="all">
+          <div class="content-list__filters">
+            <v-text-field placeholder="Фамилия Имя" v-model="filter.name" outlined @change="changeName"></v-text-field>
+            <v-select v-model="filter.position" :items="selects" placeholder="Должность" @change="changeName"
+                      outlined></v-select>
+            <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>
+          </div>
+          <v-list three-line class="workers__list content-list">
+            <template v-for="profile in profiles">
+              <v-list-item :key="profile.id" @click="openProfile(profile)"
+                           v-if="profile.active !== archive && profile.auth_user_id.email.includes(filter.email) && (profile.name + ' ' + profile.lastname).includes(filter.name)  && (profile.position===filter.position || filter.position === 'Все')">
+                <v-list-item-avatar class="content-list__image">
+                  <v-img v-if="profile.photo_path != null" :src="require('../../../media'+profile.photo_path)"></v-img>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title>{{ profile.name }} {{ profile.lastname }}</v-list-item-title>
+                  <v-list-item-subtitle>
+                    <span>{{ profile.position }}</span><br>
+                    <span>{{ profile.auth_user_id.email }}</span>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-icon color="grey lighten-1" @click="deleteUser(profile.auth_user_id.email)">$deleteIcon</v-icon>
+                </v-list-item-action>
+              </v-list-item>
+            </template>
+            <div class="content-list__btns">
+              <v-list-item class="content-list__btns-add" @click="addForm=true">
+                <v-list-item-icon>
+                  <v-icon>mdi-plus</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Добавить работника</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item class="content-list__btns-add" @click="archive=!archive">
+                <v-list-item-icon>
+                  <v-icon>$archive</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Архив</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </div>
+          </v-list>
+        </div>
+        <div class="workers-open" v-if="!all">
+          <div class="profile__image">
+            <v-img :lazy-src="require('../../../media'+currentProfile.photo_path)"
+                   :src="require('../../../media'+currentProfile.photo_path)"></v-img>
+            <div class="profile__change-photo">Сменить фото</div>
+          </div>
+          <div class="profile__info">
+            <h3>Личная информация</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Имя</span>
+                <span class="profile__info-content">{{ currentProfile.name }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Фамилия</span>
+                <span class="profile__info-content">{{ currentProfile.lastname }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Должность</span>
+                <span class="profile__info-content">{{ currentProfile.position }}</span></li>
+            </ul>
+            <h3>Контакты</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Телефон</span>
+                <span class="profile__info-content">{{ currentProfile.phone }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">E-mail</span>
+                <span class="profile__info-content">{{ currentProfile.auth_user_id.email }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       <v-dialog v-model="addForm" persistent>
         <v-card>
@@ -71,15 +130,19 @@
 import Menu from "../components/Menu";
 import $ from "jquery";
 import PdfIcon from "../components/icons/pdfIcon";
+import BackIcon from "../components/icons/backIcon";
 
 export default {
   name: "Workers",
-  components: {PdfIcon, Menu},
+  components: {BackIcon, PdfIcon, Menu},
   data() {
     return {
       page: 'home',
+      all: true,
+      archive: false,
       profiles: {},
       positions: ["Администратор", "Маляр", "Строитель"],
+      selects: ["Все", "Администратор", "Маляр", "Строитель"],
       newProfile: {
         lastname: "",
         name: "",
@@ -87,6 +150,21 @@ export default {
         email: "",
         phone: "",
         is_staff: false,
+      },
+      currentProfile: {
+        auth_user_id: "",
+        lastname: "",
+        name: "",
+        position: "",
+        email: "",
+        phone: "",
+        is_staff: false,
+        active: true
+      },
+      filter: {
+        name: "",
+        position: "Все",
+        email: ""
       },
       addForm: false,
       alertError: false,
@@ -120,6 +198,9 @@ export default {
     }
   },
   methods: {
+    changeName() {
+      console.log((this.filter.position === "Все" || this.filter.position === "Администратор") && true)
+    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/profiles",
@@ -215,6 +296,10 @@ export default {
         is_staff: "",
       }
     },
+    openProfile(profile) {
+      this.currentProfile = profile
+      this.all = false
+    }
   }
 }
 </script>

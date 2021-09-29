@@ -24,14 +24,6 @@
     text-align: center;
 }
 
-.v-text-field fieldset, .v-text-field .v-input__control, .v-text-field .v-input__slot {
-    border-radius: 20px !important;
-}
-
-.v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) > .v-input__control > .v-input__slot {
-    padding: 20px !important;
-}
-
 .v-form .v-input--selection-controls {
     margin-top: 0 !important;
 }

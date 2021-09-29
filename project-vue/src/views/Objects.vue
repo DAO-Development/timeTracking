@@ -25,14 +25,24 @@
               </v-list-item-action>
             </v-list-item>
           </template>
-          <v-list-item class="content-list__add" @click="addForm=true">
-            <v-list-item-icon>
-              <v-icon>mdi-plus</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Добавить объект</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
+          <div class="content-list__btns">
+            <v-list-item class="content-list__btns-add" @click="addForm=true">
+              <v-list-item-icon>
+                <v-icon>mdi-plus</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Добавить работника</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item class="content-list__btns-add" @click="archive=!archive">
+              <v-list-item-icon>
+                <v-icon>$archive</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Архив</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </div>
         </v-list>
         <div class="objects-open" v-else>
 
