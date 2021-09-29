@@ -29,6 +29,7 @@
         <div class="news-open" v-else>
           <h4>{{ currentNew.title }}</h4>
           <div class="news-open__text">{{ currentNew.text }}</div>
+<!--          <v-editor class="news-open__text" v-model="currentNew.text" :disable="true"></v-editor>-->
           <div class="news-open__actions">
             <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
               <edit-icon/>
@@ -157,9 +158,13 @@ export default {
           'redo',
           'fullscreen'
         ],
-        useLang: 'en'
-
+        useLang: 'en',
+        pasteText: true,
       },
+      disableEditor: {
+        printLog: false,
+        disable: true
+      }
     }
   },
   created() {
@@ -294,7 +299,10 @@ export default {
     },
     openNew(item) {
       this.currentNew = item
-      // document.getElementsByClassName('news-open__text').innerHtm
+      this.currentNew.text = this.currentNew.text.replaceAll('&lt;', '<').replaceAll('&gt;', '>')
+      console.log(this.currentNew.text.replaceAll('&lt;', '<').replaceAll('&gt;', '>'))
+      // this.currentNew.text = innerHtml(this.currentNew.text)
+      // document.getElementById('div').innerHtml(this.currentNew.text)
       this.all = false
     }
   }
