@@ -18,7 +18,7 @@
                 <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
               </div>
               <div class="news-single__title">{{ item.title }}</div>
-              <pre class="news-single__text">{{ item.text }}</pre>
+              <div class="news-single__text">{{ item.text }}</div>
             </v-card>
           </template>
           <v-card class="news-single news-single-add" @click="openAddForm">
@@ -28,7 +28,7 @@
         </div>
         <div class="news-open" v-else>
           <h4>{{ currentNew.title }}</h4>
-          <pre class="news-open__text">{{ currentNew.text }}</pre>
+          <div class="news-open__text">{{ currentNew.text }}</div>
           <div class="news-open__actions">
             <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
               <edit-icon/>
@@ -53,8 +53,17 @@
           <v-card-text>
             <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
                           outlined></v-text-field>
-            <v-textarea class="news__dialog--text" placeholder="Текст новости" v-model="newNew.text"
-                        outlined></v-textarea>
+            <!--            <v-textarea class="news__dialog&#45;&#45;text" placeholder="Текст новости" v-model="newNew.text"-->
+            <!--                        outlined></v-textarea>-->
+            <!--            <medium-editor/>-->
+            <!--            <medium-editor-->
+            <!--                v-model='newNew.text'-->
+            <!--                :options='options'-->
+            <!--                :onChange="onChange"-->
+            <!--                v-on:uploaded="uploadCallback"/>-->
+
+            <v-editor v-model="newNew.text" :config="editorConfig"></v-editor>
+            <div>{{ newNew.text }}</div>
           </v-card-text>
           <v-card-actions>
             <!--            <div class="addition-btn">-->
@@ -80,7 +89,10 @@ import BackIcon from "../components/icons/backIcon";
 
 export default {
   name: "News",
-  components: {BackIcon, EditIcon, WasteIcon, AddNewIcon, /*AddPhotoIcon, */Menu},
+  components: {
+    BackIcon, EditIcon, WasteIcon, AddNewIcon, /*AddPhotoIcon, */Menu,
+    // 'v-editor': YimoVueEditor.instance
+  },
   data() {
     return {
       page: 'news',
@@ -89,9 +101,14 @@ export default {
       newNew: {
         id: 0,
         title: '',
+        text: '',
+        plainText: '',
+      },
+      currentNew: {
+        id: 0,
+        title: '',
         text: ''
       },
-      currentNew: {},
       titleRules: [
         v => !!v || 'Необходимо ввести заголовок'
       ],
@@ -101,6 +118,48 @@ export default {
       alertError: false,
       alertSuccess: false,
       alertMsg: '',
+      options: {},
+      editorConfig: {
+        printLog: false,
+        //ie9不支持跨域
+        uploadImgUrl: 'http://localhost:2233/api/upload',
+        menus: [
+          'source',
+          '|',
+          'bold',
+          'underline',
+          'italic',
+          'strikethrough',
+          'eraser',
+          'forecolor',
+          'bgcolor',
+          '|',
+          'quote',
+          'fontfamily',
+          'fontsize',
+          'head',
+          'unorderlist',
+          'orderlist',
+          'alignleft',
+          'aligncenter',
+          'alignright',
+          '|',
+          'link',
+          'unlink',
+          'table',
+          // 'emotion',
+          '|',
+          'img',
+          'video',
+          'insertcode',
+          '|',
+          'undo',
+          'redo',
+          'fullscreen'
+        ],
+        useLang: 'en'
+
+      },
     }
   },
   created() {
@@ -119,9 +178,14 @@ export default {
     } else {
       this.$router.push({name: "Login"})
     }
-  }
-  ,
+  },
   methods: {
+    onChange() {
+      console.log(this.newNew.text.text())
+    },
+    uploadCallback(url) {
+      console.log("uploaded url", url)
+    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/news",
@@ -138,6 +202,7 @@ export default {
     },
     addNew() {
       console.log(this.newNew.id + " " + this.newNew.title)
+      console.log(this.newNew.text)
       if (this.newNew.id > 0)
         this.editNew()
       else
@@ -229,6 +294,7 @@ export default {
     },
     openNew(item) {
       this.currentNew = item
+      // document.getElementsByClassName('news-open__text').innerHtm
       this.all = false
     }
   }
