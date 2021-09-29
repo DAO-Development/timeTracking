@@ -10,42 +10,119 @@
             <back-icon/>
           </div>
         </div>
-        <v-list three-line class="workers__list content-list" v-if="all">
-          <template v-for="object in objects">
-            <v-list-item :key="object.id" v-if="!object.active" @click="all = false">
-              <v-list-item-content>
-                <v-list-item-title>{{ object.city }} {{ object.street }} {{ object.house }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  <span>{{ object.date_start }} - {{ object.date_end }}</span><br>
-                  <span>{{ object.client_id.name }}</span>
-                </v-list-item-subtitle>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-icon color="grey lighten-1" @click="deleteObject(object.id)">$deleteIcon</v-icon>
-              </v-list-item-action>
-            </v-list-item>
-          </template>
-          <div class="content-list__btns">
-            <v-list-item class="content-list__btns-add" @click="addForm=true">
-              <v-list-item-icon>
-                <v-icon>mdi-plus</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Добавить работника</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item class="content-list__btns-add" @click="archive=!archive">
-              <v-list-item-icon>
-                <v-icon>$archive</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Архив</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+        <div class="objects-all" v-if="all">
+          <div class="content-list__filters">
+            <!--            <v-text-field placeholder="Фамилия Имя" v-model="filter.name" outlined @change="changeName"></v-text-field>-->
+            <!--            <v-select v-model="filter.position" :items="selects" placeholder="Должность" @change="changeName"-->
+            <!--                      outlined></v-select>-->
+            <!--            <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>-->
           </div>
-        </v-list>
+          <v-list three-line class="objects__list content-list" v-if="all">
+            <template v-for="object in objects">
+              <v-list-item :key="object.id" v-if="object.active === archive" @click="openObject(object)">
+                <v-list-item-content>
+                  <v-list-item-title>{{ object.city }} {{ object.street }} {{ object.house }}</v-list-item-title>
+                  <v-list-item-subtitle>
+                    <span>{{ object.date_start }} - {{ object.date_end }}</span><br>
+                    <span>{{ object.client_id.name }}</span>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-icon color="grey lighten-1" @click="deleteObject(object.id)">$deleteIcon</v-icon>
+                </v-list-item-action>
+              </v-list-item>
+            </template>
+            <div class="content-list__btns">
+              <v-list-item class="content-list__btns-add" @click="addForm=true">
+                <v-list-item-icon>
+                  <v-icon>mdi-plus</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Добавить работника</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item class="content-list__btns-add" @click="archive=!archive">
+                <v-list-item-icon>
+                  <v-icon>$archive</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Архив</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </div>
+          </v-list>
+        </div>
         <div class="objects-open" v-else>
+          <!--          <div class="objects-open__image profile__image">-->
+          <!--            <v-img v-if="photo != null" :lazy-src="require('../../../media'+photo)"-->
+          <!--                   :src="require('../../../media'+photo)"></v-img>-->
+          <!--            <div class="profile__change-photo">Добавить фото</div>-->
+          <!--          </div>-->
+          <div class="objects-open__info profile__info">
+            <h3>Информация об объекте</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Объект сдан</span>
+                <v-checkbox v-model="currentObject.active"></v-checkbox>
+              </li>
+              <li>
+                <span class="profile__info-title">Клиент</span>
+                <span class="profile__info-content">{{ currentObject.client_id.name }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Начало работ</span>
+                <span class="profile__info-content">{{ currentObject.date_start }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Окончание работ</span>
+                <span class="profile__info-content">{{ currentObject.date_end }}</span></li>
+            </ul>
+            <h3>Адрес</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Улица</span>
+                <span class="profile__info-content">{{ currentObject.street }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Дом</span>
+                <span class="profile__info-content">{{ currentObject.house }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Подъезд</span>
+                <span class="profile__info-content">{{ currentObject.entrance }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Квартира</span>
+                <span class="profile__info-content">{{ currentObject.flat }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Город</span>
+                <span class="profile__info-content">{{ currentObject.city }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Индекс</span>
+                <span class="profile__info-content">{{ currentObject.index }}</span>
+              </li>
+            </ul>
+            <h3>Работники</h3>
+            <ul>
 
+            </ul>
+            <h3>Фото объекта</h3>
+<!--            <v-sheet max-width="50vw">-->
+              <v-slide-group class="pa-4 objects-open__slider" v-model="photos" active-class="slide-active" show-arrows>
+                <v-slide-item v-for="ph in photos" :key="ph.id">
+                  <v-card class="ma-4" height="250" width="300">
+                    <v-row class="fill-height" align="center" justify="center">
+                      <v-scale-transition>
+                        <v-img :src="require('../../../media'+ph.photo_path)"></v-img>
+                      </v-scale-transition>
+                    </v-row>
+                  </v-card>
+                </v-slide-item>
+              </v-slide-group>
+<!--            </v-sheet>-->
+          </div>
         </div>
       </div>
       <v-dialog v-model="addForm" persistent>
@@ -98,6 +175,8 @@ export default {
     return {
       page: 'objects',
       objects: '',
+      all: true,
+      archive: false,
       newObject: {
         id: 0,
         index: '',
@@ -111,9 +190,22 @@ export default {
         active: true,
         client_id: ''
       },
-      currentObject: {},
+      currentObject: {
+        id: 0,
+        index: '',
+        city: '',
+        street: '',
+        house: '',
+        entrance: '',
+        flat: '',
+        date_start: '',
+        date_end: '',
+        active: true,
+        client_id: '',
+      },
+      photo: "/objects/A3DPhhAL6Zg.png",
+      photos: "",
       clients: "",
-      all: true,
       formTitle: "Добавление объекта",
       formBtnText: "Добавить объект",
       addForm: false,
@@ -265,7 +357,22 @@ export default {
     },
     openObject(item) {
       this.currentObject = item
+      this.photo = this.loadPhoto(item.id)
       this.all = false
+    },
+    loadPhoto(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/photos/" + id,
+        type: "GET",
+        success: (response) => {
+          this.photos = response.data.data
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
     }
   }
 }

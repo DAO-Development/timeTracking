@@ -1,5 +1,5 @@
 .profile .summary-box,
-.workers-open {
+.workers-open, .objects-open {
     display: flex;
 }
 

@@ -1,0 +1,13 @@
+.objects-open .objects-open__image {
+    margin-right: 40px;
+}
+
+.objects-open .objects-open__image .v-img {
+    width: 250px;
+    height: 300px;
+    border-radius: 5px;
+}
+
+.objects-open .objects-open__slider {
+    max-width: 45%;
+}

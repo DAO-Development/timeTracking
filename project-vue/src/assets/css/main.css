@@ -107,6 +107,10 @@
     padding: 50px 40px;
 }
 
+.summary-box > * {
+    max-width: 100%;
+}
+
 .summary-box__title {
     display: flex;
     justify-content: space-between;
@@ -201,4 +205,9 @@
         margin-bottom: 30px;
         font-size: 30px;
     }
+}
+
+
+.wangEditor-container .wangEditor-drop-list a>*{
+    margin-bottom: 5px;
 }

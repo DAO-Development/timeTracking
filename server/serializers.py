@@ -125,7 +125,7 @@ class ObjectPhotoSerializer(serializers.ModelSerializer):
     """Сериализация рабочих на объектах"""
 
     class Meta:
-        model = ObjectUser
+        model = ObjectPhoto
         fields = ('id', 'photo_path', 'objects_id')
 
 
@@ -133,5 +133,5 @@ class ObjectPhotoPostSerializer(serializers.ModelSerializer):
     """Сериализация рабочих на объектах"""
 
     class Meta:
-        model = ObjectUser
+        model = ObjectPhoto
         fields = ('photo_path', 'objects_id')
