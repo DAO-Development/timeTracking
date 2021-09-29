@@ -26,8 +26,15 @@
     text-overflow: ellipsis;
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+}
+
+.news .summary-box .news-single__text > * {
+    margin-bottom: 3px;
+    font-size: 12px !important;
+    line-height: 13px;
+
 }
 
 .news .summary-box .news-single-add {

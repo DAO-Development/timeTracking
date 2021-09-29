@@ -18,7 +18,7 @@
                 <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
               </div>
               <div class="news-single__title">{{ item.title }}</div>
-              <div class="news-single__text">{{ item.text }}</div>
+              <div class="news-single__text" v-html="item.text"></div>
             </v-card>
           </template>
           <v-card class="news-single news-single-add" @click="openAddForm">
@@ -28,8 +28,7 @@
         </div>
         <div class="news-open" v-else>
           <h4>{{ currentNew.title }}</h4>
-          <div class="news-open__text">{{ currentNew.text }}</div>
-<!--          <v-editor class="news-open__text" v-model="currentNew.text" :disable="true"></v-editor>-->
+          <div class="news-open__text" v-html="currentNew.text"></div>
           <div class="news-open__actions">
             <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
               <edit-icon/>
@@ -54,17 +53,7 @@
           <v-card-text>
             <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
                           outlined></v-text-field>
-            <!--            <v-textarea class="news__dialog&#45;&#45;text" placeholder="Текст новости" v-model="newNew.text"-->
-            <!--                        outlined></v-textarea>-->
-            <!--            <medium-editor/>-->
-            <!--            <medium-editor-->
-            <!--                v-model='newNew.text'-->
-            <!--                :options='options'-->
-            <!--                :onChange="onChange"-->
-            <!--                v-on:uploaded="uploadCallback"/>-->
-
             <v-editor v-model="newNew.text" :config="editorConfig"></v-editor>
-            <div>{{ newNew.text }}</div>
           </v-card-text>
           <v-card-actions>
             <!--            <div class="addition-btn">-->
