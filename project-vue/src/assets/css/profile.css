@@ -6,13 +6,17 @@
 .profile .summary-box .profile__image,
 .workers-open .profile__image {
     margin-right: 90px;
+    width: 140px;
+    height: 140px;
 }
 
-.profile__image .v-img {
+.profile__image .v-img,
+.workers-open .profile__image {
     width: 140px;
     height: 140px;
     border-radius: 50%;
     overflow: hidden;
+    background-color: #9E9E9E;
 }
 
 .profile__change-photo {
@@ -35,6 +39,7 @@
 .profile__info li {
     font-size: 20px;
     display: flex;
+    align-items: baseline;
 }
 
 .profile__info-title {

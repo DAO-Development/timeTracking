@@ -29,9 +29,9 @@
           </div>
           <v-list three-line class="objects__list content-list" v-if="all">
             <template v-for="object in objects">
-              <v-list-item :key="object.id" @click="openObject(object)"
+              <v-list-item :key="object.id"
                            v-if="object.active === archive && (object.city + ' ' + object.street + ' ' + object.house).includes(filter.address) && (filter.client==='Все' || object.client_id.name===filter.client) && ((typeof(filter.dates[0]) === 'undefined' || object.date_start >= filter.dates[0]) && (object.date_start <= filter.dates[1] || typeof(filter.dates[1]) === 'undefined'))">
-                <v-list-item-content>
+                <v-list-item-content @click="openObject(object)">
                   <v-list-item-title>{{ object.city }} {{ object.street }} {{ object.house }}</v-list-item-title>
                   <v-list-item-subtitle>
                     <span>{{ object.date_start }} - {{ object.date_end }}</span><br>
@@ -39,7 +39,7 @@
                   </v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action>
-                  <v-icon color="grey lighten-1" @click="deleteObject(object.id)">$deleteIcon</v-icon>
+                  <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(object.id)">$deleteIcon</v-icon>
                 </v-list-item-action>
               </v-list-item>
             </template>
@@ -52,12 +52,20 @@
                   <v-list-item-title>Добавить работника</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item class="content-list__btns-add" @click="archive=!archive">
+              <v-list-item v-if="!archive" class="content-list__btns-add" @click="archive=!archive">
                 <v-list-item-icon>
                   <v-icon>$archive</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>Архив</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item v-else class="content-list__btns-add" @click="archive=!archive">
+                <v-list-item-icon>
+                  <v-icon>$archive</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Выйти из архива</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </div>
@@ -74,7 +82,7 @@
             <ul>
               <li>
                 <span class="profile__info-title">Объект сдан</span>
-                <v-checkbox v-model="currentObject.active"></v-checkbox>
+                <v-checkbox v-model="currentObject.active" @change="openConfirmArchiveDialog"></v-checkbox>
               </li>
               <li>
                 <span class="profile__info-title">Клиент</span>
@@ -167,6 +175,36 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-dialog v-model="confirmDeleteDialog" max-width="500">
+        <v-card>
+          <v-card-title>
+            Удаление объекта
+          </v-card-title>
+          <v-card-text>Вы действительно хотите удалить объект? Отменить это действие будет невозможно</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>
+            <v-btn color="primary" text @click="deleteObject">Подтвердить</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="confirmArchiveDialog" max-width="500">
+        <v-card>
+          <v-card-title>
+            Сдача объекта
+          </v-card-title>
+          <v-card-text>
+            Вы действительно хотите сдать объект? После подтверждения объект будет перемещен в архив
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="secondary" text @click="cancelConfirmArchiveDialog">
+              Отменить
+            </v-btn>
+            <v-btn color="primary" text @click="editObjectArchive">Подтвердить</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -225,6 +263,8 @@ export default {
       formTitle: "Добавление объекта",
       formBtnText: "Добавить объект",
       addForm: false,
+      confirmArchiveDialog: false,
+      confirmDeleteDialog: false,
       reqRules: [
         v => !!v || 'Необходимо заполнить поле'
       ],
@@ -261,6 +301,20 @@ export default {
         type: "GET",
         success: (response) => {
           this.objects = response.data.data
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    loadClients() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients",
+        type: "GET",
+        success: (response) => {
+          this.clients = response.data.data
         },
         error: (response) => {
           this.alertError = true
@@ -329,12 +383,29 @@ export default {
         },
       })
     },
-    deleteObject(id) {
+    editObjectArchive() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects",
+        type: "PUT",
+        data: this.currentObject,
+        success: () => {
+          console.log("Объект перемещен в архив")
+          this.loadData()
+          this.confirmArchiveDialog = false
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    deleteObject() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects",
         type: "DELETE",
         data: {
-          id: id
+          id: this.currentObject.id
         },
         success: () => {
           console.log("Объект удален")
@@ -346,33 +417,6 @@ export default {
           console.log(response.data)
         },
       })
-    },
-    openAddForm() {
-      this.formTitle = "Добавление объекта"
-      this.formBtnText = "Добавить объект"
-      this.addForm = true
-    },
-    openEditForm(item) {
-      this.formTitle = "Редактирование объекта"
-      this.formBtnText = "Сохранить объект"
-      this.newObject = item
-      this.addForm = true
-    },
-    closeForm() {
-      this.addForm = false
-      this.newObject = {
-        id: 0,
-        index: '',
-        city: '',
-        street: '',
-        house: '',
-        entrance: '',
-        flat: '',
-        date_start: '',
-        date_end: '',
-        active: false,
-        client_id: ''
-      }
     },
     openObject(item) {
       this.currentObject = item
@@ -392,7 +436,49 @@ export default {
           console.log(response.data)
         },
       })
-    }
+    },
+    openAddForm() {
+      this.formTitle = "Добавление объекта"
+      this.formBtnText = "Добавить объект"
+      this.addForm = true
+    },
+    openEditForm(item) {
+      this.formTitle = "Редактирование объекта"
+      this.formBtnText = "Сохранить объект"
+      this.newObject = item
+      this.addForm = true
+    },
+    openConfirmArchiveDialog() {
+      if (this.currentObject.active) {
+        this.confirmArchiveDialog = true
+      } else {
+        this.editObjectArchive()
+      }
+    },
+    cancelConfirmArchiveDialog() {
+      this.currentObject.active = false
+      this.confirmArchiveDialog = false
+    },
+    openConfirmDeleteDialog(id) {
+      this.currentObject.id = id
+      this.confirmDeleteDialog = true
+    },
+    closeForm() {
+      this.addForm = false
+      this.newObject = {
+        id: 0,
+        index: '',
+        city: '',
+        street: '',
+        house: '',
+        entrance: '',
+        flat: '',
+        date_start: '',
+        date_end: '',
+        active: false,
+        client_id: ''
+      }
+    },
   }
 }
 </script>

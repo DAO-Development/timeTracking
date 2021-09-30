@@ -74,7 +74,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ('id', 'name', 'ogrn', 'logo_path')
+        fields = ('id', 'name', 'ogrn', 'business_address', 'warehouse_address', 'phone', 'email', 'logo_path')
 
 
 class ClientPostSerializer(serializers.ModelSerializer):
@@ -82,7 +82,7 @@ class ClientPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ('name', 'ogrn', 'logo_path')
+        fields = ('name', 'ogrn', 'business_address', 'warehouse_address', 'phone', 'email', 'logo_path')
 
 
 class ObjectsSerializer(serializers.ModelSerializer):
