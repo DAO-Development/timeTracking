@@ -12,14 +12,25 @@
         </div>
         <div class="objects-all" v-if="all">
           <div class="content-list__filters">
-            <!--            <v-text-field placeholder="Фамилия Имя" v-model="filter.name" outlined @change="changeName"></v-text-field>-->
-            <!--            <v-select v-model="filter.position" :items="selects" placeholder="Должность" @change="changeName"-->
-            <!--                      outlined></v-select>-->
-            <!--            <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>-->
+            <v-text-field placeholder="Адрес" v-model="filter.address" outlined></v-text-field>
+            <v-select v-model="filter.client" :items="selects" outlined></v-select>
+            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="filter.dates"
+                    transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field v-model="filter.dates" placeholder="Начало работ" readonly v-bind="attrs"
+                              v-on="on" outlined></v-text-field>
+              </template>
+              <v-date-picker v-model="filter.dates" no-title scrollable range color="primary">
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="menu = false"> Cancel</v-btn>
+                <v-btn text color="primary" @click="$refs.menu.save(filter.dates)">OK</v-btn>
+              </v-date-picker>
+            </v-menu>
           </div>
           <v-list three-line class="objects__list content-list" v-if="all">
             <template v-for="object in objects">
-              <v-list-item :key="object.id" v-if="object.active === archive" @click="openObject(object)">
+              <v-list-item :key="object.id" @click="openObject(object)"
+                           v-if="object.active === archive && (object.city + ' ' + object.street + ' ' + object.house).includes(filter.address) && (filter.client==='Все' || object.client_id.name===filter.client) && ((typeof(filter.dates[0]) === 'undefined' || object.date_start >= filter.dates[0]) && (object.date_start <= filter.dates[1] || typeof(filter.dates[1]) === 'undefined'))">
                 <v-list-item-content>
                   <v-list-item-title>{{ object.city }} {{ object.street }} {{ object.house }}</v-list-item-title>
                   <v-list-item-subtitle>
@@ -109,19 +120,17 @@
 
             </ul>
             <h3>Фото объекта</h3>
-<!--            <v-sheet max-width="50vw">-->
-              <v-slide-group class="pa-4 objects-open__slider" v-model="photos" active-class="slide-active" show-arrows>
-                <v-slide-item v-for="ph in photos" :key="ph.id">
-                  <v-card class="ma-4" height="250" width="300">
-                    <v-row class="fill-height" align="center" justify="center">
-                      <v-scale-transition>
-                        <v-img :src="require('../../../media'+ph.photo_path)"></v-img>
-                      </v-scale-transition>
-                    </v-row>
-                  </v-card>
-                </v-slide-item>
-              </v-slide-group>
-<!--            </v-sheet>-->
+            <v-slide-group class="pa-4 objects-open__slider" v-model="photos" active-class="slide-active" show-arrows>
+              <v-slide-item v-for="ph in photos" :key="ph.id">
+                <v-card class="ma-4" height="250" width="300">
+                  <v-row class="fill-height" align="center" justify="center">
+                    <v-scale-transition>
+                      <v-img :src="require('../../../media'+ph.photo_path)"></v-img>
+                    </v-scale-transition>
+                  </v-row>
+                </v-card>
+              </v-slide-item>
+            </v-slide-group>
           </div>
         </div>
       </div>
@@ -205,7 +214,14 @@ export default {
       },
       photo: "/objects/A3DPhhAL6Zg.png",
       photos: "",
-      clients: "",
+      clients: ["ООО \"Праздник\""],
+      selects: ["Все", "ООО \"Праздник\"", "ООО \"Цветы\""],
+      filter: {
+        address: "",
+        client: "Все",
+        dates: []
+      },
+      menu: false,
       formTitle: "Добавление объекта",
       formBtnText: "Добавить объект",
       addForm: false,
@@ -236,6 +252,9 @@ export default {
   }
   ,
   methods: {
+    changeName() {
+      console.log((this.filter.dates[0] === '' || "2021-09-21" >= this.filter.dates[0]) && ("2021-09-21" <= this.filter.dates[1] || this.filter.dates[1] === ''))
+    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects",
