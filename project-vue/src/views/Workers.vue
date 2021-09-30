@@ -12,9 +12,8 @@
         </div>
         <div class="workers-all" v-if="all">
           <div class="content-list__filters">
-            <v-text-field placeholder="Фамилия Имя" v-model="filter.name" outlined @change="changeName"></v-text-field>
-            <v-select v-model="filter.position" :items="selects" placeholder="Должность" @change="changeName"
-                      outlined></v-select>
+            <v-text-field placeholder="Фамилия Имя" v-model="filter.name" outlined></v-text-field>
+            <v-select v-model="filter.position" :items="selects" placeholder="Должность" outlined></v-select>
             <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>
           </div>
           <v-list three-line class="workers__list content-list">
@@ -39,7 +38,7 @@
               </v-list-item>
             </template>
             <div class="content-list__btns">
-              <v-list-item class="content-list__btns-add" @click="addForm=true">
+              <v-list-item v-if="!archive" class="content-list__btns-add" @click="addForm=true">
                 <v-list-item-icon>
                   <v-icon>mdi-plus</v-icon>
                 </v-list-item-icon>
@@ -71,7 +70,7 @@
             <v-img v-if="currentProfile.photo_path != null"
                    :lazy-src="require('../../../media'+currentProfile.photo_path)"
                    :src="require('../../../media'+currentProfile.photo_path)"></v-img>
-            <div class="profile__change-photo">Сменить фото</div>
+            <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
           </div>
           <div class="profile__info">
             <h3>Личная информация</h3>
@@ -142,7 +141,7 @@
       <v-dialog v-model="confirmDeleteDialog" max-width="500">
         <v-card>
           <v-card-title>
-            Удаление объекта
+            Удаление работника
           </v-card-title>
           <v-card-text>Вы действительно хотите удалить профиль? Отменить это действие будет невозможно</v-card-text>
           <v-card-actions>
@@ -165,7 +164,22 @@
             <v-btn color="secondary" text @click="cancelConfirmArchiveDialog">
               Отменить
             </v-btn>
-            <v-btn color="primary" text @click="editProfileArchive">Подтвердить</v-btn>
+            <v-btn color="primary" text @click="editProfile">Подтвердить</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="photoDialog" max-width="500">
+        <v-card>
+          <v-card-title>
+            Сменить фото
+          </v-card-title>
+          <v-card-text>
+            <v-file-input v-model="photoField" placeholder="Фото профиля" accept="image/*"
+                          prepend-icon="" outlined></v-file-input>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="savePhoto">Сохранить</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -207,7 +221,8 @@ export default {
         email: "",
         phone: "",
         is_staff: false,
-        active: true
+        active: true,
+        photo_path: null,
       },
       filter: {
         name: "",
@@ -217,6 +232,8 @@ export default {
       addForm: false,
       confirmArchiveDialog: false,
       confirmDeleteDialog: false,
+      photoField: null,
+      photoDialog: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
@@ -248,9 +265,6 @@ export default {
     }
   },
   methods: {
-    changeName() {
-      console.log((this.filter.position === "Все" || this.filter.position === "Администратор") && true)
-    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/profiles",
@@ -316,7 +330,7 @@ export default {
         },
       })
     },
-    editProfileArchive() {
+    editProfile() {
       $.ajax({
         url: this.$hostname + "time-tracking/profiles",
         type: "PUT",
@@ -327,12 +341,44 @@ export default {
           lastname: this.currentProfile.lastname,
           position: this.currentProfile.position,
           phone: this.currentProfile.phone,
-          active: this.currentProfile.active
+          active: this.currentProfile.active,
+          // photo_path: this.currentProfile.photo_path
         },
         success: () => {
-          console.log("Профиль перемещен в архив")
+          console.log("Профиль изменен")
           this.loadData()
           this.confirmArchiveDialog = false
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    savePhoto() {
+      let reader = new FileReader();
+      this.currentProfile.photo_path = "/users/" + this.photoField.name
+      reader.readAsDataURL(this.photoField)
+      // reader.onload = function () {
+      //   console.log(reader.result);
+      // };
+      // reader.onerror = function (error) {
+      //   console.log('Error: ', error);
+      // };
+      // console.log(this.currentProfile.photo_path.toDataURL(this.currentProfile.photo_path.type, 1.0))
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles",
+        type: "PUT",
+        data: {
+          id: this.currentProfile.id,
+          photo: reader,
+          photo_path: this.currentProfile.photo_path
+        },
+        success: () => {
+          console.log("Профиль изменен")
+          this.loadData()
+          this.photoDialog = false
         },
         error: (response) => {
           this.alertError = true
@@ -383,7 +429,7 @@ export default {
       if (!this.currentProfile.active) {
         this.confirmArchiveDialog = true
       } else {
-        this.editProfileArchive()
+        this.editProfile()
       }
     },
     cancelConfirmArchiveDialog() {

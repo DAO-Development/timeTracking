@@ -7,11 +7,11 @@
 .workers-open .profile__image {
     margin-right: 90px;
     width: 140px;
-    height: 140px;
+    min-height: 140px;
 }
 
 .profile__image .v-img,
-.workers-open .profile__image {
+.workers-open .profile__image .v-img {
     width: 140px;
     height: 140px;
     border-radius: 50%;

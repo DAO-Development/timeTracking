@@ -44,12 +44,12 @@
               </v-list-item>
             </template>
             <div class="content-list__btns">
-              <v-list-item class="content-list__btns-add" @click="addForm=true">
+              <v-list-item v-if="!archive" class="content-list__btns-add" @click="addForm=true">
                 <v-list-item-icon>
                   <v-icon>mdi-plus</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>Добавить работника</v-list-item-title>
+                  <v-list-item-title>Добавить объект</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item v-if="!archive" class="content-list__btns-add" @click="archive=!archive">

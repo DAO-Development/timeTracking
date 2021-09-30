@@ -65,7 +65,10 @@ class ProfilesView(APIView):
             return Response(status=400)
 
     def put(self, request):
+        print(request)
+        return Response(request)
         saved_profile = get_object_or_404(UserProfile.objects.all(), id=request.data['id'])
+        # if (request.data["photo"] != null):
         serializer = UserProfileSerializer(saved_profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
