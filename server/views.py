@@ -65,8 +65,8 @@ class ProfilesView(APIView):
             return Response(status=400)
 
     def put(self, request):
-        print(request)
-        return Response(request)
+        # print(request)
+        # return Response(request.data)
         saved_profile = get_object_or_404(UserProfile.objects.all(), id=request.data['id'])
         # if (request.data["photo"] != null):
         serializer = UserProfileSerializer(saved_profile, data=request.data, partial=True)
@@ -170,8 +170,8 @@ class ObjectsView(APIView):
         else:
             return Response(status=400)
 
-    def delete(self, request, id):
-        object = get_object_or_404(Objects.objects.all(), id=id)
+    def delete(self, request):
+        object = get_object_or_404(Objects.objects.all(), id=request.data["id"])
         object.delete()
         return Response(status=204)
 

@@ -14,7 +14,8 @@
           <div class="content-list__filters">
             <v-text-field placeholder="Адрес" v-model="filter.address" outlined></v-text-field>
             <v-select v-model="filter.client" :items="selects" outlined></v-select>
-            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="filter.dates"
+            <v-menu ref="menu_filter" v-model="datePickers.menu_filter" :close-on-content-click="false"
+                    :return-value.sync="filter.dates"
                     transition="scale-transition" offset-y min-width="auto">
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field v-model="filter.dates" placeholder="Начало работ" readonly v-bind="attrs"
@@ -22,8 +23,8 @@
               </template>
               <v-date-picker v-model="filter.dates" no-title scrollable range color="primary">
                 <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="menu = false"> Cancel</v-btn>
-                <v-btn text color="primary" @click="$refs.menu.save(filter.dates)">OK</v-btn>
+                <v-btn text color="primary" @click="datePickers.menu_filter = false"> Cancel</v-btn>
+                <v-btn text color="primary" @click="$refs.menu_filter.save(filter.dates)">OK</v-btn>
               </v-date-picker>
             </v-menu>
           </div>
@@ -160,10 +161,36 @@
                           outlined></v-text-field>
             <v-text-field placeholder="Дом*" v-model="newObject.house" :rules="reqRules"
                           required outlined></v-text-field>
-            <v-text-field placeholder="Подъезд" v-model="newObject.house" outlined></v-text-field>
-            <v-text-field placeholder="Квартира" v-model="newObject.house" outlined></v-text-field>
-            <v-combobox ref="positionCombobox" v-model="newObject.client_id" :items="clients" placeholder="Клиент*"
-                        outlined dense></v-combobox>
+            <v-text-field placeholder="Подъезд" v-model="newObject.entrance" outlined></v-text-field>
+            <v-text-field placeholder="Квартира" v-model="newObject.flat" outlined></v-text-field>
+            <v-menu ref="menu_start" v-model="datePickers.menu_start" :close-on-content-click="false"
+                    :return-value.sync="newObject.date_start"
+                    transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field v-model="newObject.date_start" placeholder="Начало работ*" readonly v-bind="attrs"
+                              v-on="on" outlined></v-text-field>
+              </template>
+              <v-date-picker v-model="newObject.date_start" no-title scrollable color="primary">
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="datePickers.menu_start = false"> Cancel</v-btn>
+                <v-btn text color="primary" @click="$refs.menu_start.save(newObject.date_start)">OK</v-btn>
+              </v-date-picker>
+            </v-menu>
+            <v-menu ref="menu_end" v-model="datePickers.menu_end" :close-on-content-click="false"
+                    :return-value.sync="newObject.date_end"
+                    transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field v-model="newObject.date_end" placeholder="Окончание работ" readonly v-bind="attrs"
+                              v-on="on" outlined></v-text-field>
+              </template>
+              <v-date-picker v-model="newObject.date_end" no-title scrollable color="primary">
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="datePickers.menu_end = false"> Cancel</v-btn>
+                <v-btn text color="primary" @click="$refs.menu_end.save(newObject.date_end)">OK</v-btn>
+              </v-date-picker>
+            </v-menu>
+            <v-select ref="positionCombobox" v-model="newObject.client_id" :items="clients" item-text="name"
+                      item-value="id" placeholder="Клиент*" outlined dense></v-select>
           </v-card-text>
           <v-card-actions>
             <div class="addition-btn">
@@ -234,7 +261,7 @@ export default {
         flat: '',
         date_start: '',
         date_end: '',
-        active: true,
+        active: false,
         client_id: ''
       },
       currentObject: {
@@ -247,7 +274,7 @@ export default {
         flat: '',
         date_start: '',
         date_end: '',
-        active: true,
+        active: false,
         client_id: '',
       },
       photo: "/objects/A3DPhhAL6Zg.png",
@@ -259,7 +286,11 @@ export default {
         client: "Все",
         dates: []
       },
-      menu: false,
+      datePickers: {
+        menu_filter: false,
+        menu_start: false,
+        menu_end: false
+      },
       formTitle: "Добавление объекта",
       formBtnText: "Добавить объект",
       addForm: false,
@@ -280,21 +311,20 @@ export default {
         headers: {"Authorization": "Token " + localStorage.getItem("auth_token")}
       })
       this.loadData()
+      this.loadClients()
     } else if (sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
       })
       this.loadData()
+      this.loadClients()
     } else {
       this.$router.push({name: "Login"})
     }
   }
   ,
   methods: {
-    changeName() {
-      console.log((this.filter.dates[0] === '' || "2021-09-21" >= this.filter.dates[0]) && ("2021-09-21" <= this.filter.dates[1] || this.filter.dates[1] === ''))
-    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects",
@@ -372,7 +402,7 @@ export default {
         //   client_id: this.newObject.client_id
         // },
         success: () => {
-          console.log("Объект добавлен ")
+          console.log("Объект изменен ")
           this.loadData()
           this.closeForm()
         },
