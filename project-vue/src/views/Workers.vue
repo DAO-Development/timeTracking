@@ -357,9 +357,10 @@ export default {
       })
     },
     savePhoto() {
-      let reader = new FileReader();
+      console.log(this.photoField.name)
+      // let reader = new FileReader();
       this.currentProfile.photo_path = "/users/" + this.photoField.name
-      reader.readAsDataURL(this.photoField)
+      // reader.readAsDataURL(this.photoField)
       // reader.onload = function () {
       //   console.log(reader.result);
       // };
@@ -367,14 +368,25 @@ export default {
       //   console.log('Error: ', error);
       // };
       // console.log(this.currentProfile.photo_path.toDataURL(this.currentProfile.photo_path.type, 1.0))
+
+      let fd = new FormData();
+      let avatar = this.photoField;
+      if (avatar !== undefined) {
+        fd.append('image', avatar)
+      } else {
+        console.log("ERROR")
+        return
+      }
+
       $.ajax({
-        url: this.$hostname + "time-tracking/profiles",
+        url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
         type: "PUT",
-        data: {
-          id: this.currentProfile.id,
-          photo: reader,
-          photo_path: this.currentProfile.photo_path
-        },
+        processData: false,
+        data: fd,
+        // data: {
+        //   photo: this.photoField,
+        //   photo_path: this.currentProfile.photo_path
+        // },
         success: () => {
           console.log("Профиль изменен")
           this.loadData()
