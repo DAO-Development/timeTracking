@@ -5,6 +5,10 @@
       <div class="menu-burger__item"></div>
       <div class="menu-burger__item"></div>
     </div>
+    <div class="menu__profile" @click="goPage(0)">
+      <v-img v-if="user.photo_path != null" :lazy-src="require('../../../media'+user.photo_path)"
+             :src="require('../../../media'+user.photo_path)"></v-img>
+    </div>
     <v-list dense nav class="menu-list" color="primary">
       <h2>Главная</h2>
       <v-list-item-group v-model="selectedItem">
@@ -36,12 +40,6 @@
           </v-list-item-content>
         </v-list-item>
       </v-list-item-group>
-      <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
-        {{ alertMsg }}
-      </v-alert>
-      <v-alert v-model="alertSuccess" close-text="Закрыть" color="success" dismissible>
-        {{ alertMsg }}
-      </v-alert>
     </v-list>
   </div>
 </template>
@@ -52,7 +50,9 @@ import $ from "jquery";
 export default {
   name: "Menu",
   created() {
-    console.log(this.$router.getMatchedComponents()[0].name)
+    if ($(window).width() <= '568') {
+      this.loadUser()
+    }
     switch (this.$router.getMatchedComponents()[0].name) {
       case "Home":
         this.selectedItem = 0
@@ -82,9 +82,7 @@ export default {
     }
   },
   data: () => ({
-    alertSuccess: false,
-    alertError: false,
-    alertMsg: '',
+    user: {},
     selectedItem: 0,
     items: [
       {text: 'Объекты', name: 'Objects'},
@@ -100,6 +98,7 @@ export default {
       switch (selected) {
         case 0:
           this.$router.push({name: "Home"})
+          this.selectedItem = 0
           break
         case 1:
           this.$router.push({name: "News"})
@@ -136,7 +135,33 @@ export default {
         $(".menu").removeClass("open")
       else
         $(".menu").addClass("open")
-    }
+    },
+    loadUser() {
+      if (localStorage.getItem('auth_token')) {
+        $.ajaxSetup({
+          headers: {"Authorization": "Token " + localStorage.getItem("auth_token")}
+        })
+      } else if (sessionStorage.getItem('auth_token')) {
+        $.ajaxSetup({
+          headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
+        })
+      }
+      $.ajax({
+        url: this.$hostname + "time-tracking/user",
+        type: "GET",
+        success: (response) => {
+          this.user = response.data.data
+          console.log(this.user.photo_path)
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            console.log("Ошибка соединения с сервером")
+          } else {
+            console.log("Непредвиденная ошибка")
+          }
+        }
+      })
+    },
   }
 }
 </script>

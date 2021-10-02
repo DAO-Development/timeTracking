@@ -2,7 +2,7 @@
   <div class="profile flex-content">
     <div class="summary-box">
       <div class="profile__image">
-        <v-img :lazy-src="require('../../../media'+user.photo_path)"
+        <v-img v-if="user.photo_path != null" :lazy-src="require('../../../media'+user.photo_path)"
                :src="require('../../../media'+user.photo_path)"></v-img>
         <div class="profile__change-photo">Сменить фото</div>
       </div>
