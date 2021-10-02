@@ -211,13 +211,14 @@ body {
 
 .flex-sidebar {
     flex-shrink: 0;
-    width: 550px;
+    /*width: 550px;*/
     display: flex;
     justify-content: flex-start;
     align-items: stretch;
     flex-direction: column;
     height: 100%;
-    margin-right: 20px;
+    /*margin-right: 20px;*/
+    margin-right: 70px;
 }
 
 .fs-top-content {
@@ -1581,7 +1582,6 @@ body {
     /*.summary-box {*/
     /*    display: none;*/
     /*}*/
-
     .flex-sidebar .summary-box {
         display: block;
         width: auto;

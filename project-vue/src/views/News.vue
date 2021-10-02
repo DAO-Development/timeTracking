@@ -1,6 +1,4 @@
 <template>
-  <!--  <div class="flex-main">-->
-  <!--    <Menu class="flex-sidebar"/>-->
   <div class="news flex-content">
     <div class="summary-box">
       <div class="summary-box__title">
@@ -11,20 +9,28 @@
         </div>
       </div>
       <div class="news-all" v-if="all">
-        <template v-for="item in news">
-          <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)">
-            <div class="news-single__actions">
-              <v-icon @click="deleteNew(item.id)">$waste</v-icon>
-              <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
-            </div>
-            <div class="news-single__title">{{ item.title }}</div>
-            <div class="news-single__text" v-html="item.text"></div>
-          </v-card>
-        </template>
-        <v-card class="news-single news-single-add" @click="openAddForm">
-          <add-new-icon/>
-          <div class="news-single-add__text">Добавить новость</div>
-        </v-card>
+        <div class="news-all__grid">
+          <template v-for="item in news">
+            <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)">
+              <div class="news-single__actions">
+                <v-icon @click="deleteNew(item.id)">$waste</v-icon>
+                <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
+              </div>
+              <div class="news-single__title">{{ item.title }}</div>
+              <div class="news-single__text" v-html="item.text"></div>
+            </v-card>
+          </template>
+        </div>
+        <v-list>
+          <v-list-item class="content-list__btns-add" @click="openAddForm">
+            <v-list-item-icon>
+              <v-icon>mdi-plus</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Добавить новость</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
       </div>
       <div class="news-open" v-else>
         <h4>{{ currentNew.title }}</h4>
@@ -66,13 +72,10 @@
       </v-card>
     </v-dialog>
   </div>
-  <!--  </div>-->
 </template>
 
 <script>
 import $ from "jquery";
-// import Menu from "../components/Menu";
-import AddNewIcon from "../components/icons/addNewIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
 import BackIcon from "../components/icons/backIcon";
@@ -80,8 +83,7 @@ import BackIcon from "../components/icons/backIcon";
 export default {
   name: "News",
   components: {
-    BackIcon, EditIcon, WasteIcon, AddNewIcon, /*AddPhotoIcon, Menu,*/
-    // 'v-editor': YimoVueEditor.instance
+    BackIcon, EditIcon, WasteIcon, /*AddPhotoIcon,*/
   },
   data() {
     return {
@@ -111,7 +113,6 @@ export default {
       options: {},
       editorConfig: {
         printLog: false,
-        //ie9不支持跨域
         uploadImgUrl: 'http://localhost:2233/api/upload',
         menus: [
           'source',

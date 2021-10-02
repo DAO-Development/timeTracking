@@ -192,12 +192,17 @@
 .content-list__btns {
     display: flex;
     justify-content: flex-start;
+    gap: 10px;
+}
+
+.workers .content-list__btns-add:first-child {
+    max-width: 250px;
 }
 
 .content-list__btns-add {
     align-items: center;
-    width: min-content !important;
-    max-width: 300px;
+    width: fit-content !important;
+    max-width: 210px;
 }
 
 .content-list__btns-add .v-list-item__icon {
@@ -297,6 +302,11 @@
         width: auto;
         margin: 80px 70px;
         padding: 70px 40px;
+    }
+
+    .content-list__btns-add {
+        border: 1px solid #616161;
+        border-radius: 30px;
     }
 }
 
