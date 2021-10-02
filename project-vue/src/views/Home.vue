@@ -78,6 +78,7 @@ export default {
         type: "GET",
         success: (response) => {
           this.user = response.data.data
+          console.log(response.data.data)
           // this.user.photo_path = "../../../media" + this.user.photo_path
         },
         error: (response) => {

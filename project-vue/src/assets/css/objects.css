@@ -21,3 +21,10 @@
         max-width: 85vw;
     }
 }
+
+@media screen and (max-width: 568px) {
+    .objects-open .objects-open__slider {
+        max-width: 100%;
+        padding: 0 !important;
+    }
+}

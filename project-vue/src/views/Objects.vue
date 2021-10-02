@@ -1,17 +1,21 @@
 <template>
-  <!--  <div class="flex-main">-->
-  <!--    <Menu class="flex-sidebar"/>-->
   <div class="objects flex-content">
     <div class="summary-box">
       <div class="summary-box__title">
         <h3>Объекты</h3>
         <div class="addition-btn" @click="all = true" v-if="!all">
-          К списку объектов
+          <span>К списку объектов</span>
           <back-icon/>
+        </div>
+        <div class=" addition-btn content-list__filters-mobile" v-if="all"
+             @click="openFilters">Фильтры
         </div>
       </div>
       <div class="objects-all" v-if="all">
         <div class="content-list__filters">
+          <v-icon color="grey lighten-1" @click="closeFilters">
+            $deleteIcon
+          </v-icon>
           <v-text-field placeholder="Адрес" v-model="filter.address" outlined></v-text-field>
           <v-select v-model="filter.client" :items="selects" outlined></v-select>
           <v-menu ref="menu_filter" v-model="datePickers.menu_filter" :close-on-content-click="false"
@@ -507,6 +511,16 @@ export default {
         active: false,
         client_id: ''
       }
+    },
+    openFilters() {
+      console.log("open filters")
+      $('.content-list__filters').addClass('open')
+      $('.content-list__btns').addClass('hidden')
+    },
+    closeFilters() {
+      console.log("open filters")
+      $('.content-list__filters').removeClass('open')
+      $('.content-list__btns').removeClass('hidden')
     },
   }
 }

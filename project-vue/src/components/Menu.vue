@@ -6,7 +6,8 @@
       <div class="menu-burger__item"></div>
     </div>
     <div class="menu__profile" @click="goPage(0)">
-      <v-img v-if="user.photo_path != null" :lazy-src="require('../../../media'+user.photo_path)"
+      <v-img v-if="user.photo_path != null"
+             :lazy-src="require('../../../media'+user.photo_path)"
              :src="require('../../../media'+user.photo_path)"></v-img>
     </div>
     <v-list dense nav class="menu-list" color="primary">

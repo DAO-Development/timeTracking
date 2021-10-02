@@ -4,12 +4,18 @@
       <div class="summary-box__title">
         <h3>Работники</h3>
         <div class="addition-btn" @click="all = true" v-if="!all">
-          К списку работников
+          <span>К списку работников</span>
           <back-icon/>
+        </div>
+        <div class=" addition-btn content-list__filters-mobile" v-if="all"
+             @click="openFilters">Фильтры
         </div>
       </div>
       <div class="workers-all" v-if="all">
         <div class="content-list__filters">
+          <v-icon color="grey lighten-1" @click="closeFilters">
+            $deleteIcon
+          </v-icon>
           <v-text-field placeholder="Фамилия Имя" v-model="filter.name" outlined></v-text-field>
           <v-select v-model="filter.position" :items="selects" placeholder="Должность" outlined></v-select>
           <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>
@@ -447,6 +453,17 @@ export default {
     openConfirmDeleteDialog(email) {
       this.currentProfile.email = email
       this.confirmDeleteDialog = true
+    },
+
+    openFilters() {
+      console.log("open filters")
+      $('.content-list__filters').addClass('open')
+      $('.content-list__btns').addClass('hidden')
+    },
+    closeFilters() {
+      console.log("open filters")
+      $('.content-list__filters').removeClass('open')
+      $('.content-list__btns').removeClass('hidden')
     },
   }
 }

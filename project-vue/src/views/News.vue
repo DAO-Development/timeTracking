@@ -4,7 +4,7 @@
       <div class="summary-box__title">
         <h3>Новости</h3>
         <div class="addition-btn" @click="all = true" v-if="!all">
-          К списку новостей
+          <span>К списку новостей</span>
           <back-icon/>
         </div>
       </div>
