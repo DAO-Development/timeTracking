@@ -304,6 +304,18 @@
         padding: 70px 40px;
     }
 
+    .v-application .addition-btn {
+        padding: 17px 25px;
+        font-size: 22px;
+        text-decoration: none;
+        border: 1px solid #616161;
+        border-radius: 30px;
+    }
+
+    .v-application .summary-box__title .addition-btn {
+        flex-direction: row-reverse;
+    }
+
     .content-list__btns-add {
         border: 1px solid #616161;
         border-radius: 30px;
