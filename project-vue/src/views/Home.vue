@@ -1,40 +1,37 @@
 <template>
-  <div class="flex-main">
-    <Menu class="flex-sidebar"/>
-    <div class="profile flex-content">
-      <div class="summary-box">
-        <div class="profile__image">
-          <v-img :lazy-src="require('../../../media'+user.photo_path)"
-                 :src="require('../../../media'+user.photo_path)"></v-img>
-          <div class="profile__change-photo">Сменить фото</div>
-        </div>
-        <div class="profile__info">
-          <h3>Личная информация</h3>
-          <ul>
-            <li>
-              <span class="profile__info-title">Имя</span>
-              <span class="profile__info-content">{{ user.name }}</span>
-            </li>
-            <li>
-              <span class="profile__info-title">Фамилия</span>
-              <span class="profile__info-content">{{ user.lastname }}</span>
-            </li>
-            <li>
-              <span class="profile__info-title">Должность</span>
-              <span class="profile__info-content">{{ user.position }}</span></li>
-          </ul>
-          <h3>Контакты</h3>
-          <ul>
-            <li>
-              <span class="profile__info-title">Телефон</span>
-              <span class="profile__info-content">{{ user.phone }}</span>
-            </li>
-            <li>
-              <span class="profile__info-title">E-mail</span>
-              <span class="profile__info-content">{{ user.auth_user_id.email }}</span>
-            </li>
-          </ul>
-        </div>
+  <div class="profile flex-content">
+    <div class="summary-box">
+      <div class="profile__image">
+        <v-img :lazy-src="require('../../../media'+user.photo_path)"
+               :src="require('../../../media'+user.photo_path)"></v-img>
+        <div class="profile__change-photo">Сменить фото</div>
+      </div>
+      <div class="profile__info">
+        <h3>Личная информация</h3>
+        <ul>
+          <li>
+            <span class="profile__info-title">Имя</span>
+            <span class="profile__info-content">{{ user.name }}</span>
+          </li>
+          <li>
+            <span class="profile__info-title">Фамилия</span>
+            <span class="profile__info-content">{{ user.lastname }}</span>
+          </li>
+          <li>
+            <span class="profile__info-title">Должность</span>
+            <span class="profile__info-content">{{ user.position }}</span></li>
+        </ul>
+        <h3>Контакты</h3>
+        <ul>
+          <li>
+            <span class="profile__info-title">Телефон</span>
+            <span class="profile__info-content">{{ user.phone }}</span>
+          </li>
+          <li>
+            <span class="profile__info-title">E-mail</span>
+            <span class="profile__info-content">{{ user.auth_user_id.email }}</span>
+          </li>
+        </ul>
       </div>
     </div>
     <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
@@ -45,11 +42,9 @@
 
 <script>
 import $ from 'jquery'
-import Menu from "../components/Menu";
 
 export default {
   name: 'Home',
-  components: {Menu},
   data() {
     return {
       page: 'home',

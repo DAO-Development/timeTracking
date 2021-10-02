@@ -1557,7 +1557,7 @@ body {
 @media only screen and (max-width: 1024px) {
     .flex-main {
         display: block;
-        height: auto;
+        /*height: auto;*/
     }
 
     .flex-sidebar {
@@ -1566,10 +1566,10 @@ body {
     }
 
     .flex-content {
-        position: absolute;
-        top: 20px;
-        left: 100%;
-        z-index: 100;
+        /*position: absolute;*/
+        /*top: 20px;*/
+        /*left: 100%;*/
+        /*z-index: 100;*/
         height: auto;
     }
 
@@ -1578,9 +1578,9 @@ body {
         max-height: calc(100vh - 100px);
     }
 
-    .summary-box {
-        display: none;
-    }
+    /*.summary-box {*/
+    /*    display: none;*/
+    /*}*/
 
     .flex-sidebar .summary-box {
         display: block;

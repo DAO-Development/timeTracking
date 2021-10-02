@@ -1,77 +1,77 @@
 <template>
-  <div class="flex-main">
-    <Menu class="flex-sidebar"/>
-    <div class="news flex-content">
-      <div class="summary-box">
-        <div class="summary-box__title">
-          <h3>Новости</h3>
-          <div class="addition-btn" @click="all = true" v-if="!all">
-            К списку новостей
-            <back-icon/>
-          </div>
+  <!--  <div class="flex-main">-->
+  <!--    <Menu class="flex-sidebar"/>-->
+  <div class="news flex-content">
+    <div class="summary-box">
+      <div class="summary-box__title">
+        <h3>Новости</h3>
+        <div class="addition-btn" @click="all = true" v-if="!all">
+          К списку новостей
+          <back-icon/>
         </div>
-        <div class="news-all" v-if="all">
-          <template v-for="item in news">
-            <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)">
-              <div class="news-single__actions">
-                <v-icon @click="deleteNew(item.id)">$waste</v-icon>
-                <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
-              </div>
-              <div class="news-single__title">{{ item.title }}</div>
-              <div class="news-single__text" v-html="item.text"></div>
-            </v-card>
-          </template>
-          <v-card class="news-single news-single-add" @click="openAddForm">
-            <add-new-icon/>
-            <div class="news-single-add__text">Добавить новость</div>
+      </div>
+      <div class="news-all" v-if="all">
+        <template v-for="item in news">
+          <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)">
+            <div class="news-single__actions">
+              <v-icon @click="deleteNew(item.id)">$waste</v-icon>
+              <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
+            </div>
+            <div class="news-single__title">{{ item.title }}</div>
+            <div class="news-single__text" v-html="item.text"></div>
           </v-card>
-        </div>
-        <div class="news-open" v-else>
-          <h4>{{ currentNew.title }}</h4>
-          <div class="news-open__text" v-html="currentNew.text"></div>
-          <div class="news-open__actions">
-            <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
-              <edit-icon/>
-              Редактировать новость
-            </div>
-            <div class="addition-btn" @click="deleteNew(currentNew.id)">
-              <waste-icon/>
-              Удалить новость
-            </div>
+        </template>
+        <v-card class="news-single news-single-add" @click="openAddForm">
+          <add-new-icon/>
+          <div class="news-single-add__text">Добавить новость</div>
+        </v-card>
+      </div>
+      <div class="news-open" v-else>
+        <h4>{{ currentNew.title }}</h4>
+        <div class="news-open__text" v-html="currentNew.text"></div>
+        <div class="news-open__actions">
+          <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
+            <edit-icon/>
+            Редактировать новость
+          </div>
+          <div class="addition-btn" @click="deleteNew(currentNew.id)">
+            <waste-icon/>
+            Удалить новость
           </div>
         </div>
       </div>
-      <v-dialog class="news__dialog" v-model="addForm" persistent>
-        <v-card>
-          <v-toolbar flat>
-            <v-spacer></v-spacer>
-            <v-btn icon @click="closeForm">
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <h3>{{ formTitle }}</h3>
-          <v-card-text>
-            <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
-                          outlined></v-text-field>
-            <v-editor v-model="newNew.text" :config="editorConfig"></v-editor>
-          </v-card-text>
-          <v-card-actions>
-            <!--            <div class="addition-btn">-->
-            <!--              <add-photo-icon/>-->
-            <!--              Загрузить обложку-->
-            <!--            </div>-->
-            <v-spacer></v-spacer>
-            <v-btn class="action-btn" color="primary" @click="addNew">{{ formBtnText }}</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </div>
+    <v-dialog class="news__dialog" v-model="addForm" persistent>
+      <v-card>
+        <v-toolbar flat>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="closeForm">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <h3>{{ formTitle }}</h3>
+        <v-card-text>
+          <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
+                        outlined></v-text-field>
+          <v-editor v-model="newNew.text" :config="editorConfig"></v-editor>
+        </v-card-text>
+        <v-card-actions>
+          <!--            <div class="addition-btn">-->
+          <!--              <add-photo-icon/>-->
+          <!--              Загрузить обложку-->
+          <!--            </div>-->
+          <v-spacer></v-spacer>
+          <v-btn class="action-btn" color="primary" @click="addNew">{{ formBtnText }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
+  <!--  </div>-->
 </template>
 
 <script>
 import $ from "jquery";
-import Menu from "../components/Menu";
+// import Menu from "../components/Menu";
 import AddNewIcon from "../components/icons/addNewIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
@@ -80,7 +80,7 @@ import BackIcon from "../components/icons/backIcon";
 export default {
   name: "News",
   components: {
-    BackIcon, EditIcon, WasteIcon, AddNewIcon, /*AddPhotoIcon, */Menu,
+    BackIcon, EditIcon, WasteIcon, AddNewIcon, /*AddPhotoIcon, Menu,*/
     // 'v-editor': YimoVueEditor.instance
   },
   data() {

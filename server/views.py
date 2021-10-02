@@ -6,6 +6,7 @@ from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
 import datetime
 
+from server.forms import ProfilePhotoForm
 from server.serializers import *
 
 
@@ -66,6 +67,9 @@ class ProfilesView(APIView):
 
     def put(self, request, id=None):
         if id is not None:
+            form = ProfilePhotoForm(request.data)
+            if form.is_valid():
+                return Response({"form": "is valid"})
             return Response({"data": request.data, "id": id})
         saved_profile = get_object_or_404(UserProfile.objects.all(), id=request.data['id'])
         serializer = UserProfileSerializer(saved_profile, data=request.data, partial=True)

@@ -1,42 +1,49 @@
 <template>
-  <v-list dense nav class="menu" color="primary">
-    <h2>Главная</h2>
-    <v-list-item-group v-model="selectedItem">
-      <v-list-item @click="goPage(0)">
-        <v-list-item-content>
-          <v-list-item-title>Профиль</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-list-item @click="goPage(1)">
-        <v-list-item-content>
-          <v-list-item-title>Новости</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-spacer></v-spacer>
-      <v-list-item v-for="(item, i) in items" :key="i" @click="goPage(i+2)">
-        <v-list-item-content>
-          <v-list-item-title v-text="item.text"></v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-spacer></v-spacer>
-      <v-list-item @click="goPage(2+items.length)">
-        <v-list-item-content>
-          <v-list-item-title>Настройки</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-list-item @click="goPage(2+items.length+1)">
-        <v-list-item-content>
-          <v-list-item-title>Выход</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list-item-group>
-    <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
-      {{ alertMsg }}
-    </v-alert>
-    <v-alert v-model="alertSuccess" close-text="Закрыть" color="success" dismissible>
-      {{ alertMsg }}
-    </v-alert>
-  </v-list>
+  <div class="menu">
+    <div class="menu-burger" @click="showMobileMenu">
+      <div class="menu-burger__item"></div>
+      <div class="menu-burger__item"></div>
+      <div class="menu-burger__item"></div>
+    </div>
+    <v-list dense nav class="menu-list" color="primary">
+      <h2>Главная</h2>
+      <v-list-item-group v-model="selectedItem">
+        <v-list-item @click="goPage(0)">
+          <v-list-item-content>
+            <v-list-item-title>Профиль</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="goPage(1)">
+          <v-list-item-content>
+            <v-list-item-title>Новости</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-spacer></v-spacer>
+        <v-list-item v-for="(item, i) in items" :key="i" @click="goPage(i+2)">
+          <v-list-item-content>
+            <v-list-item-title v-text="item.text"></v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-spacer></v-spacer>
+        <v-list-item @click="goPage(2+items.length)">
+          <v-list-item-content>
+            <v-list-item-title>Настройки</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="goPage(2+items.length+1)">
+          <v-list-item-content>
+            <v-list-item-title>Выход</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
+      <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
+        {{ alertMsg }}
+      </v-alert>
+      <v-alert v-model="alertSuccess" close-text="Закрыть" color="success" dismissible>
+        {{ alertMsg }}
+      </v-alert>
+    </v-list>
+  </div>
 </template>
 
 <script>
@@ -88,6 +95,8 @@ export default {
   }),
   methods: {
     goPage(selected) {
+      if ($(".menu").hasClass("open"))
+        $(".menu").removeClass("open")
       switch (selected) {
         case 0:
           this.$router.push({name: "Home"})
@@ -121,6 +130,13 @@ export default {
         },
       })
     },
+    showMobileMenu() {
+      console.log("open menu")
+      if ($(".menu").hasClass("open"))
+        $(".menu").removeClass("open")
+      else
+        $(".menu").addClass("open")
+    }
   }
 }
 </script>
