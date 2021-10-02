@@ -322,7 +322,19 @@
     }
 }
 
+@media screen and (max-width: 768px) {
+    .content-list__filters {
+        flex-wrap: wrap;
+    }
+
+    .content-list__filters .v-input:first-child {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
 @media screen and (max-width: 425px) {
+
     .v-application h1 {
         margin-bottom: 30px;
         font-size: 30px;

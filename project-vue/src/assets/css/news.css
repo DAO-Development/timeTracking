@@ -92,3 +92,10 @@
         height: 370px;
     }
 }
+
+@media screen and (max-width: 768px) {
+    .news .summary-box .news-all__grid {
+        justify-content: center;
+        max-height: 550px;
+    }
+}

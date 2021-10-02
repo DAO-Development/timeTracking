@@ -11,3 +11,13 @@
 .objects-open .objects-open__slider {
     max-width: 45%;
 }
+
+@media screen and (max-width: 768px) {
+    .objects-open .objects-open__slider {
+        max-width: 70%;
+    }
+
+    .objects-open .objects-open__slider .v-slide-group__content {
+        max-width: 85vw;
+    }
+}
