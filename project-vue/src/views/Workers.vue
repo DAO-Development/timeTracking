@@ -35,7 +35,7 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(profile.auth_user_id.email)">
+                <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(profile)">
                   $deleteIcon
                 </v-icon>
               </v-list-item-action>
@@ -440,7 +440,9 @@ export default {
       }
     },
     openConfirmArchiveDialog() {
-      if (!this.currentProfile.active) {
+      console.log(this.currentProfile.id)
+      if ((!this.currentProfile.active && !this.all) || (this.currentProfile.active && this.all)) {
+        this.currentProfile.active = false
         this.confirmArchiveDialog = true
       } else {
         this.editProfile()
@@ -450,11 +452,15 @@ export default {
       this.currentProfile.active = true
       this.confirmArchiveDialog = false
     },
-    openConfirmDeleteDialog(email) {
-      this.currentProfile.email = email
-      this.confirmDeleteDialog = true
+    openConfirmDeleteDialog(item) {
+      this.currentProfile = item
+      this.currentProfile.email = item.auth_user_id.email
+      if (this.archive) {
+        this.confirmDeleteDialog = true
+      } else {
+        this.openConfirmArchiveDialog()
+      }
     },
-
     openFilters() {
       console.log("open filters")
       $('.content-list__filters').addClass('open')

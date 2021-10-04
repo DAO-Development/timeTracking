@@ -50,7 +50,7 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item v-if="!archive" class="content-list__btns-add" @click="addForm=true">
+          <v-list-item v-if="!archive" class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -84,6 +84,16 @@
         <!--          </div>-->
         <div class="objects-open__info profile__info">
           <h3>Информация об объекте</h3>
+          <div class="news-open__actions">
+            <div class="addition-btn" @click="openEditForm(currentObject)">
+              <edit-icon/>
+              Редактировать объект
+            </div>
+            <div class="addition-btn" @click="deleteObject(currentObject.id)">
+              <waste-icon/>
+              Удалить объект
+            </div>
+          </div>
           <ul>
             <li>
               <span class="profile__info-title">Объект сдан</span>
@@ -155,7 +165,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <h3>Добавление объекта</h3>
+        <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-text-field placeholder="Индекс*" v-model="newObject.index" :rules="reqRules" required
                         outlined></v-text-field>
@@ -202,7 +212,7 @@
             Загрузить изображение
           </div>
           <v-spacer></v-spacer>
-          <v-btn class="action-btn" color="primary" @click="addObject">Добавить объект</v-btn>
+          <v-btn class="action-btn" color="primary" @click="addObject">{{ formBtnText }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -237,17 +247,18 @@
       </v-card>
     </v-dialog>
   </div>
-  <!--  </div>-->
 </template>
 
 <script>
 import $ from 'jquery';
 import AddPhotoIcon from "../components/icons/addPhotoIcon";
 import BackIcon from "../components/icons/backIcon";
+import WasteIcon from "../components/icons/wasteIcon";
+import EditIcon from "../components/icons/editIcon";
 
 export default {
   name: "Objects",
-  components: {BackIcon, AddPhotoIcon},
+  components: {EditIcon, WasteIcon, BackIcon, AddPhotoIcon},
   data() {
     return {
       page: 'objects',
