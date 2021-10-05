@@ -43,7 +43,7 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item v-if="!archive" class="content-list__btns-add" @click="addForm=true">
+          <v-list-item v-if="!archive" class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -108,6 +108,16 @@
               <v-checkbox v-model="currentProfile.active" @change="openConfirmArchiveDialog"></v-checkbox>
             </li>
           </ul>
+          <div class="news-open__actions open__actions">
+            <div class="addition-btn" @click="openEditForm(currentProfile)">
+              <edit-icon/>
+              Редактировать объект
+            </div>
+            <div class="addition-btn" @click="openConfirmDeleteDialog(currentProfile)">
+              <waste-icon/>
+              Удалить объект
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -119,7 +129,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <h3>Добавление работника</h3>
+        <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-text-field placeholder="Фамилия*" v-model="newProfile.lastname" :rules="reqRules" required
                         outlined></v-text-field>
@@ -138,7 +148,7 @@
             Конвертировать в .pdf
           </div>
           <v-spacer></v-spacer>
-          <v-btn class="action-btn" color="primary" @click="addUser">Добавить работника</v-btn>
+          <v-btn class="action-btn" color="primary" @click="addUser">{{ formBtnText }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -194,10 +204,12 @@
 import $ from "jquery";
 import PdfIcon from "../components/icons/pdfIcon";
 import BackIcon from "../components/icons/backIcon";
+import EditIcon from "../components/icons/editIcon";
+import WasteIcon from "../components/icons/wasteIcon";
 
 export default {
   name: "Workers",
-  components: {BackIcon, PdfIcon},
+  components: {WasteIcon, EditIcon, BackIcon, PdfIcon},
   data() {
     return {
       page: 'home',
@@ -231,6 +243,8 @@ export default {
         position: "Все",
         email: ""
       },
+      formTitle: "Добавление работника",
+      formBtnText: "Добавить работника",
       addForm: false,
       confirmArchiveDialog: false,
       confirmDeleteDialog: false,
@@ -286,27 +300,31 @@ export default {
       })
     },
     addUser() {
-      if (this.newProfile.position === "Администратор") {
-        this.newProfile.is_staff = true
+      if (this.newProfile.id !== 0) {
+        this.editProfile()
+      } else {
+        if (this.newProfile.position === "Администратор") {
+          this.newProfile.is_staff = true
+        }
+        $.ajax({
+          url: this.$hostname + "time-tracking/user",
+          type: "POST",
+          data: {
+            username: this.newProfile.email,
+            email: this.newProfile.email,
+            is_staff: this.newProfile.is_staff,
+            password: "12345678"
+          },
+          success: (response) => {
+            this.addProfile(response.data.data.id)
+          },
+          error: (response) => {
+            this.alertError = true
+            this.alertMsg = "Непредвиденная ошибка"
+            console.log(response.data)
+          },
+        })
       }
-      $.ajax({
-        url: this.$hostname + "time-tracking/user",
-        type: "POST",
-        data: {
-          username: this.newProfile.email,
-          email: this.newProfile.email,
-          is_staff: this.newProfile.is_staff,
-          password: "12345678"
-        },
-        success: (response) => {
-          this.addProfile(response.data.data.id)
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
     },
     addProfile(id) {
       $.ajax({
@@ -348,8 +366,34 @@ export default {
         },
         success: () => {
           console.log("Профиль изменен")
-          this.loadData()
           this.confirmArchiveDialog = false
+          if (this.addForm) {
+            this.editUser()
+          } else {
+            this.loadData()
+          }
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    editUser() {
+      this.currentProfile.auth_user_id.email = this.newProfile.email
+      $.ajax({
+        url: this.$hostname + "time-tracking/user",
+        type: "PUT",
+        data: {
+          id: this.newProfile.auth_user_id.id,
+          username: this.newProfile.email,
+          email: this.newProfile.email,
+        },
+        success: () => {
+          console.log("Пользователь изменен")
+          this.loadData()
+          this.closeForm()
         },
         error: (response) => {
           this.alertError = true
@@ -439,6 +483,18 @@ export default {
         is_staff: false,
       }
     },
+    openAddForm() {
+      this.formTitle = "Добавление работника"
+      this.formBtnText = "Добавить работника"
+      this.addForm = true
+    },
+    openEditForm(item) {
+      this.formTitle = "Редактирование работника"
+      this.formBtnText = "Сохранить работника"
+      this.newProfile = item
+      this.newProfile.email = item.auth_user_id.email
+      this.addForm = true
+    },
     openConfirmArchiveDialog() {
       console.log(this.currentProfile.id)
       if ((!this.currentProfile.active && !this.all) || (this.currentProfile.active && this.all)) {
@@ -455,7 +511,7 @@ export default {
     openConfirmDeleteDialog(item) {
       this.currentProfile = item
       this.currentProfile.email = item.auth_user_id.email
-      if (this.archive) {
+      if (this.archive || !this.all) {
         this.confirmDeleteDialog = true
       } else {
         this.openConfirmArchiveDialog()

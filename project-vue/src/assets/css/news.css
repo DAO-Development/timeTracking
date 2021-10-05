@@ -67,20 +67,6 @@
     line-height: 110%;
 }
 
-.news .summary-box .news-open__actions {
-    display: flex;
-    gap: 35px;
-    margin-top: 30px;
-}
-
-.news .summary-box .news-open__actions svg {
-    margin-right: 10px;
-}
-
-.news .summary-box .news-open__actions svg > path {
-    fill: #616161;
-}
-
 @media screen and (max-width: 1024px) {
     .news .summary-box .news-all__grid {
         max-height: 880px;
@@ -109,13 +95,6 @@
         padding: 30px 20px;
         width: 300px;
         height: 300px;
-    }
-
-    .news .summary-box .news-open__actions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 30px;
     }
 
     .news .summary-box .news-all .v-list {

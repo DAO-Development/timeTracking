@@ -84,7 +84,7 @@
         <!--          </div>-->
         <div class="objects-open__info profile__info">
           <h3>Информация об объекте</h3>
-          <div class="news-open__actions">
+          <div class="news-open__actions open__actions">
             <div class="addition-btn" @click="openEditForm(currentObject)">
               <edit-icon/>
               Редактировать объект

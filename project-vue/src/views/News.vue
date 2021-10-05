@@ -35,7 +35,7 @@
       <div class="news-open" v-else>
         <h4>{{ currentNew.title }}</h4>
         <div class="news-open__text" v-html="currentNew.text"></div>
-        <div class="news-open__actions">
+        <div class="news-open__actions open__actions">
           <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
             <edit-icon/>
             Редактировать новость

@@ -34,11 +34,11 @@ class UserView(APIView):
             return Response(status=400)
 
     def put(self, request):
-        saved_user = get_object_or_404(User.objects.all(), email=request.data['email'])
+        saved_user = get_object_or_404(User.objects.all(), id=request.data['id'])
         serializer = UserSerializer(saved_user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=201)
+            return Response({"data": serializer.data}, status=201)
         else:
             return Response(status=400)
 
