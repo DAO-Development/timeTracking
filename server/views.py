@@ -67,10 +67,17 @@ class ProfilesView(APIView):
 
     def put(self, request, id=None):
         if id is not None:
-            form = ProfilePhotoForm(request.data)
-            if form.is_valid():
-                return Response({"form": "is valid"})
-            return Response({"data": request.data, "id": id})
+            data = request.data
+            # form = ProfilePhotoForm(request.FILES)
+            # if form.is_valid():
+            #     return Response({"form": "is valid"})
+            # with open('image'+str(id)+'.png', 'wb+') as destination:
+            #     for chunk in request.FILES['image'].chunks():
+            #         destination.write(chunk)
+            # name = "not"
+            # for image in request.FILES:
+            #     name = image.name
+            return Response({"data": data, "id": id})
         saved_profile = get_object_or_404(UserProfile.objects.all(), id=request.data['id'])
         serializer = UserProfileSerializer(saved_profile, data=request.data, partial=True)
         if serializer.is_valid():

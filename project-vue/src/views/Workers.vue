@@ -402,48 +402,87 @@ export default {
         },
       })
     },
-    savePhoto() {
-      console.log(this.photoField.name)
-      // let reader = new FileReader();
-      this.currentProfile.photo_path = "/users/" + this.photoField.name
-      // reader.readAsDataURL(this.photoField)
-      // reader.onload = function () {
-      //   console.log(reader.result);
-      // };
-      // reader.onerror = function (error) {
-      //   console.log('Error: ', error);
-      // };
-      // console.log(this.currentProfile.photo_path.toDataURL(this.currentProfile.photo_path.type, 1.0))
+    makeblob(dataURL) {
+      var BASE64_MARKER = ';base64,';
+      // var parts, contentType, raw, rawLength
+      if (dataURL.indexOf(BASE64_MARKER) === -1) {
+        let parts = dataURL.split(',');
+        let contentType = parts[0].split(':')[1];
+        let raw = decodeURIComponent(parts[1]);
+        return new Blob([raw], {type: contentType});
+      }
+      let parts = dataURL.split(BASE64_MARKER);
+      let contentType = parts[0].split(':')[1];
+      let raw = window.atob(parts[1]);
+      let rawLength = raw.length;
 
-      let fd = new FormData();
-      let avatar = this.photoField;
-      if (avatar !== undefined) {
-        fd.append('image', avatar)
-      } else {
-        console.log("ERROR")
-        return
+      var uInt8Array = new Uint8Array(rawLength);
+
+      for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
       }
 
-      $.ajax({
-        url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
-        type: "PUT",
-        processData: false,
-        data: fd,
-        // data: {
-        //   photo: this.photoField,
-        //   photo_path: this.currentProfile.photo_path
-        // },
-        success: () => {
-          console.log("Профиль изменен")
-          this.loadData()
-          this.photoDialog = false
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
+      return new Blob([uInt8Array], {type: contentType});
+    },
+    savePhoto() {
+      console.log(this.photoField.name)
+      this.currentProfile.photo_path = "/users/" + this.photoField.name
+      // чтение файла как base64
+      let reader = new FileReader();
+      let str;
+      reader.readAsDataURL(this.photoField)
+      reader.onload = function () {
+        str = reader.result
+        console.log(reader.result);
+      };
+      reader.onerror = function (error) {
+        console.log('Error: ', error);
+      };
+
+      console.log(str)
+      // console.log(this.reader.toString())
+      //
+      // var base64ImageContent = reader.toString().replace(/^data:image\/(png|jpg);base64,/, "");
+      // var blob = base64ToBlob(base64ImageContent, 'image/png');
+      // var formData = new FormData();
+      // formData.append('picture', blob);
+
+      // чтение файла в formData
+      // let fd = new FormData();
+      // let avatar = this.photoField;
+      // if (avatar !== undefined) {
+      //   fd.append('image', avatar)
+      // } else {
+      //   console.log("ERROR")
+      //   return
+      // }
+
+      // $.ajax({
+      //   url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
+      //   type: "PUT",
+      //   // contentType: "multipart/form-data; boundary=------WebKitFormBoundary",
+      //   // contentType: "image/png",
+      //   // contentType: 'application/octet-stream',
+      //   processData: false,
+      //   // data: fd,
+      //   data: {
+      //     photo: this.makeblob(reader.result)
+      //   },
+      //   // data: {
+      //   //   photo: this.photoField,
+      //   //   photo_path: this.currentProfile.photo_path
+      //   // },
+      //   success: () => {
+      //     console.log("Профиль изменен")
+      //     this.loadData()
+      //     this.photoDialog = false
+      //   },
+      //   error: (response) => {
+      //     this.alertError = true
+      //     this.alertMsg = "Непредвиденная ошибка"
+      //     console.log(response.data)
+      //   },
+      // })
     },
     deleteUser(email) {
       if (email == null) {
