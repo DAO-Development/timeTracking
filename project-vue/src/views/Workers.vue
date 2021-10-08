@@ -425,21 +425,63 @@ export default {
       return new Blob([uInt8Array], {type: contentType});
     },
     savePhoto() {
+      const file = document.querySelector('input[type=file]').files[0]
       console.log(this.photoField.name)
       this.currentProfile.photo_path = "/users/" + this.photoField.name
-      // чтение файла как base64
-      let reader = new FileReader();
-      let str;
-      reader.readAsDataURL(this.photoField)
-      reader.onload = function () {
-        str = reader.result
-        console.log(reader.result);
-      };
-      reader.onerror = function (error) {
-        console.log('Error: ', error);
-      };
 
-      console.log(str)
+      const reader = new FileReader()
+
+      reader.onload = readerOnLoad;
+
+      let rawImg;
+
+      function readerOnLoad(e) {
+        rawImg = btoa(e.target.result)
+        console.log(rawImg);
+      }
+
+      reader.readAsBinaryString(file);
+      console.log(file)
+
+
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
+        type: "PUT",
+        // contentType: "multipart/form-data; boundary=------WebKitFormBoundary",
+        // contentType: "image/png",
+        // contentType: 'application/octet-stream',
+        processData: false,
+        // data: fd,
+        data: {
+          photo: rawImg
+        },
+        // data: {
+        //   photo: this.photoField,
+        //   photo_path: this.currentProfile.photo_path
+        // },
+        success: () => {
+          console.log("Профиль изменен")
+          this.loadData()
+          this.photoDialog = false
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+      console.log("done ajax")
+      // чтение файла как base64
+      // let reader = new FileReader();
+      // // let str;
+      // reader.readAsDataURL(this.photoField)
+      // reader.onload = function () {
+      //   console.log(reader.result);
+      // };
+      // reader.onerror = function (error) {
+      //   console.log('Error: ', error);
+      // };
+      // console.log(reader.result)
       // console.log(this.reader.toString())
       //
       // var base64ImageContent = reader.toString().replace(/^data:image\/(png|jpg);base64,/, "");
@@ -457,6 +499,7 @@ export default {
       //   return
       // }
 
+
       // $.ajax({
       //   url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
       //   type: "PUT",
@@ -466,7 +509,7 @@ export default {
       //   processData: false,
       //   // data: fd,
       //   data: {
-      //     photo: this.makeblob(reader.result)
+      //     photo: rawImg
       //   },
       //   // data: {
       //   //   photo: this.photoField,
