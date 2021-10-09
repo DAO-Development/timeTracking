@@ -182,7 +182,8 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL': True,
 }
 
-try:
-    from .local_settings import *
-except ImportError:
-    from .prod_settings import *
+# try:
+#     from .local_settings import *
+# except ImportError:
+#     from .prod_settings import *
+from .prod_settings import *
