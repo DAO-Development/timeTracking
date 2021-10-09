@@ -57,11 +57,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'corsheaders.middleware.CorsMiddleware',
+]
 
+MIDDLEWARE_CLASSES = (
     # Simplified static file serving.
     # https://warehouse.python.org/project/whitenoise/
     'whitenoise.middleware.WhiteNoiseMiddleware',
-]
+)
 
 ROOT_URLCONF = 'timeTrack.urls'
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
@@ -171,11 +173,11 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 # smtp
-EMAIL_USE_TLS: True
-EMAIL_HOST: 'smtp.gmail.com'
-EMAIL_HOST_USER: 'polya.bagrowa@gmail.com'
-EMAIL_HOST_PASSWORD: '070801pol'
-EMAIL_PORT: 587
+# EMAIL_USE_TLS: True
+# EMAIL_HOST: 'smtp.gmail.com'
+# EMAIL_HOST_USER: 'polya.bagrowa@gmail.com'
+# EMAIL_HOST_PASSWORD: '070801pol'
+# EMAIL_PORT: 587
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
