@@ -184,6 +184,15 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL': True,
 }
 
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # try:
 #     from .local_settings import *
 # except ImportError:
