@@ -12,3 +12,4 @@ DATABASES = {
 }
 
 django_heroku.settings(locals())
+ALLOWED_HOSTS = ['*']
