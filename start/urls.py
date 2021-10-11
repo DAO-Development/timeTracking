@@ -1,8 +1,8 @@
 # Urls for server app
 
 from django.urls import path
-import views
+from start.views import start
 
 urlpatterns = [
-    path('', views.start),
+    path('', start),
 ]
