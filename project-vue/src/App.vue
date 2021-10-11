@@ -26,6 +26,8 @@ export default {
   name: 'App',
   components: {Menu},
   created() {
+    var $crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
+    console.log($crf_token)
     if (localStorage.getItem('auth_token')) {
       this.auth = true
     } else if (sessionStorage.getItem(('auth_token'))) {
