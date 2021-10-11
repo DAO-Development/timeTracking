@@ -10,10 +10,6 @@ from server.forms import ProfilePhotoForm
 from server.serializers import *
 
 
-def start(request):
-    return render(request, "start/index.html")
-
-
 class UserView(APIView):
     """Пользователи"""
     permission_classes = [permissions.IsAuthenticated]
