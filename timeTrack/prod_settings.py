@@ -4,10 +4,10 @@ import django_heroku
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'work24',
-        'USER': 'r414216',
-        'PASSWORD': 'Koznix-jiwbo5-manjis',
-        'HOST': 'localhost',
+        'NAME': 'd5j18hj8boj3bg',
+        'USER': 'xfcyrotabvetaq',
+        'PASSWORD': 'e186ab96384accbbfc53be365f0c893350cc0c2266f0ae790362b48304f290bc',
+        'HOST': 'ec2-54-147-93-73.compute-1.amazonaws.com',
         'PORT': '5432',
     },
 }
