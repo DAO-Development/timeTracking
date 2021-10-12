@@ -121,7 +121,7 @@
         </div>
       </div>
     </div>
-    <v-dialog v-model="addForm" persistent>
+    <v-dialog v-model="addForm">
       <v-card>
         <v-toolbar flat>
           <v-spacer></v-spacer>
@@ -219,6 +219,7 @@ export default {
       positions: ["Администратор", "Маляр", "Строитель"],
       selects: ["Все", "Администратор", "Маляр", "Строитель"],
       newProfile: {
+        id: 0,
         lastname: "",
         name: "",
         position: "",
