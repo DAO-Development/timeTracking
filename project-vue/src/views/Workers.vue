@@ -558,6 +558,7 @@ export default {
     closeForm() {
       this.addForm = false
       this.newProfile = {
+        id: 0,
         lastname: "",
         name: "",
         position: "",
