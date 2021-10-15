@@ -403,130 +403,30 @@ export default {
         },
       })
     },
-    makeblob(dataURL) {
-      var BASE64_MARKER = ';base64,';
-      // var parts, contentType, raw, rawLength
-      if (dataURL.indexOf(BASE64_MARKER) === -1) {
-        let parts = dataURL.split(',');
-        let contentType = parts[0].split(':')[1];
-        let raw = decodeURIComponent(parts[1]);
-        return new Blob([raw], {type: contentType});
-      }
-      let parts = dataURL.split(BASE64_MARKER);
-      let contentType = parts[0].split(':')[1];
-      let raw = window.atob(parts[1]);
-      let rawLength = raw.length;
-
-      var uInt8Array = new Uint8Array(rawLength);
-
-      for (var i = 0; i < rawLength; ++i) {
-        uInt8Array[i] = raw.charCodeAt(i);
-      }
-
-      return new Blob([uInt8Array], {type: contentType});
-    },
     savePhoto() {
-      const file = document.querySelector('input[type=file]').files[0]
-      console.log(this.photoField.name)
-      this.currentProfile.photo_path = "/users/" + this.photoField.name
-
-      const reader = new FileReader()
-
-      reader.onload = readerOnLoad;
-
-      let rawImg;
-
-      function readerOnLoad(e) {
-        rawImg = btoa(e.target.result)
-        console.log(rawImg);
-      }
-
-      reader.readAsBinaryString(file);
-      console.log(file)
-
-
-      $.ajax({
-        url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
-        type: "PUT",
-        // contentType: "multipart/form-data; boundary=------WebKitFormBoundary",
-        // contentType: "image/png",
-        // contentType: 'application/octet-stream',
-        processData: false,
-        // data: fd,
-        data: {
-          photo: rawImg
-        },
-        // data: {
-        //   photo: this.photoField,
-        //   photo_path: this.currentProfile.photo_path
-        // },
-        success: () => {
-          console.log("Профиль изменен")
-          this.loadData()
-          this.photoDialog = false
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
-      console.log("done ajax")
-      // чтение файла как base64
-      // let reader = new FileReader();
-      // // let str;
-      // reader.readAsDataURL(this.photoField)
-      // reader.onload = function () {
-      //   console.log(reader.result);
-      // };
-      // reader.onerror = function (error) {
-      //   console.log('Error: ', error);
-      // };
-      // console.log(reader.result)
-      // console.log(this.reader.toString())
-      //
-      // var base64ImageContent = reader.toString().replace(/^data:image\/(png|jpg);base64,/, "");
-      // var blob = base64ToBlob(base64ImageContent, 'image/png');
-      // var formData = new FormData();
-      // formData.append('picture', blob);
-
+      const axios = require('axios')
       // чтение файла в formData
-      // let fd = new FormData();
-      // let avatar = this.photoField;
-      // if (avatar !== undefined) {
-      //   fd.append('image', avatar)
-      // } else {
-      //   console.log("ERROR")
-      //   return
-      // }
-
-
-      // $.ajax({
-      //   url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
-      //   type: "PUT",
-      //   // contentType: "multipart/form-data; boundary=------WebKitFormBoundary",
-      //   // contentType: "image/png",
-      //   // contentType: 'application/octet-stream',
-      //   processData: false,
-      //   // data: fd,
-      //   data: {
-      //     photo: rawImg
-      //   },
-      //   // data: {
-      //   //   photo: this.photoField,
-      //   //   photo_path: this.currentProfile.photo_path
-      //   // },
-      //   success: () => {
-      //     console.log("Профиль изменен")
-      //     this.loadData()
-      //     this.photoDialog = false
-      //   },
-      //   error: (response) => {
-      //     this.alertError = true
-      //     this.alertMsg = "Непредвиденная ошибка"
-      //     console.log(response.data)
-      //   },
-      // })
+      let fd = new FormData();
+      let avatar = this.photoField;
+      if (avatar !== undefined) {
+        fd.append('image', avatar)
+      } else {
+        console.log("ERROR")
+        return
+      }
+      axios({
+        method: 'put',
+        url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
+      })
+          .then(response => {
+            console.log(response.data.data)
+            this.photoDialog = false
+            this.photoField = null
+            this.currentProfile.photo_path = response.data.data.name
+            this.loadData()
+          });
     },
     deleteUser(email) {
       if (email == null) {

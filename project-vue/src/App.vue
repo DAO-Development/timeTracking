@@ -19,8 +19,10 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 global.jQuery = global.$ = $;
-global.appUrl = "https://shielded-plateau-96200.herokuapp.com/";
-Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+// global.appUrl = "https://shielded-plateau-96200.herokuapp.com/";
+global.appUrl = "http://127.0.0.1:8000/";
+// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 
 export default {
   name: 'App',

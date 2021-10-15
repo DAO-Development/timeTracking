@@ -360,3 +360,6 @@ pnpm-debug.log*
 #heroku files
 #Procfile
 #runtime.txt
+
+#Migrations
+server/migrations
