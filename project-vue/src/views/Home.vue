@@ -4,7 +4,7 @@
       <div class="profile__image">
         <v-img v-if="user.photo_path != null" :lazy-src="require('../../../media'+user.photo_path)"
                :src="require('../../../media'+user.photo_path)"></v-img>
-        <div class="profile__change-photo">Сменить фото</div>
+<!--        <div class="profile__change-photo">Сменить фото</div>-->
       </div>
       <div class="profile__info">
         <h3>Личная информация</h3>

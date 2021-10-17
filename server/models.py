@@ -7,10 +7,34 @@ class UserProfile(models.Model):
     auth_user_id = models.OneToOneField(User, models.CASCADE, verbose_name='Пользователь')
     name = models.CharField(verbose_name='Имя', max_length=45)
     lastname = models.CharField(verbose_name='Фамилия', max_length=45)
-    phone = models.CharField(verbose_name='Телефон', max_length=45)
-    position = models.CharField(verbose_name='Должность', max_length=60)
+    citizenship = models.CharField(verbose_name='Гражданство', max_length=45)  # todo убрать  Null
+    birthdate = models.DateField(verbose_name='Дата рождения')  # todo убрать Null
+    social_code_own = models.CharField(verbose_name='Номер социального страхования', max_length=20, null=True,
+                                       blank=True)
+    social_code_fin = models.CharField(verbose_name='Финский номер социального страхования', max_length=20, null=True,
+                                       blank=True)
+    address_own = models.JSONField(verbose_name='Адрес в своей стране', null=True, blank=True)
+    address_fin = models.JSONField(verbose_name='Адрес в Финляндии', null=True, blank=True)
+    phone = models.CharField(verbose_name='Телефон', max_length=45, null=True, blank=True)
+    phone_fin = models.CharField(verbose_name='Телефон в Финляндии', max_length=45, null=True, blank=True)
+    position = models.CharField(verbose_name='Специальность', max_length=60)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
     active = models.BooleanField(verbose_name='Работает')
+    bank_account = models.CharField(verbose_name='Счет в банке', max_length=31, null=True, blank=True)
+    tax_number = models.CharField(verbose_name='Налоговый номер', max_length=30, null=True, blank=True)
+    auto = models.BooleanField(verbose_name='Свой автомобиль', default=False)
+    tool = models.BooleanField(verbose_name='Свой инструмент', default=False)
+    english = models.BooleanField(verbose_name='Английский язык', default=False)
+    estonian = models.BooleanField(verbose_name='Эстонский язык', default=False)
+    finnish = models.BooleanField(verbose_name='Финский язык', default=False)
+    russian = models.BooleanField(verbose_name='Русский язык', default=False)
+    other_language = models.CharField(verbose_name='Другой язык', max_length=100, null=True, blank=True)
+    skills = models.TextField(verbose_name='Что умеет делать', max_length=500, null=True, blank=True)
+
+    boots = models.IntegerField(verbose_name='Ботинки', null=True, blank=True)
+    jacket = models.IntegerField(verbose_name='Куртка', null=True, blank=True)
+    pants = models.IntegerField(verbose_name='Штаны', null=True, blank=True)
+    shirt = models.IntegerField(verbose_name='Футболка', null=True, blank=True)
 
     class Meta:
         db_table = "user_profile"
@@ -20,7 +44,8 @@ class UserProfile(models.Model):
 
 class Functions(models.Model):
     """Функции"""
-    name = models.CharField(verbose_name="Название", max_length=45)
+    name = models.CharField(verbose_name="Компонент", max_length=45)
+    text = models.CharField(verbose_name="Название", max_length=45)  # todo убрать Null
 
     class Meta:
         db_table = "functions"
@@ -32,6 +57,8 @@ class GroupFunctions(models.Model):
     """Доступные группам функции"""
     group_id = models.ForeignKey(Group, models.CASCADE, verbose_name='Группа')
     functions_id = models.ForeignKey('Functions', models.CASCADE, verbose_name='Функция')
+    read = models.BooleanField(verbose_name="Чтение", null=True, blank=True)
+    edit = models.BooleanField(verbose_name="Редактирование", null=True, blank=True)
 
     class Meta:
         db_table = "group_functions"
@@ -67,6 +94,7 @@ class News(models.Model):
     title = models.CharField(verbose_name='Заголовок', max_length=100)
     text = models.TextField(verbose_name='Текст новости', max_length=1200)
     author = models.ForeignKey('UserProfile', models.CASCADE, verbose_name='Автор')
+    photo_path = models.CharField(verbose_name='Обложка', max_length=250, null=True, blank=True)
 
     class Meta:
         db_table = "news"
@@ -74,12 +102,24 @@ class News(models.Model):
 
 class Client(models.Model):
     name = models.CharField(verbose_name='Название юрлица', max_length=200)
+    short_name = models.CharField(verbose_name='Краткое название', max_length=50, null=True, blank=True)
     ogrn = models.CharField(verbose_name='ОГРН', max_length=13)
-    business_address = models.CharField(verbose_name='Юр. адрес', max_length=250)
-    warehouse_address = models.CharField(verbose_name='Адрес склада', max_length=250)
+    business_address = models.JSONField(verbose_name='Юр. адрес')
+    warehouse_address = models.JSONField(verbose_name='Адрес доставки', null=True, blank=True)
     phone = models.CharField(verbose_name='Телефон', max_length=45)
     email = models.CharField(verbose_name='Email', max_length=100)
+    site = models.CharField(verbose_name='Сайт', max_length=300, null=True, blank=True)
     logo_path = models.CharField(verbose_name='Путь к логотипу', max_length=250, null=True, blank=True)
+    vat = models.IntegerField(verbose_name='НДС', null=True, blank=True)
+    branch = models.CharField(verbose_name='Отрасль', max_length=150, null=True, blank=True)
+    bank_account = models.CharField(verbose_name='Номер счета в банке', max_length=31, null=True, blank=True)
+    bank = models.CharField(verbose_name='Банк', max_length=200, null=True, blank=True)
+    bic = models.CharField(verbose_name='BIC/SWIFT', max_length=11, null=True, blank=True)
+    account_operator = models.CharField(verbose_name='Оператор электронных счетов', max_length=200, null=True,
+                                        blank=True)
+    index_operator = models.CharField(verbose_name='Индекс посредника', max_length=12, null=True, blank=True)
+    electronic_number = models.CharField(verbose_name='Номер электронных счетов', max_length=31, null=True, blank=True)
+    account_email = models.CharField(verbose_name='Email для счетов', max_length=100, null=True, blank=True)
 
     class Meta:
         db_table = "client"
@@ -93,24 +133,36 @@ class ClientEmployees(models.Model):
     lastname = models.CharField(verbose_name='Фамилия', max_length=45)
     position = models.CharField(verbose_name='Должность', max_length=60)
     phone = models.CharField(verbose_name='Телефон', max_length=45)
+    work_phone = models.CharField(verbose_name='Рабочий телефон', max_length=45, null=True, blank=True)
     email = models.CharField(verbose_name='Email', max_length=100)
+    work_email = models.CharField(verbose_name='Рабочий Email', max_length=100, null=True, blank=True)
+    client = models.ForeignKey(Client, models.CASCADE, verbose_name='Фирма', null=True, blank=True)
+    photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
 
     class Meta:
         db_table = "client_employees"
+        verbose_name = "Контакт"
+        verbose_name_plural = "Контакты"
 
 
 class Objects(models.Model):
     """Объекты"""
-    index = models.CharField(verbose_name='Индекс', max_length=6)
+    index = models.CharField(verbose_name='Индекс', max_length=12)
     city = models.CharField(verbose_name='Город', max_length=45)
     street = models.CharField(verbose_name='Улица', max_length=150)
     house = models.CharField(verbose_name='Дом', max_length=10)
     entrance = models.IntegerField(verbose_name='Подъезд', null=True, blank=True)
     flat = models.CharField(verbose_name='Квартира', max_length=10, null=True, blank=True)
-    date_start = models.DateField(verbose_name='Дата начала')
-    date_end = models.DateField(verbose_name='Дата завершения')
-    active = models.BooleanField(verbose_name='Объект сдан')
+    date_start = models.DateField(verbose_name='Начало работ')
+    date_end = models.DateField(verbose_name='Конец работ')
+    active = models.BooleanField(verbose_name='Объект сдан', default=False)
     client_id = models.ForeignKey("Client", models.CASCADE, verbose_name='Клиент')
+    contact_id = models.ForeignKey("ClientEmployees", models.CASCADE, verbose_name='Контактное лицо')
+    work_description = models.TextField(verbose_name='Описание работ', max_length=1500, null=True, blank=True)
+    habitation = models.CharField(verbose_name='Жилье', max_length=100, null=True, blank=True)
+    accident_insurance = models.CharField(verbose_name='Страховка от несчастных случаев', max_length=100, null=True,
+                                          blank=True)
+    health_insurance = models.CharField(verbose_name='Страховка здоровья', max_length=100, null=True, blank=True)
 
     class Meta:
         db_table = "objects"
@@ -122,6 +174,9 @@ class ObjectUser(models.Model):
     """Рабочие на объектах"""
     user_profile_id = models.ForeignKey("UserProfile", models.CASCADE, verbose_name='Пользователь')
     objects_id = models.ForeignKey("Objects", models.CASCADE, verbose_name='Объект')
+    start_date = models.DateField(verbose_name='Начало работ')  # todo убрать null
+    end_date = models.DateField(verbose_name='Конец работ', null=True, blank=True)
+    comment = models.TextField(verbose_name='Комментарий', max_length=1500, null=True, blank=True)
 
     class Meta:
         db_table = "object_user"
@@ -162,3 +217,5 @@ class TimeReport(models.Model):
 
     class Meta:
         db_table = "time_report"
+        verbose_name = "Часовой отчет"
+        verbose_name_plural = "Часовые отчеты"

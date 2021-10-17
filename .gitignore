@@ -362,4 +362,4 @@ pnpm-debug.log*
 #runtime.txt
 
 #Migrations
-server/migrations
+#server/migrations

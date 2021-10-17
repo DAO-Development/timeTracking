@@ -1,15 +1,12 @@
 <template>
   <v-app>
-    <!--    <Header></Header>-->
     <v-container>
       <div class="flex-main">
         <Menu v-if="auth" class="flex-sidebar"/>
-        <!--        <Menu v-if="auth" class="flex-sidebar"/>-->
         <!--      <Menu v-if="auth"></Menu>-->
-        <router-view v-on:set-auth="setAuth"/>
+        <router-view v-on:set-auth="setAuth" v-on:set-admin="setAdmin"/>
       </div>
     </v-container>
-    <!--    <Footer></Footer>-->
   </v-app>
 </template>
 
@@ -23,13 +20,12 @@ global.jQuery = global.$ = $;
 global.appUrl = "http://127.0.0.1:8000/";
 // Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
 Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+Vue.prototype.$admin = false
 
 export default {
   name: 'App',
   components: {Menu},
   created() {
-    var $crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
-    console.log($crf_token)
     if (localStorage.getItem('auth_token')) {
       this.auth = true
     } else if (sessionStorage.getItem(('auth_token'))) {
@@ -44,6 +40,9 @@ export default {
   methods: {
     setAuth() {
       this.auth = true
+    },
+    setAdmin() {
+      Vue.prototype.$admin = true
     }
   }
 };
