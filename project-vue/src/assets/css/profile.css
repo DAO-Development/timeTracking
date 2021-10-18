@@ -34,6 +34,10 @@
     text-decoration: none;
 }
 
+.profile__info .addition-btn {
+    margin-bottom: 30px;
+}
+
 .profile__info ul {
     display: flex;
     flex-direction: column;
@@ -49,12 +53,36 @@
     align-items: baseline;
 }
 
+.profile__info li .v-input--selection-controls {
+    margin-top: 0;
+}
+
+.profile__info li .v-input__slot {
+    margin-bottom: 0;
+}
+
+.profile__info li .v-message {
+    display: none;
+}
+
 .profile__info-title {
     width: 140px;
     margin-right: 50px;
 }
 
+@media screen and (max-width: 1300px) {
+    .profile .summary-box,
+    .workers-open, .objects-open {
+        display: block;
+    }
+}
+
 @media screen and (max-width: 1024px) {
+    .profile .summary-box,
+    .workers-open, .objects-open {
+        display: flex;
+    }
+
     .profile .summary-box .profile__image,
     .workers-open .profile__image {
         margin-right: 80px;

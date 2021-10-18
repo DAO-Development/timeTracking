@@ -1101,9 +1101,7 @@ body {
 .flex-content {
     width: 100%;
     /*height: 100%;*/
-    /*overflow: auto;*/
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: auto;
     position: relative;
 }
 
@@ -1516,7 +1514,7 @@ body {
 
 @media only screen and (max-width: 1180px) {
     .flex-sidebar {
-        width: 450px;
+        /*width: 450px;*/
         margin-right: 15px;
     }
 

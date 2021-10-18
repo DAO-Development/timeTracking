@@ -103,7 +103,7 @@
 .summary-box {
     margin-top: 30px;
     width: fit-content;
-    min-width: 800px;
+    min-width: 640px;
     max-width: 90%;
     padding: 50px;
 }
@@ -242,6 +242,16 @@
     fill: #616161;
 }
 
+
+.v-dialog .v-form .row {
+    margin: 0;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.v-dialog .row + .row {
+    margin-top: 0;
+}
 
 @media screen and (max-width: 1024px) {
     .summary-box {

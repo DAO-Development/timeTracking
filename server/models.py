@@ -7,8 +7,8 @@ class UserProfile(models.Model):
     auth_user_id = models.OneToOneField(User, models.CASCADE, verbose_name='Пользователь')
     name = models.CharField(verbose_name='Имя', max_length=45)
     lastname = models.CharField(verbose_name='Фамилия', max_length=45)
-    citizenship = models.CharField(verbose_name='Гражданство', max_length=45)  # todo убрать  Null
-    birthdate = models.DateField(verbose_name='Дата рождения')  # todo убрать Null
+    citizenship = models.CharField(verbose_name='Гражданство', max_length=45)
+    birthdate = models.DateField(verbose_name='Дата рождения')
     social_code_own = models.CharField(verbose_name='Номер социального страхования', max_length=20, null=True,
                                        blank=True)
     social_code_fin = models.CharField(verbose_name='Финский номер социального страхования', max_length=20, null=True,

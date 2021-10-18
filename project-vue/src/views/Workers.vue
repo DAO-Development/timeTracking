@@ -88,8 +88,29 @@
               <span class="profile__info-content">{{ currentProfile.lastname }}</span>
             </li>
             <li>
+              <span class="profile__info-title">Дата рождения</span>
+              <span class="profile__info-content">{{ currentProfile.birthdate }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Гражданство</span>
+              <span class="profile__info-content">{{ currentProfile.citizenship }}</span>
+            </li>
+            <li>
               <span class="profile__info-title">Должность</span>
-              <span class="profile__info-content">{{ currentProfile.position }}</span></li>
+              <span class="profile__info-content">{{ currentProfile.position }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Номер соц. страхования</span>
+              <span class="profile__info-content">{{ currentProfile.social_code_own }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Финский номер соц. страхования</span>
+              <span class="profile__info-content">{{ currentProfile.social_code_fin }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Работает</span>
+              <v-checkbox v-model="currentProfile.active" @change="openConfirmArchiveDialog"></v-checkbox>
+            </li>
           </ul>
           <h3>Контакты</h3>
           <ul>
@@ -98,24 +119,110 @@
               <span class="profile__info-content">{{ currentProfile.phone }}</span>
             </li>
             <li>
+              <span class="profile__info-title">Телефон в Финляндии</span>
+              <span class="profile__info-content">{{ currentProfile.phone_fin }}</span>
+            </li>
+            <li>
               <span class="profile__info-title">E-mail</span>
               <span class="profile__info-content">{{ currentProfile.auth_user_id.email }}</span>
             </li>
           </ul>
+          <h3>Банковская информация</h3>
           <ul>
             <li>
-              <span class="profile__info-title">Работает</span>
-              <v-checkbox v-model="currentProfile.active" @change="openConfirmArchiveDialog"></v-checkbox>
+              <span class="profile__info-title">Налоговый номер</span>
+              <span class="profile__info-content">{{ currentProfile.tax_number }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Счет в банке</span>
+              <span class="profile__info-content">{{ currentProfile.bank_account }}</span>
             </li>
           </ul>
+
+          <div class="open__actions">
+            <div class="addition-btn" @click="full = !full">
+              <span v-if="full">Скрыть полную информацию</span>
+              <span v-if="!full">Показать полную информацию</span>
+            </div>
+          </div>
+          <div class="profile__info profile__info-full" v-if="full">
+            <h3>Адреса</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Адрес в своей стране</span>
+                <span class="profile__info-content">{{ currentProfile.address_own }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Адрес в Финляндии</span>
+                <span class="profile__info-content">{{ currentProfile.address_fin }}</span>
+              </li>
+            </ul>
+            <h3>Одежда (размеры)</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Ботинки</span>
+                <span class="profile__info-content">{{ currentProfile.boots }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Куртка</span>
+                <span class="profile__info-content">{{ currentProfile.jacket }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Штаны</span>
+                <span class="profile__info-content">{{ currentProfile.pants }}</span>
+              </li>
+              <li>
+                <span class="profile__info-title">Футболка</span>
+                <span class="profile__info-content">{{ currentProfile.shirt }}</span>
+              </li>
+            </ul>
+            <h3>Языки</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Русский</span>
+                <v-checkbox class="profile__info-content" v-model="currentProfile.russian" disabled></v-checkbox>
+              </li>
+              <li>
+                <span class="profile__info-title">Английский</span>
+                <v-checkbox class="profile__info-content" v-model="currentProfile.english" disabled></v-checkbox>
+              </li>
+              <li>
+                <span class="profile__info-title">Эстонский</span>
+                <v-checkbox class="profile__info-content" v-model="currentProfile.estonian" disabled></v-checkbox>
+              </li>
+              <li>
+                <span class="profile__info-title">Финский</span>
+                <v-checkbox class="profile__info-content" v-model="currentProfile.finnish" disabled></v-checkbox>
+              </li>
+              <li>
+                <span class="profile__info-title">Другие</span>
+                <span class="profile__info-content">{{ currentProfile.other_language }}</span>
+              </li>
+            </ul>
+            <h3>Другое</h3>
+            <ul>
+              <li>
+                <span class="profile__info-title">Свой автомобиль</span>
+                <v-checkbox class="profile__info-content" v-model="currentProfile.auto" disabled></v-checkbox>
+              </li>
+              <li>
+                <span class="profile__info-title">Свой инструмент</span>
+                <v-checkbox class="profile__info-content" v-model="currentProfile.tool" disabled></v-checkbox>
+              </li>
+              <li>
+                <span class="profile__info-title">Навыки</span>
+                <span class="profile__info-content">{{ currentProfile.skills }}</span>
+              </li>
+            </ul>
+          </div>
           <div class="news-open__actions open__actions">
             <div class="addition-btn" @click="openEditForm(currentProfile)">
               <edit-icon/>
-              Редактировать объект
+              Редактировать работника
             </div>
             <div class="addition-btn" @click="openConfirmDeleteDialog(currentProfile)">
               <waste-icon/>
-              Удалить объект
+              Удалить работника
             </div>
           </div>
         </div>
@@ -131,22 +238,98 @@
         </v-toolbar>
         <h3>{{ formTitle }}</h3>
         <v-card-text>
-          <v-text-field placeholder="Фамилия*" v-model="newProfile.lastname" :rules="reqRules" required
-                        outlined></v-text-field>
-          <v-text-field placeholder="Имя*" v-model="newProfile.name" :rules="reqRules"
-                        required outlined></v-text-field>
-          <v-combobox ref="positionCombobox" v-model="newProfile.position" :items="positions" placeholder="Должность*"
-                      outlined dense></v-combobox>
-          <v-text-field placeholder="Почта*" v-model="newProfile.email" :rules="emailRules" required
-                        outlined></v-text-field>
-          <v-text-field placeholder="Телефон*" v-model="newProfile.phone" :rules="phoneRules"
-                        required outlined></v-text-field>
+          <v-form ref="addForm" :model="newProfile">
+            <v-text-field placeholder="Фамилия*" v-model="newProfile.lastname" :rules="reqRules" required
+                          outlined></v-text-field>
+            <v-text-field placeholder="Имя*" v-model="newProfile.name" :rules="reqRules"
+                          required outlined></v-text-field>
+            <v-text-field placeholder="Гражданство*" v-model="newProfile.citizenship" :rules="reqRules"
+                          required outlined></v-text-field>
+            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="newProfile.birthdate"
+                    transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field v-model="newProfile.birthdate" readonly v-bind="attrs" v-on="on"
+                              placeholder="Дата рождения*" :rules="reqRules" outlined></v-text-field>
+              </template>
+              <v-date-picker v-model="newProfile.birthdate" no-title scrollable>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="menu = false"> Cancel</v-btn>
+                <v-btn text color="primary" @click="$refs.menu.save(newProfile.birthdate)"> OK</v-btn>
+              </v-date-picker>
+            </v-menu>
+            <v-text-field placeholder="Номер социального страхования" v-model="newProfile.social_code_own"
+                          outlined></v-text-field>
+            <v-text-field placeholder="Номер соц. страхования в Финляндии*" v-model="newProfile.social_code_fin"
+                          :rules="reqRules" required outlined></v-text-field>
+            <h4>Адрес в своей стране</h4>
+            <v-row>
+              <v-text-field placeholder="Страна" v-model="newProfile.address_own.country" outlined></v-text-field>
+              <v-text-field placeholder="Город" v-model="newProfile.address_own.city" outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Улица" v-model="newProfile.address_own.street" outlined></v-text-field>
+              <v-text-field placeholder="Индекс" v-model="newProfile.address_own.index" outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Дом" v-model="newProfile.address_own.house" outlined></v-text-field>
+              <v-text-field placeholder="Подъезд" v-model="newProfile.address_own.entrance" outlined></v-text-field>
+              <v-text-field placeholder="Квартира" v-model="newProfile.address_own.flat" outlined></v-text-field>
+            </v-row>
+            <h4>Адрес в Финляндии</h4>
+            <v-row>
+              <v-text-field placeholder="Страна" v-model="newProfile.address_fin.country" outlined></v-text-field>
+              <v-text-field placeholder="Город" v-model="newProfile.address_fin.city" outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Улица" v-model="newProfile.address_fin.street" outlined></v-text-field>
+              <v-text-field placeholder="Индекс" v-model="newProfile.address_fin.index" outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Дом" v-model="newProfile.address_fin.house" outlined></v-text-field>
+              <v-text-field placeholder="Подъезд" v-model="newProfile.address_fin.entrance" outlined></v-text-field>
+              <v-text-field placeholder="Квартира" v-model="newProfile.address_fin.flat" outlined></v-text-field>
+            </v-row>
+            <v-text-field placeholder="Телефон" v-model="newProfile.phone" :rules="phoneRules"
+                          required outlined></v-text-field>
+            <v-text-field placeholder="Телефон в Финляндии*" v-model="newProfile.phone_fin" :rules="phoneFinRules"
+                          required outlined></v-text-field>
+            <v-text-field placeholder="Почта*" v-model="newProfile.email" :rules="emailRules" required
+                          outlined></v-text-field>
+            <v-text-field placeholder="Номер счета в банке*" v-model="newProfile.bank_account" :rules="reqRules"
+                          required outlined></v-text-field>
+            <v-text-field placeholder="Налоговый номер*" v-model="newProfile.tax_number" :rules="reqRules" required
+                          outlined></v-text-field>
+            <v-row>
+              <v-checkbox label="Свой автомобиль" v-model="newProfile.auto"></v-checkbox>
+              <v-checkbox label="Свой инструмент" v-model="newProfile.tool"></v-checkbox>
+            </v-row>
+            <h4>Языки</h4>
+            <v-row>
+              <v-checkbox label="Английский" v-model="newProfile.english"></v-checkbox>
+              <v-checkbox label="Финский" v-model="newProfile.finnish"></v-checkbox>
+              <v-checkbox label="Русский" v-model="newProfile.russian"></v-checkbox>
+              <v-checkbox label="Эстонский" v-model="newProfile.estonian"></v-checkbox>
+            </v-row>
+            <v-text-field placeholder="Другие языки" v-model="newProfile.other_language" outlined></v-text-field>
+            <v-combobox ref="positionCombobox" v-model="newProfile.position" :items="positions" placeholder="Должность*"
+                        outlined dense :rules="reqRules"></v-combobox>
+            <v-textarea placeholder="Что умеете делать?" v-model="newProfile.skills" outlined></v-textarea>
+            <h4>Одежда</h4>
+            <v-row>
+              <v-text-field placeholder="Ботинки" v-model="newProfile.boots" outlined></v-text-field>
+              <v-text-field placeholder="Куртка" v-model="newProfile.jacket" outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Штаны" v-model="newProfile.pants" outlined></v-text-field>
+              <v-text-field placeholder="Футболка" v-model="newProfile.shirt" outlined></v-text-field>
+            </v-row>
+          </v-form>
         </v-card-text>
         <v-card-actions>
-          <div class="addition-btn">
-            <pdf-icon/>
-            Конвертировать в .pdf
-          </div>
+          <!--          <div class="addition-btn">-->
+          <!--            <pdf-icon/>-->
+          <!--            Конвертировать в .pdf-->
+          <!--          </div>-->
           <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="addUser">{{ formBtnText }}</v-btn>
         </v-card-actions>
@@ -202,18 +385,19 @@
 
 <script>
 import $ from "jquery";
-import PdfIcon from "../components/icons/pdfIcon";
+// import PdfIcon from "../components/icons/pdfIcon";
 import BackIcon from "../components/icons/backIcon";
 import EditIcon from "../components/icons/editIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 
 export default {
   name: "Workers",
-  components: {WasteIcon, EditIcon, BackIcon, PdfIcon},
+  components: {WasteIcon, EditIcon, BackIcon, /*PdfIcon*/},
   data() {
     return {
       page: 'home',
       all: true,
+      full: false,
       archive: false,
       profiles: {},
       positions: ["Администратор", "Маляр", "Строитель"],
@@ -222,9 +406,46 @@ export default {
         id: 0,
         lastname: "",
         name: "",
-        position: "",
-        email: "",
+        citizenship: "",
+        birthdate: "",
+        social_code_own: "",
+        social_code_fin: "",
+        address_own: {
+          index: '',
+          country: '',
+          city: '',
+          street: '',
+          house: '',
+          entrance: '',
+          flat: '',
+        },
+        address_fin: {
+          index: '',
+          country: '',
+          city: '',
+          street: '',
+          house: '',
+          entrance: '',
+          flat: '',
+        },
         phone: "",
+        phone_fin: "",
+        email: "",
+        bank_account: "",
+        tax_number: "",
+        auto: false,
+        tool: false,
+        english: false,
+        estonian: false,
+        finnish: false,
+        russian: false,
+        other_language: "",
+        position: "",
+        skills: "",
+        boots: null,
+        jacket: null,
+        pants: null,
+        shirt: null,
         is_staff: false,
       },
       currentProfile: {
@@ -251,16 +472,23 @@ export default {
       confirmDeleteDialog: false,
       photoField: null,
       photoDialog: false,
+      menu: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
         v => !!v || 'Необходимо заполнить поле'
       ],
       emailRules: [
-        v => !!v || 'Необходимо заполнить поле'
+        v => !!v || 'Необходимо заполнить поле',
+        v => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'Некорректный E-mail',
       ],
       phoneRules: [
-        v => !!v || 'Необходимо заполнить поле'
+        v => !!v || '',
+        v => /^(\+)?((\d{2,3}) ?\d|\d)(([ -]?\d)|( ?(\d{2,3}) ?)){5,12}\d$/.test(v) || 'Некорректный номер телефона'
+      ],
+      phoneFinRules: [
+        v => !!v || 'Необходимо заполнить поле',
+        v => /^((([+][\s]{0,1})|([0]{2}[\s-]{0,1}))([358]{3})([\s-]{0,1})|([0]{1}))(([1-9]{1}[0-9]{0,1})([\s-]{0,1})([0-9]{2,4})([\s-]{0,1})([0-9]{2,4})([\s-]{0,1}))([0-9]{0,3}){1}$/.test(v) || 'Некорректный номер телефона'
       ],
     }
   },
@@ -301,30 +529,29 @@ export default {
       })
     },
     addUser() {
-      if (this.newProfile.id !== 0) {
-        this.editProfile()
-      } else {
-        if (this.newProfile.position === "Администратор") {
-          this.newProfile.is_staff = true
+      if (this.$refs.addForm.validate()) {
+        if (this.newProfile.id !== 0) {
+          this.editProfile()
+        } else {
+          $.ajax({
+            url: this.$hostname + "time-tracking/user",
+            type: "POST",
+            data: {
+              username: this.newProfile.email,
+              email: this.newProfile.email,
+              is_staff: this.newProfile.is_staff,
+              password: "12345678"
+            },
+            success: (response) => {
+              this.addProfile(response.data.data.id)
+            },
+            error: (response) => {
+              this.alertError = true
+              this.alertMsg = "Непредвиденная ошибка"
+              console.log(response.data)
+            },
+          })
         }
-        $.ajax({
-          url: this.$hostname + "time-tracking/user",
-          type: "POST",
-          data: {
-            username: this.newProfile.email,
-            email: this.newProfile.email,
-            is_staff: this.newProfile.is_staff,
-            password: "12345678"
-          },
-          success: (response) => {
-            this.addProfile(response.data.data.id)
-          },
-          error: (response) => {
-            this.alertError = true
-            this.alertMsg = "Непредвиденная ошибка"
-            console.log(response.data)
-          },
-        })
       }
     },
     addProfile(id) {
