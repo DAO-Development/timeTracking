@@ -25,7 +25,8 @@
             <v-list-item :key="profile.id"
                          v-if="profile.active !== archive && profile.auth_user_id.email.includes(filter.email) && (profile.name + ' ' + profile.lastname).includes(filter.name)  && (profile.position===filter.position || filter.position === 'Все')">
               <v-list-item-avatar class="content-list__image">
-                <v-img v-if="profile.photo_path != null" :src="require('../../../media'+profile.photo_path)"></v-img>
+                <v-img v-if="profile.photo_path != null || profile.photo_path !== ''"
+                       :src="require('../../../media'+profile.photo_path)"></v-img>
               </v-list-item-avatar>
               <v-list-item-content @click="openProfile(profile)">
                 <v-list-item-title>{{ profile.name }} {{ profile.lastname }}</v-list-item-title>
@@ -71,9 +72,10 @@
       </div>
       <div class="workers-open" v-if="!all">
         <div class="profile__image">
-          <v-img v-if="currentProfile.photo_path != null"
-                 :lazy-src="require('../../../media'+currentProfile.photo_path)"
-                 :src="require('../../../media'+currentProfile.photo_path)"></v-img>
+          <v-img
+              v-if="currentProfile.photo_path != null || currentProfile.photo_path !== '' || currentProfile.photo_path !== 'null'"
+              :lazy-src="require('../../../media'+currentProfile.photo_path)"
+              :src="require('../../../media'+currentProfile.photo_path)"></v-img>
           <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
         </div>
         <div class="profile__info">
@@ -150,11 +152,23 @@
             <ul>
               <li>
                 <span class="profile__info-title">Адрес в своей стране</span>
-                <span class="profile__info-content">{{ currentProfile.address_own }}</span>
+                <span class="profile__info-content" v-if="currentProfile.address_own.city !== ''">{{
+                    currentProfile.address_own.index
+                  }} {{ currentProfile.address_own.country }}, г.{{
+                    currentProfile.address_own.city
+                  }}, {{ currentProfile.address_own.street }}, д.{{
+                    currentProfile.address_own.house
+                  }}, {{ currentProfile.address_own.entrance }}, кв.{{ currentProfile.address_own.flat }}</span>
               </li>
               <li>
                 <span class="profile__info-title">Адрес в Финляндии</span>
-                <span class="profile__info-content">{{ currentProfile.address_fin }}</span>
+                <span class="profile__info-content" v-if="currentProfile.address_fin.city !== ''">{{
+                    currentProfile.address_fin.index
+                  }} {{ currentProfile.address_fin.country }}, г.{{
+                    currentProfile.address_fin.city
+                  }}, {{ currentProfile.address_fin.street }}, д.{{
+                    currentProfile.address_fin.house
+                  }}, {{ currentProfile.address_fin.entrance }}, кв.{{ currentProfile.address_fin.flat }}</span>
               </li>
             </ul>
             <h3>Одежда (размеры)</h3>
@@ -239,28 +253,35 @@
         <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-form ref="addForm" :model="newProfile">
-            <v-text-field placeholder="Фамилия*" v-model="newProfile.lastname" :rules="reqRules" required
-                          outlined></v-text-field>
-            <v-text-field placeholder="Имя*" v-model="newProfile.name" :rules="reqRules"
-                          required outlined></v-text-field>
-            <v-text-field placeholder="Гражданство*" v-model="newProfile.citizenship" :rules="reqRules"
-                          required outlined></v-text-field>
-            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="newProfile.birthdate"
-                    transition="scale-transition" offset-y min-width="auto">
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field v-model="newProfile.birthdate" readonly v-bind="attrs" v-on="on"
-                              placeholder="Дата рождения*" :rules="reqRules" outlined></v-text-field>
-              </template>
-              <v-date-picker v-model="newProfile.birthdate" no-title scrollable>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="menu = false"> Cancel</v-btn>
-                <v-btn text color="primary" @click="$refs.menu.save(newProfile.birthdate)"> OK</v-btn>
-              </v-date-picker>
-            </v-menu>
-            <v-text-field placeholder="Номер социального страхования" v-model="newProfile.social_code_own"
-                          outlined></v-text-field>
-            <v-text-field placeholder="Номер соц. страхования в Финляндии*" v-model="newProfile.social_code_fin"
-                          :rules="reqRules" required outlined></v-text-field>
+            <v-row>
+              <v-text-field placeholder="Фамилия*" v-model="newProfile.lastname" :rules="reqRules" required
+                            outlined></v-text-field>
+              <v-text-field placeholder="Имя*" v-model="newProfile.name" :rules="reqRules"
+                            required outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Гражданство*" v-model="newProfile.citizenship" :rules="reqRules"
+                            required outlined></v-text-field>
+              <v-menu ref="menu" v-model="menu" :close-on-content-click="false"
+                      :return-value.sync="newProfile.birthdate"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newProfile.birthdate" readonly v-bind="attrs" v-on="on"
+                                placeholder="Дата рождения*" :rules="reqRules" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="newProfile.birthdate" no-title scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="menu = false"> Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.menu.save(newProfile.birthdate)"> OK</v-btn>
+                </v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Номер социального страхования" v-model="newProfile.social_code_own"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Номер соц. страхования в Финляндии*" v-model="newProfile.social_code_fin"
+                            :rules="reqRules" required outlined></v-text-field>
+            </v-row>
             <h4>Адрес в своей стране</h4>
             <v-row>
               <v-text-field placeholder="Страна" v-model="newProfile.address_own.country" outlined></v-text-field>
@@ -289,10 +310,12 @@
               <v-text-field placeholder="Подъезд" v-model="newProfile.address_fin.entrance" outlined></v-text-field>
               <v-text-field placeholder="Квартира" v-model="newProfile.address_fin.flat" outlined></v-text-field>
             </v-row>
-            <v-text-field placeholder="Телефон" v-model="newProfile.phone" :rules="phoneRules"
-                          required outlined></v-text-field>
-            <v-text-field placeholder="Телефон в Финляндии*" v-model="newProfile.phone_fin" :rules="phoneFinRules"
-                          required outlined></v-text-field>
+            <v-row>
+              <v-text-field placeholder="Телефон" v-model="newProfile.phone" :rules="phoneRules"
+                            required outlined></v-text-field>
+              <v-text-field placeholder="Телефон в Финляндии*" v-model="newProfile.phone_fin" :rules="phoneFinRules"
+                            required outlined></v-text-field>
+            </v-row>
             <v-text-field placeholder="Почта*" v-model="newProfile.email" :rules="emailRules" required
                           outlined></v-text-field>
             <v-text-field placeholder="Номер счета в банке*" v-model="newProfile.bank_account" :rules="reqRules"
@@ -318,8 +341,6 @@
             <v-row>
               <v-text-field placeholder="Ботинки" v-model="newProfile.boots" outlined></v-text-field>
               <v-text-field placeholder="Куртка" v-model="newProfile.jacket" outlined></v-text-field>
-            </v-row>
-            <v-row>
               <v-text-field placeholder="Штаны" v-model="newProfile.pants" outlined></v-text-field>
               <v-text-field placeholder="Футболка" v-model="newProfile.shirt" outlined></v-text-field>
             </v-row>
@@ -447,6 +468,7 @@ export default {
         pants: null,
         shirt: null,
         is_staff: false,
+        photo_path: null,
       },
       currentProfile: {
         id: 0,
@@ -552,6 +574,9 @@ export default {
             },
           })
         }
+      } else {
+        this.alertError = true
+        this.alertMsg = "Заполните все обязательные поля"
       }
     },
     addProfile(id) {
@@ -562,14 +587,36 @@ export default {
           auth_user_id: id,
           name: this.newProfile.name,
           lastname: this.newProfile.lastname,
-          position: this.newProfile.position,
+          citizenship: this.newProfile.citizenship,
+          birthdate: this.newProfile.birthdate,
+          social_code_own: this.newProfile.social_code_own,
+          social_code_fin: this.newProfile.social_code_fin,
+          address_own: JSON.stringify(this.newProfile.address_own),
+          address_fin: JSON.stringify(this.newProfile.address_fin),
           phone: this.newProfile.phone,
-          active: true
+          phone_fin: this.newProfile.phone_fin,
+          bank_account: this.newProfile.bank_account,
+          tax_number: this.newProfile.tax_number,
+          auto: this.newProfile.auto,
+          tool: this.newProfile.tool,
+          english: this.newProfile.english,
+          estonian: this.newProfile.estonian,
+          finnish: this.newProfile.finnish,
+          russian: this.newProfile.russian,
+          other_language: this.newProfile.other_language,
+          position: this.newProfile.position,
+          skills: this.newProfile.skills,
+          boots: this.newProfile.boots,
+          jacket: this.newProfile.jacket,
+          pants: this.newProfile.pants,
+          shirt: this.newProfile.shirt,
+          photo_path: this.currentProfile.photo_path,
+          active: true,
         },
         success: () => {
           this.alertMsg = "Пользователь добавлен"
-          this.loadData()
           this.closeForm()
+          this.loadData()
         },
         error: (response) => {
           this.alertError = true
@@ -582,16 +629,7 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/profiles",
         type: "PUT",
-        data: {
-          id: this.currentProfile.id,
-          auth_user_id: this.currentProfile.auth_user_id,
-          name: this.currentProfile.name,
-          lastname: this.currentProfile.lastname,
-          position: this.currentProfile.position,
-          phone: this.currentProfile.phone,
-          active: this.currentProfile.active,
-          // photo_path: this.currentProfile.photo_path
-        },
+        data: this.currentProfile,
         success: () => {
           console.log("Профиль изменен")
           this.confirmArchiveDialog = false
@@ -688,9 +726,47 @@ export default {
         id: 0,
         lastname: "",
         name: "",
-        position: "",
-        email: "",
+        citizenship: "",
+        birthdate: "",
+        social_code_own: "",
+        social_code_fin: "",
+        address_own: {
+          index: '',
+          country: '',
+          city: '',
+          street: '',
+          house: '',
+          entrance: '',
+          flat: '',
+        },
+        address_fin: {
+          index: '',
+          country: '',
+          city: '',
+          street: '',
+          house: '',
+          entrance: '',
+          flat: '',
+        },
         phone: "",
+        phone_fin: "",
+        email: "",
+        bank_account: "",
+        tax_number: "",
+        auto: false,
+        tool: false,
+        english: false,
+        estonian: false,
+        finnish: false,
+        russian: false,
+        other_language: "",
+        position: "",
+        skills: "",
+        boots: null,
+        jacket: null,
+        pants: null,
+        shirt: null,
+        photo_path: null,
         is_staff: false,
       }
     },

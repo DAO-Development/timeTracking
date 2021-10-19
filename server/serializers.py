@@ -46,7 +46,10 @@ class UserProfilePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('auth_user_id', 'name', 'lastname', 'phone', 'position', 'photo_path', 'active')
+        fields = ('auth_user_id', 'name', 'lastname', 'photo_path', 'active', 'citizenship', 'birthdate',
+                  'social_code_own', 'social_code_fin', 'address_own', 'address_fin', 'phone', 'phone_fin',
+                  'bank_account', 'tax_number', 'auto', 'tool', 'english', 'estonian', 'finnish', 'russian',
+                  'other_language', 'position', 'skills', 'boots', 'jacket', 'pants', 'shirt')
 
 
 class GroupSerializer(serializers.ModelSerializer):
