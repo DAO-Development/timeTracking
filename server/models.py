@@ -93,7 +93,6 @@ class News(models.Model):
     """Новости"""
     title = models.CharField(verbose_name='Заголовок', max_length=100)
     text = models.TextField(verbose_name='Текст новости', max_length=1200)
-    author = models.ForeignKey('UserProfile', models.CASCADE, verbose_name='Автор')
     photo_path = models.CharField(verbose_name='Обложка', max_length=250, null=True, blank=True)
 
     class Meta:

@@ -11,7 +11,16 @@
       <div class="news-all" v-if="all">
         <div class="news-all__grid">
           <template v-for="item in news">
-            <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)">
+            <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)" v-if="item.photo_path"
+                    v-bind:style="{'background-image': 'url('+require('../../../media'+item.photo_path)+ ')', 'background-size': 'cover', 'background-position': 'center'}">
+              <div class="news-single__actions">
+                <v-icon @click="deleteNew(item.id)">$waste</v-icon>
+                <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
+              </div>
+              <div class="news-single__title">{{ item.title }}</div>
+              <div class="news-single__text" v-html="item.text"></div>
+            </v-card>
+            <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)" v-else>
               <div class="news-single__actions">
                 <v-icon @click="deleteNew(item.id)">$waste</v-icon>
                 <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
@@ -34,6 +43,9 @@
       </div>
       <div class="news-open" v-else>
         <h4>{{ currentNew.title }}</h4>
+        <div class="news-open__image">
+          <v-img v-if="currentNew.photo_path" :src="require('../../../media'+currentNew.photo_path)"></v-img>
+        </div>
         <div class="news-open__text" v-html="currentNew.text"></div>
         <div class="news-open__actions open__actions">
           <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
@@ -47,7 +59,7 @@
         </div>
       </div>
     </div>
-    <v-dialog class="news__dialog" v-model="addForm" persistent>
+    <v-dialog class="news__dialog" v-model="addForm">
       <v-card>
         <v-toolbar flat>
           <v-spacer></v-spacer>
@@ -57,17 +69,38 @@
         </v-toolbar>
         <h3>{{ formTitle }}</h3>
         <v-card-text>
-          <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
-                        outlined></v-text-field>
-          <v-editor v-model="newNew.text" :config="editorConfig"></v-editor>
+          <v-form ref="form">
+            <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
+                          outlined></v-text-field>
+            <v-editor v-model="newNew.text" :config="editorConfig"></v-editor>
+          </v-form>
+          <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
+            {{ alertMsg }}
+          </v-alert>
         </v-card-text>
         <v-card-actions>
-          <!--            <div class="addition-btn">-->
-          <!--              <add-photo-icon/>-->
-          <!--              Загрузить обложку-->
-          <!--            </div>-->
+          <div class="addition-btn" @click="photoDialog=true">
+            <add-photo-icon/>
+            <span v-if="newNew.photo_path == null">Загрузить обложку</span>
+            <span v-if="newNew.photo_path != null">Сменить обложку</span>
+          </div>
           <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="addNew">{{ formBtnText }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="photoDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Сменить фото
+        </v-card-title>
+        <v-card-text>
+          <v-file-input v-model="newNew.photo_path" placeholder="Обложка новости" accept="image/*"
+                        prepend-icon="" outlined></v-file-input>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="closePhotoForm">Сохранить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -79,12 +112,11 @@ import $ from "jquery";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
 import BackIcon from "../components/icons/backIcon";
+import AddPhotoIcon from "../components/icons/addPhotoIcon"
 
 export default {
   name: "News",
-  components: {
-    BackIcon, EditIcon, WasteIcon, /*AddPhotoIcon,*/
-  },
+  components: {BackIcon, EditIcon, WasteIcon, AddPhotoIcon},
   data() {
     return {
       page: 'news',
@@ -94,12 +126,13 @@ export default {
         id: 0,
         title: '',
         text: '',
-        plainText: '',
+        photo_path: null,
       },
       currentNew: {
         id: 0,
         title: '',
-        text: ''
+        text: '',
+        photo_path: null
       },
       titleRules: [
         v => !!v || 'Необходимо ввести заголовок'
@@ -107,6 +140,7 @@ export default {
       formTitle: "Добавление новости",
       formBtnText: "Добавить новость",
       addForm: false,
+      photoDialog: false,
       alertError: false,
       alertSuccess: false,
       alertMsg: '',
@@ -196,55 +230,68 @@ export default {
       })
     },
     addNew() {
-      console.log(this.newNew.id + " " + this.newNew.title)
-      console.log(this.newNew.text)
-      if (this.newNew.id > 0)
-        this.editNew()
-      else
-        $.ajax({
-          url: this.$hostname + "time-tracking/news",
-          type: "POST",
-          data: {
-            title: this.newNew.title,
-            text: this.newNew.text,
-          },
-          success: () => {
-            this.alertMsg = "Новость добавлена"
-            this.loadData()
-            this.addForm = false
-          },
-          error: (response) => {
-            this.alertError = true
-            this.alertMsg = "Непредвиденная ошибка"
-            console.log(response.data)
-          },
-        })
+      if (this.$refs.form.validate()) {
+        console.log(this.newNew.id + " " + this.newNew.title)
+        console.log(this.newNew.text)
+        if (this.newNew.id > 0)
+          this.editNew()
+        else {
+          const axios = require('axios')
+          // чтение файла в formData
+          let fd = new FormData();
+          let photo = this.newNew.photo_path;
+          if (this.newNew.photo_path !== undefined) {
+            fd.append('image', photo)
+          } else {
+            console.log("ERROR")
+            return
+          }
+          fd.append('title', this.newNew.title)
+          fd.append('text', this.newNew.text)
+          axios({
+            method: 'post',
+            url: this.$hostname + "time-tracking/news",
+            headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+            data: fd
+          })
+              .then(response => {
+                console.log(response.data.data)
+                this.photoDialog = false
+                this.closeForm()
+                this.loadData()
+              });
+        }
+      } else {
+        this.alertError = true
+        this.alertMsg = "Заполните обязательные поля"
+      }
     },
     editNew() {
-      $.ajax({
+      const axios = require('axios')
+      // чтение файла в formData
+      let fd = new FormData();
+      let photo = this.newNew.photo_path;
+      if (this.newNew.photo_path !== null) {
+        fd.append('image', photo)
+      } else {
+        console.log("ERROR")
+        return
+      }
+      fd.append('title', this.newNew.title)
+      fd.append('text', this.newNew.text)
+      fd.append('id', this.newNew.id)
+      axios({
+        method: 'put',
         url: this.$hostname + "time-tracking/news",
-        type: "PUT",
-        data: {
-          id: this.newNew.id,
-          title: this.newNew.title,
-          text: this.newNew.text
-        },
-        success: () => {
-          this.alertMsg = "Новость изменена"
-          this.loadData()
-          this.currentNew = {
-            id: this.newNew.id,
-            title: this.newNew.title,
-            text: this.newNew.text
-          }
-          this.closeForm()
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
       })
+          .then(response => {
+            console.log(response.data.data)
+            this.photoDialog = false
+            this.closeForm()
+            this.loadData()
+          });
     },
     deleteNew(id) {
       $.ajax({
@@ -283,16 +330,20 @@ export default {
     closeForm() {
       this.addForm = false
       this.newNew = {
+        id: 0,
         title: "",
         text: "",
+        photo: null
       }
+    },
+    closePhotoForm() {
+      if (this.newNew.photo_path !== null)
+        this.currentNew.photo_path = '/news/' + this.newNew.photo_path.name
+      this.photoDialog = false
     },
     openNew(item) {
       this.currentNew = item
-      this.currentNew.text = this.currentNew.text.replaceAll('&lt;', '<').replaceAll('&gt;', '>')
-      console.log(this.currentNew.text.replaceAll('&lt;', '<').replaceAll('&gt;', '>'))
-      // this.currentNew.text = innerHtml(this.currentNew.text)
-      // document.getElementById('div').innerHtml(this.currentNew.text)
+      // this.currentNew.text = this.currentNew.text.replaceAll('&lt;', '<').replaceAll('&gt;', '>')
       this.all = false
     }
   }

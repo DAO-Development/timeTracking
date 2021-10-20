@@ -65,7 +65,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ('id', 'title', 'text', 'author')
+        fields = ('id', 'title', 'text', 'photo_path')
 
 
 class NewsPostSerializer(serializers.ModelSerializer):
@@ -73,7 +73,7 @@ class NewsPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ('title', 'text', 'author')
+        fields = ('title', 'text', 'photo_path')
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -81,7 +81,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ('id', 'name', 'ogrn', 'business_address', 'warehouse_address', 'phone', 'email', 'logo_path')
+        fields = '__all__'
 
 
 class ClientPostSerializer(serializers.ModelSerializer):

@@ -67,7 +67,6 @@ class ProfilesView(APIView):
 
     def put(self, request, id=None):
         if id is not None:
-            # name = '/users/user' + str(id) + '.png'
             name = '/users/' + request.FILES['image'].name
             with open('media' + name, 'wb+') as destination:
                 for chunk in request.FILES['image'].chunks():
@@ -120,12 +119,17 @@ class NewsView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        user = UserSerializer(request.user)
-        user_profile = UserProfileSerializer(get_object_or_404(UserProfile.objects.all(), auth_user_id=user.data["id"]))
+        name = ''
+        if len(request.FILES) == 1:
+            name = '/news/' + request.FILES['image'].name
+            with open('media' + name, 'wb+') as destination:
+                for chunk in request.FILES['image'].chunks():
+                    destination.write(chunk)
+
         serializer = NewsPostSerializer(data={
             "title": request.data["title"],
             "text": request.data["text"],
-            "author": user_profile.data["id"]
+            "photo_path": name
         })
         if serializer.is_valid():
             serializer.save()
@@ -135,8 +139,21 @@ class NewsView(APIView):
 
     def put(self, request):
         saved_news = get_object_or_404(News.objects.all(), id=request.data["id"])
-        data = request.data
-        serializer = NewsSerializer(saved_news, data=data, partial=True)
+        name = ''
+        if len(request.FILES) == 1:
+            name = '/news/' + request.FILES['image'].name
+            with open('media' + name, 'wb+') as destination:
+                for chunk in request.FILES['image'].chunks():
+                    destination.write(chunk)
+            serializer = NewsSerializer(saved_news, data={
+                "title": request.data["title"],
+                "text": request.data["text"],
+                "photo_path": name
+            }, partial=True)
+        serializer = NewsSerializer(saved_news, data={
+            "title": request.data["title"],
+            "text": request.data["text"]
+        }, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

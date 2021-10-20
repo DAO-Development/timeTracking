@@ -25,8 +25,7 @@
             <v-list-item :key="profile.id"
                          v-if="profile.active !== archive && profile.auth_user_id.email.includes(filter.email) && (profile.name + ' ' + profile.lastname).includes(filter.name)  && (profile.position===filter.position || filter.position === 'Все')">
               <v-list-item-avatar class="content-list__image">
-                <v-img v-if="profile.photo_path != null || profile.photo_path !== ''"
-                       :src="require('../../../media'+profile.photo_path)"></v-img>
+                <v-img v-if="profile.photo_path" :src="require('../../../media'+profile.photo_path)"></v-img>
               </v-list-item-avatar>
               <v-list-item-content @click="openProfile(profile)">
                 <v-list-item-title>{{ profile.name }} {{ profile.lastname }}</v-list-item-title>
@@ -73,8 +72,7 @@
       <div class="workers-open" v-if="!all">
         <div class="profile__image">
           <v-img
-              v-if="currentProfile.photo_path != null || currentProfile.photo_path !== '' || currentProfile.photo_path !== 'null'"
-              :lazy-src="require('../../../media'+currentProfile.photo_path)"
+              v-if="currentProfile.photo_path" :lazy-src="require('../../../media'+currentProfile.photo_path)"
               :src="require('../../../media'+currentProfile.photo_path)"></v-img>
           <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
         </div>
