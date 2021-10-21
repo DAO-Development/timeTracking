@@ -17,4 +17,6 @@ urlpatterns = [
     path('objects/employees/<int:objects_id>', ObjectUserView.as_view()),
     path('objects/photos/<int:objects_id>', ObjectPhotoView.as_view()),
     path('clients', ClientView.as_view()),
+    path('clients-employees', ClientEmployeesView.as_view()),
+    path('clients-employees/<int:client_id>', ClientEmployeesView.as_view()),
 ]

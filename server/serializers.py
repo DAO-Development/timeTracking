@@ -89,18 +89,28 @@ class ClientPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ('name', 'ogrn', 'business_address', 'warehouse_address', 'phone', 'email', 'logo_path')
+        fields = '__all__'
+
+
+class ClientEmployeesSerializer(serializers.ModelSerializer):
+    """Сериализация сотрудников клиентов"""
+
+    client = ClientSerializer()
+
+    class Meta:
+        model = ClientEmployees
+        fields = '__all__'
 
 
 class ObjectsSerializer(serializers.ModelSerializer):
     """Сериализация объектов"""
 
     client_id = ClientSerializer()
+    contact_id = ClientEmployeesSerializer()
 
     class Meta:
         model = Objects
-        fields = ('id', 'index', 'city', 'street', 'house', 'entrance', 'flat', 'date_start', 'date_end',
-                  'active', 'client_id')
+        fields = '__all__'
 
 
 class ObjectsPostSerializer(serializers.ModelSerializer):
@@ -109,7 +119,7 @@ class ObjectsPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Objects
         fields = ('index', 'city', 'street', 'house', 'entrance', 'flat', 'date_start', 'date_end',
-                  'active', 'client_id')
+                  'active', 'client_id', 'contact_id', 'habitation', 'accident_insurance', 'health_insurance')
 
 
 class ObjectUserSerializer(serializers.ModelSerializer):

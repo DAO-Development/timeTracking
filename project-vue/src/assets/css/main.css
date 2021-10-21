@@ -278,6 +278,7 @@
         height: 100vh;
         padding: 70px 0;
         transition: 0.3s ease-in-out;
+        overflow: hidden;
     }
 
     .menu:not(.open).flex-sidebar .menu-list .v-list-item-group .v-list-item--active {

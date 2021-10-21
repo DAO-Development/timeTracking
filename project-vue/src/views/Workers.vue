@@ -630,10 +630,10 @@ export default {
         data: this.currentProfile,
         success: () => {
           console.log("Профиль изменен")
-          this.confirmArchiveDialog = false
           if (this.addForm) {
             this.editUser()
           } else {
+            this.confirmArchiveDialog = false
             this.loadData()
           }
         },

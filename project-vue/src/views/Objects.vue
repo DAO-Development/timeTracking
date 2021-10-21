@@ -32,7 +32,7 @@
             </v-date-picker>
           </v-menu>
         </div>
-        <v-list three-line class="objects__list content-list" v-if="all">
+        <v-list three-line class="objects__list content-list">
           <template v-for="object in objects">
             <v-list-item :key="object.id"
                          v-if="object.active === archive && (object.city + ' ' + object.street + ' ' + object.house).includes(filter.address) && (filter.client==='Все' || object.client_id.name===filter.client) && ((typeof(filter.dates[0]) === 'undefined' || object.date_start >= filter.dates[0]) && (object.date_start <= filter.dates[1] || typeof(filter.dates[1]) === 'undefined'))">
@@ -44,7 +44,7 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(object.id)">$deleteIcon</v-icon>
+                <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(object)">$deleteIcon</v-icon>
               </v-list-item-action>
             </v-list-item>
           </template>
@@ -138,6 +138,25 @@
               <span class="profile__info-content">{{ currentObject.index }}</span>
             </li>
           </ul>
+          <h3>Контактное лицо</h3>
+          <ul>
+            <li>
+              <span class="profile__info-title">Фамилия</span>
+              <span class="profile__info-content">{{ currentObject.contact_id.lastname }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Имя</span>
+              <span class="profile__info-content">{{ currentObject.contact_id.name }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Телефон</span>
+              <span class="profile__info-content">{{ currentObject.contact_id.work_phone }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">E-mail</span>
+              <span class="profile__info-content">{{ currentObject.contact_id.work_email }}</span>
+            </li>
+          </ul>
           <h3>Работники</h3>
           <ul>
 
@@ -157,7 +176,7 @@
         </div>
       </div>
     </div>
-    <v-dialog v-model="addForm" persistent>
+    <v-dialog v-model="addForm">
       <v-card>
         <v-toolbar flat>
           <v-spacer></v-spacer>
@@ -167,50 +186,72 @@
         </v-toolbar>
         <h3>{{ formTitle }}</h3>
         <v-card-text>
-          <v-text-field placeholder="Индекс*" v-model="newObject.index" :rules="reqRules" required
-                        outlined></v-text-field>
-          <v-text-field placeholder="Город*" v-model="newObject.city" :rules="reqRules"
-                        required outlined></v-text-field>
-          <v-text-field placeholder="Улица*" v-model="newObject.street" :rules="reqRules" required
-                        outlined></v-text-field>
-          <v-text-field placeholder="Дом*" v-model="newObject.house" :rules="reqRules"
-                        required outlined></v-text-field>
-          <v-text-field placeholder="Подъезд" v-model="newObject.entrance" outlined></v-text-field>
-          <v-text-field placeholder="Квартира" v-model="newObject.flat" outlined></v-text-field>
-          <v-menu ref="menu_start" v-model="datePickers.menu_start" :close-on-content-click="false"
-                  :return-value.sync="newObject.date_start"
-                  transition="scale-transition" offset-y min-width="auto">
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field v-model="newObject.date_start" placeholder="Начало работ*" readonly v-bind="attrs"
-                            v-on="on" outlined></v-text-field>
-            </template>
-            <v-date-picker v-model="newObject.date_start" no-title scrollable color="primary">
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="datePickers.menu_start = false"> Cancel</v-btn>
-              <v-btn text color="primary" @click="$refs.menu_start.save(newObject.date_start)">OK</v-btn>
-            </v-date-picker>
-          </v-menu>
-          <v-menu ref="menu_end" v-model="datePickers.menu_end" :close-on-content-click="false"
-                  :return-value.sync="newObject.date_end"
-                  transition="scale-transition" offset-y min-width="auto">
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field v-model="newObject.date_end" placeholder="Окончание работ" readonly v-bind="attrs"
-                            v-on="on" outlined></v-text-field>
-            </template>
-            <v-date-picker v-model="newObject.date_end" no-title scrollable color="primary">
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="datePickers.menu_end = false"> Cancel</v-btn>
-              <v-btn text color="primary" @click="$refs.menu_end.save(newObject.date_end)">OK</v-btn>
-            </v-date-picker>
-          </v-menu>
-          <v-select ref="positionCombobox" v-model="newObject.client_id" :items="clients" item-text="name"
-                    item-value="id" placeholder="Клиент*" outlined dense></v-select>
+          <v-form ref="form">
+            <v-text-field placeholder="Индекс*" v-model="newObject.index" :rules="reqRules" required
+                          outlined></v-text-field>
+            <v-row>
+              <v-text-field placeholder="Город*" v-model="newObject.city" :rules="reqRules"
+                            required outlined></v-text-field>
+              <v-text-field placeholder="Улица*" v-model="newObject.street" :rules="reqRules" required
+                            outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Дом*" v-model="newObject.house" :rules="reqRules"
+                            required outlined></v-text-field>
+              <v-text-field placeholder="Подъезд" v-model="newObject.entrance" outlined></v-text-field>
+              <v-text-field placeholder="Квартира" v-model="newObject.flat" outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-menu ref="menu_start" v-model="datePickers.menu_start" :close-on-content-click="false"
+                      :return-value.sync="newObject.date_start"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newObject.date_start" placeholder="Начало работ*" readonly v-bind="attrs"
+                                v-on="on" outlined :rules="reqRules"></v-text-field>
+                </template>
+                <v-date-picker v-model="newObject.date_start" no-title scrollable color="primary">
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="datePickers.menu_start = false"> Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.menu_start.save(newObject.date_start)">OK</v-btn>
+                </v-date-picker>
+              </v-menu>
+              <v-menu ref="menu_end" v-model="datePickers.menu_end" :close-on-content-click="false"
+                      :return-value.sync="newObject.date_end"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newObject.date_end" placeholder="Окончание работ" readonly v-bind="attrs"
+                                v-on="on" outlined :rules="reqRules"></v-text-field>
+                </template>
+                <v-date-picker v-model="newObject.date_end" no-title scrollable color="primary">
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="datePickers.menu_end = false"> Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.menu_end.save(newObject.date_end)">OK</v-btn>
+                </v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-row>
+              <v-select v-model="newObject.client_id" :items="clients" item-text="name" item-value="id"
+                        :rules="reqRules" placeholder="Клиент*" outlined dense
+                        @change="loadContacts(newObject.client_id)"></v-select>
+              <v-select v-model="newObject.contact_id" :items="contacts" item-value="id" item-text="label"
+                        no-data-text="Выберите клиента" placeholder="Контактное лицо*" :rules="reqRules" outlined
+                        dense></v-select>
+            </v-row>
+            <v-text-field placeholder="Жилье" v-model="newObject.habitation" outlined></v-text-field>
+            <v-row>
+              <v-text-field placeholder="Страховка от несчастных случаев" v-model="newObject.accident_insurance"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Страховка здоровья" v-model="newObject.health_insurance"
+                            outlined></v-text-field>
+            </v-row>
+            <v-textarea placeholder="Описание работ" v-model="newObject.work_description" outlined></v-textarea>
+          </v-form>
         </v-card-text>
         <v-card-actions>
-          <div class="addition-btn">
-            <add-photo-icon/>
-            Загрузить изображение
-          </div>
+          <!--          <div class="addition-btn">-->
+          <!--            <add-photo-icon/>-->
+          <!--            Загрузить изображение-->
+          <!--          </div>-->
           <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="addObject">{{ formBtnText }}</v-btn>
         </v-card-actions>
@@ -242,7 +283,7 @@
           <v-btn color="secondary" text @click="cancelConfirmArchiveDialog">
             Отменить
           </v-btn>
-          <v-btn color="primary" text @click="editObjectArchive">Подтвердить</v-btn>
+          <v-btn color="primary" text @click="editObject">Подтвердить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -251,14 +292,14 @@
 
 <script>
 import $ from 'jquery';
-import AddPhotoIcon from "../components/icons/addPhotoIcon";
+// import AddPhotoIcon from "../components/icons/addPhotoIcon";
 import BackIcon from "../components/icons/backIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
 
 export default {
   name: "Objects",
-  components: {EditIcon, WasteIcon, BackIcon, AddPhotoIcon},
+  components: {EditIcon, WasteIcon, BackIcon, /*AddPhotoIcon*/},
   data() {
     return {
       page: 'objects',
@@ -276,7 +317,12 @@ export default {
         date_start: '',
         date_end: '',
         active: false,
-        client_id: ''
+        client_id: '',
+        contact_id: '',
+        work_description: null,
+        habitation: null,
+        accident_insurance: null,
+        health_insurance: null,
       },
       currentObject: {
         id: 0,
@@ -290,10 +336,16 @@ export default {
         date_end: '',
         active: false,
         client_id: '',
+        contact_id: '',
+        work_description: null,
+        habitation: null,
+        accident_insurance: null,
+        health_insurance: null,
       },
       photo: "/objects/A3DPhhAL6Zg.png",
       photos: "",
-      clients: ["ООО \"Праздник\""],
+      clients: [],
+      contacts: [],
       selects: ["Все", "ООО \"Праздник\"", "ООО \"Цветы\""],
       filter: {
         address: "",
@@ -336,8 +388,7 @@ export default {
     } else {
       this.$router.push({name: "Login"})
     }
-  }
-  ,
+  },
   methods: {
     loadData() {
       $.ajax({
@@ -367,58 +418,78 @@ export default {
         },
       })
     },
+    loadContacts(client_id) {
+      this.newObject.contact_id = null
+      this.contacts = []
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients-employees/" + client_id,
+        type: "GET",
+        success: (response) => {
+          this.contacts = response.data.data
+          this.contacts.forEach(contact => {
+            contact.label = contact.lastname + ' ' + contact.name + ', ' + contact.position
+            console.log(contact.label)
+          })
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
     addObject() {
-      if (this.newObject.id === 0)
-        $.ajax({
-          url: this.$hostname + "time-tracking/objects",
-          type: "POST",
-          data: {
-            index: this.newObject.index,
-            city: this.newObject.city,
-            street: this.newObject.street,
-            house: this.newObject.house,
-            entrance: this.newObject.entrance,
-            flat: this.newObject.flat,
-            date_start: this.newObject.date_start,
-            date_end: this.newObject.date_end,
-            active: this.newObject.active,
-            client_id: this.newObject.client_id
-          },
-          success: () => {
-            console.log("Объект добавлен ")
-            this.loadData()
-            this.closeForm()
-          },
-          error: (response) => {
-            this.alertError = true
-            this.alertMsg = "Непредвиденная ошибка"
-            console.log(response.data)
-          },
-        })
-      else
-        this.editObject()
+      if (this.$refs.form.validate()) {
+        if (this.newObject.id === 0)
+          $.ajax({
+            url: this.$hostname + "time-tracking/objects",
+            type: "POST",
+            data: {
+              index: this.newObject.index,
+              city: this.newObject.city,
+              street: this.newObject.street,
+              house: this.newObject.house,
+              entrance: this.newObject.entrance,
+              flat: this.newObject.flat,
+              date_start: this.newObject.date_start,
+              date_end: this.newObject.date_end,
+              active: this.newObject.active,
+              client_id: this.newObject.client_id,
+              contact_id: this.newObject.contact_id,
+              work_description: this.newObject.work_description,
+              habitation: this.newObject.habitation,
+              accident_insurance: this.newObject.accident_insurance,
+              health_insurance: this.newObject.health_insurance,
+            },
+            success: () => {
+              console.log("Объект добавлен ")
+              this.loadData()
+              this.closeForm()
+            },
+            error: (response) => {
+              this.alertError = true
+              this.alertMsg = "Непредвиденная ошибка"
+              console.log(response.data)
+            },
+          })
+        else
+          this.editObject()
+      }
     },
     editObject() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects",
         type: "PUT",
-        data: this.newObject,
-        //     {
-        //   index: this.newObject.index,
-        //   city: this.newObject.city,
-        //   street: this.newObject.street,
-        //   house: this.newObject.house,
-        //   entrance: this.newObject.entrance,
-        //   flat: this.newObject.flat,
-        //   date_start: this.newObject.date_start,
-        //   date_end: this.newObject.date_end,
-        //   active: this.newObject.active,
-        //   client_id: this.newObject.client_id
-        // },
+        data: this.currentObject,
+        // data: this.newObject,
         success: () => {
           console.log("Объект изменен ")
-          this.loadData()
-          this.closeForm()
+          if (this.addForm) {
+            this.loadData()
+            this.closeForm()
+          } else {
+            this.confirmArchiveDialog = false
+          }
         },
         error: (response) => {
           this.alertError = true
@@ -427,23 +498,23 @@ export default {
         },
       })
     },
-    editObjectArchive() {
-      $.ajax({
-        url: this.$hostname + "time-tracking/objects",
-        type: "PUT",
-        data: this.currentObject,
-        success: () => {
-          console.log("Объект перемещен в архив")
-          this.loadData()
-          this.confirmArchiveDialog = false
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
-    },
+    // editObjectArchive() {
+    //   $.ajax({
+    //     url: this.$hostname + "time-tracking/objects",
+    //     type: "PUT",
+    //     data: this.currentObject,
+    //     success: () => {
+    //       console.log("Объект перемещен в архив")
+    //       this.loadData()
+    //       this.confirmArchiveDialog = false
+    //     },
+    //     error: (response) => {
+    //       this.alertError = true
+    //       this.alertMsg = "Непредвиденная ошибка"
+    //       console.log(response.data)
+    //     },
+    //   })
+    // },
     deleteObject() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects",
@@ -493,19 +564,23 @@ export default {
       this.addForm = true
     },
     openConfirmArchiveDialog() {
-      if (this.currentObject.active) {
+      if ((this.currentObject.active && !this.all) || (!this.currentObject.active && this.all)) {
+        this.currentObject.active = true
         this.confirmArchiveDialog = true
       } else {
-        this.editObjectArchive()
+        this.editObject()
       }
     },
     cancelConfirmArchiveDialog() {
       this.currentObject.active = false
       this.confirmArchiveDialog = false
     },
-    openConfirmDeleteDialog(id) {
-      this.currentObject.id = id
-      this.confirmDeleteDialog = true
+    openConfirmDeleteDialog(item) {
+      this.currentObject = item
+      if (this.archive || !this.all) {
+        this.confirmDeleteDialog = true
+      } else
+        this.openConfirmArchiveDialog()
     },
     closeForm() {
       this.addForm = false
@@ -520,7 +595,12 @@ export default {
         date_start: '',
         date_end: '',
         active: false,
-        client_id: ''
+        client_id: '',
+        contact_id: '',
+        work_description: null,
+        habitation: null,
+        accident_insurance: null,
+        health_insurance: null,
       }
     },
     openFilters() {

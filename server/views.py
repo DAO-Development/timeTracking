@@ -140,6 +140,10 @@ class NewsView(APIView):
     def put(self, request):
         saved_news = get_object_or_404(News.objects.all(), id=request.data["id"])
         name = ''
+        serializer = NewsSerializer(saved_news, data={
+            "title": request.data["title"],
+            "text": request.data["text"]
+        }, partial=True)
         if len(request.FILES) == 1:
             name = '/news/' + request.FILES['image'].name
             with open('media' + name, 'wb+') as destination:
@@ -150,10 +154,6 @@ class NewsView(APIView):
                 "text": request.data["text"],
                 "photo_path": name
             }, partial=True)
-        serializer = NewsSerializer(saved_news, data={
-            "title": request.data["title"],
-            "text": request.data["text"]
-        }, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
@@ -274,22 +274,14 @@ class ClientView(APIView):
         serializer = ClientSerializer(clients, many=True)
         return Response({"data": serializer.data})
 
-    # def put(self, request):
-    #     if request.data['id'] != '':
-    #         saved_object = ObjectPhoto.objects.get(pk=request.data['id'])
-    #         serializer = ObjectPhoto(saved_object, data=request.data, partial=True)
-    #     else:
-    #         serializer = ObjectPhotoPostSerializer(data={
-    #             "photo_path": request.data['photo_path'],
-    #             "objects_id": request.data['objects_id'],
-    #         })
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(status=201)
-    #     else:
-    #         return Response(status=400)
-    #
-    # def delete(self, request, id):
-    #     object_photo = get_object_or_404(Objects.objects.all(), id=id)
-    #     object_photo.delete()
-    #     return Response(status=204)
+
+class ClientEmployeesView(APIView):
+    """Сотрудники фирм-клиентов"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, client_id=None):
+        employees = ClientEmployees.objects.all()
+        if client_id is not None:
+            employees = employees.filter(client=client_id)
+        serializer = ClientEmployeesSerializer(employees, many=True)
+        return Response({"data": serializer.data})

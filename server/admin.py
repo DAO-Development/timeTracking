@@ -22,6 +22,11 @@ class ClientsAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone', 'email')
 
 
+class ClientEmployeesAdmin(admin.ModelAdmin):
+    """Штат клиентов"""
+    list_display = ('name', 'lastname', 'email', 'phone', 'client')
+
+
 class ObjectsAdmin(admin.ModelAdmin):
     """Объекты"""
     list_display = ('index', 'date_start', 'date_end', 'client_id')
@@ -36,5 +41,6 @@ admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Functions, FunctionsAdmin)
 admin.site.register(GroupFunctions, GroupFunctionsAdmin)
 admin.site.register(Client, ClientsAdmin)
+admin.site.register(ClientEmployees, ClientEmployeesAdmin)
 admin.site.register(Objects, ObjectsAdmin)
 admin.site.register(ObjectUser, ObjectUserAdmin)
