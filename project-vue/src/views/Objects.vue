@@ -77,11 +77,6 @@
         </v-list>
       </div>
       <div class="objects-open" v-else>
-        <!--          <div class="objects-open__image profile__image">-->
-        <!--            <v-img v-if="photo != null" :lazy-src="require('../../../media'+photo)"-->
-        <!--                   :src="require('../../../media'+photo)"></v-img>-->
-        <!--            <div class="profile__change-photo">Добавить фото</div>-->
-        <!--          </div>-->
         <div class="objects-open__info profile__info">
           <h3>Информация об объекте</h3>
           <div class="news-open__actions open__actions">
@@ -109,7 +104,12 @@
             </li>
             <li>
               <span class="profile__info-title">Окончание работ</span>
-              <span class="profile__info-content">{{ currentObject.date_end }}</span></li>
+              <span class="profile__info-content">{{ currentObject.date_end }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Описание работ</span>
+              <span class="profile__info-content">{{ currentObject.work_description }}</span>
+            </li>
           </ul>
           <h3>Адрес</h3>
           <ul>
@@ -157,10 +157,51 @@
               <span class="profile__info-content">{{ currentObject.contact_id.work_email }}</span>
             </li>
           </ul>
-          <h3>Работники</h3>
+          <h3>Дополнительная информация</h3>
           <ul>
-
+            <li>
+              <span class="profile__info-title">Жилье</span>
+              <span class="profile__info-content">{{ currentObject.habitation }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Страховка от несчастных случаев</span>
+              <span class="profile__info-content">{{ currentObject.accident_insurance }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Страховка здоровья</span>
+              <span class="profile__info-content">{{ currentObject.health_insurance }}</span>
+            </li>
           </ul>
+          <h3>Работники</h3>
+          <v-list three-line class="workers__list content-list">
+            <template v-for="profile in objectWorkers">
+              <v-list-item :key="profile.id">
+                <!--                <v-list-item-content @click="openProfile(profile)">-->
+                <v-list-item-content>
+                  <v-list-item-title>{{ profile.name }} {{ profile.lastname }}</v-list-item-title>
+                  <v-list-item-subtitle>
+                    <span>{{ profile.position }}</span><br>
+                    <span>{{ profile.auth_user_id.email }}</span>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(profile)">
+                    $deleteIcon
+                  </v-icon>
+                </v-list-item-action>
+              </v-list-item>
+            </template>
+          </v-list>
+          <v-list class="content-list__btns">
+            <v-list-item class="content-list__btns-add" @click="addWorkerForm=true">
+              <v-list-item-icon>
+                <v-icon>mdi-plus</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Добавить работника</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
           <h3>Фото объекта</h3>
           <v-slide-group class="pa-4 objects-open__slider" v-model="photos" active-class="slide-active" show-arrows>
             <v-slide-item v-for="ph in photos" :key="ph.id">
@@ -248,12 +289,60 @@
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <!--          <div class="addition-btn">-->
-          <!--            <add-photo-icon/>-->
-          <!--            Загрузить изображение-->
-          <!--          </div>-->
           <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="addObject">{{ formBtnText }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="addWorkerForm" max-width="500">
+      <v-card>
+        <v-toolbar flat>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="closeForm">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <!--        <h3>{{ formTitle }}</h3>-->
+        <h3>Добавление работника на объект</h3>
+        <v-card-text>
+          <v-form ref="workerForm">
+            <v-select v-model="addWorker.user_profile_id" :items="workers" item-value="id" item-text="label"
+                      no-data-text="Нет свободных работников" placeholder="Выберите работника*" :rules="reqRules"
+                      outlined dense></v-select>
+            <v-row>
+              <v-menu ref="worker_start" v-model="datePickers.worker_start" :close-on-content-click="false"
+                      :return-value.sync="addWorker.start_date"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="addWorker.start_date" placeholder="Начало работ*" readonly v-bind="attrs"
+                                v-on="on" outlined :rules="reqRules"></v-text-field>
+                </template>
+                <v-date-picker v-model="addWorker.start_date" no-title scrollable color="primary">
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="datePickers.worker_start = false"> Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.worker_start.save(addWorker.start_date)">OK</v-btn>
+                </v-date-picker>
+              </v-menu>
+              <v-menu ref="worker_end" v-model="datePickers.worker_end" :close-on-content-click="false"
+                      :return-value.sync="addWorker.end_date"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="addWorker.end_date" placeholder="Окончание работ" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="addWorker.end_date" no-title scrollable color="primary">
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="datePickers.worker_end = false"> Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.worker_end.save(addWorker.end_date)">OK</v-btn>
+                </v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-textarea placeholder="Комментарий" v-model="addWorker.comment" outlined></v-textarea>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="action-btn" color="primary" @click="putObjectUser">Сохранить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -303,7 +392,8 @@ export default {
   data() {
     return {
       page: 'objects',
-      objects: '',
+      objects: [],
+      objectWorkers: [],
       all: true,
       archive: false,
       newObject: {
@@ -342,10 +432,19 @@ export default {
         accident_insurance: null,
         health_insurance: null,
       },
+      addWorker: {
+        id: 0,
+        user_profile_id: 0,
+        object_id: 0,
+        start_date: null,
+        end_date: null,
+        comment: null,
+      },
       photo: "/objects/A3DPhhAL6Zg.png",
       photos: "",
       clients: [],
       contacts: [],
+      workers: [],
       selects: ["Все", "ООО \"Праздник\"", "ООО \"Цветы\""],
       filter: {
         address: "",
@@ -355,11 +454,14 @@ export default {
       datePickers: {
         menu_filter: false,
         menu_start: false,
-        menu_end: false
+        menu_end: false,
+        worker_start: false,
+        worker_end: false,
       },
       formTitle: "Добавление объекта",
       formBtnText: "Добавить объект",
       addForm: false,
+      addWorkerForm: false,
       confirmArchiveDialog: false,
       confirmDeleteDialog: false,
       reqRules: [
@@ -498,23 +600,6 @@ export default {
         },
       })
     },
-    // editObjectArchive() {
-    //   $.ajax({
-    //     url: this.$hostname + "time-tracking/objects",
-    //     type: "PUT",
-    //     data: this.currentObject,
-    //     success: () => {
-    //       console.log("Объект перемещен в архив")
-    //       this.loadData()
-    //       this.confirmArchiveDialog = false
-    //     },
-    //     error: (response) => {
-    //       this.alertError = true
-    //       this.alertMsg = "Непредвиденная ошибка"
-    //       console.log(response.data)
-    //     },
-    //   })
-    // },
     deleteObject() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects",
@@ -537,6 +622,33 @@ export default {
       this.currentObject = item
       this.photo = this.loadPhoto(item.id)
       this.all = false
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/employees/" + this.currentObject.id,
+        type: "GET",
+        success: (response) => {
+          this.objectWorkers = response.data.data
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/employees",
+        type: "GET",
+        success: (response) => {
+          this.workers = response.data.data
+          this.workers.forEach(worker => {
+            worker.label = worker.lastname + ' ' + worker.name + ', ' + worker.position
+          })
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
     },
     loadPhoto(id) {
       $.ajax({
@@ -544,6 +656,29 @@ export default {
         type: "GET",
         success: (response) => {
           this.photos = response.data.data
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    putObjectUser() {
+      this.addWorker.object_id = this.currentObject.id
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/employees",
+        type: "PUT",
+        data: {
+          id: this.addWorker.id,
+          user_profile_id: this.addWorker.user_profile_id,
+          object_id: this.addWorker.object_id,
+          start_date: this.addWorker.start_date,
+          end_date: this.addWorker.end_date,
+          comment: this.addWorker.comment,
+        },
+        success: (response) => {
+          console.log(response)
         },
         error: (response) => {
           this.alertError = true
@@ -602,6 +737,14 @@ export default {
         accident_insurance: null,
         health_insurance: null,
       }
+      this.addWorker = {
+        user_profile_id: 0,
+        object_id: 0,
+        start_date: null,
+        end_date: null,
+        comment: null,
+      }
+      this.addWorkerForm = false
     },
     openFilters() {
       console.log("open filters")

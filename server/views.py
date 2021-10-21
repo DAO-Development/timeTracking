@@ -6,7 +6,6 @@ from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
 import datetime
 
-from server.forms import ProfilePhotoForm
 from server.serializers import *
 
 
@@ -209,30 +208,43 @@ class ObjectUserView(APIView):
     """Рабочие на объектах"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, objects_id):
-        objects = Objects.objects.all().filter(objects_id=objects_id)
-        serializer = ObjectsSerializer(objects, many=True)
+    def get(self, request, objects_id=None):
+        if objects_id is not None:
+            workers = ObjectUser.objects.all().filter(objects_id=objects_id)
+            serializer = ObjectUserSerializer(workers, many=True)
+        else:
+            busy = ObjectUser.objects.all().filter(end_date__gt=datetime.date.today()).values_list('user_profile_id',
+                                                                                                   flat=True)
+            workers = UserProfile.objects.all().exclude(id__in=busy)
+            serializer = UserProfileSerializer(workers, many=True)
         return Response({"data": serializer.data})
 
     def put(self, request):
-        if request.data['id'] != '':
-            saved_object = ObjectUser.objects.get(pk=request.data['id'])
-            serializer = ObjectUserSerializer(saved_object, data=request.data, partial=True)
-        else:
+        id = int(request.data['id'])
+        if id == 0:
             serializer = ObjectUserPostSerializer(data={
                 "user_profile_id": request.data['user_profile_id'],
-                "objects_id": request.data['objects_id'],
+                "object_id": request.data['object_id'],
+                "start_date": request.data['start_date'],
+                "end_date": request.data['end_date'],
+                "comment": request.data['comment'],
             })
+        else:
+            saved_object = get_object_or_404(ObjectUser.objects.all(), id=request.data["id"])
+            serializer = ObjectUserSerializer(saved_object, data=request.data, partial=True)
+        # else:
+        #     serializer = ObjectUserPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
         else:
             return Response(status=400)
 
-    def delete(self, request):
-        object_user = get_object_or_404(Objects.objects.all(), id=request.data['id'])
-        object_user.delete()
-        return Response(status=204)
+
+def delete(self, request):
+    object_user = get_object_or_404(Objects.objects.all(), id=request.data['id'])
+    object_user.delete()
+    return Response(status=204)
 
 
 class ObjectPhotoView(APIView):

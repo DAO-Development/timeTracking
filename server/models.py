@@ -45,7 +45,7 @@ class UserProfile(models.Model):
 class Functions(models.Model):
     """Функции"""
     name = models.CharField(verbose_name="Компонент", max_length=45)
-    text = models.CharField(verbose_name="Название", max_length=45)  # todo убрать Null
+    text = models.CharField(verbose_name="Название", max_length=45)
 
     class Meta:
         db_table = "functions"
@@ -173,7 +173,7 @@ class ObjectUser(models.Model):
     """Рабочие на объектах"""
     user_profile_id = models.ForeignKey("UserProfile", models.CASCADE, verbose_name='Пользователь')
     objects_id = models.ForeignKey("Objects", models.CASCADE, verbose_name='Объект')
-    start_date = models.DateField(verbose_name='Начало работ')  # todo убрать null
+    start_date = models.DateField(verbose_name='Начало работ')
     end_date = models.DateField(verbose_name='Конец работ', null=True, blank=True)
     comment = models.TextField(verbose_name='Комментарий', max_length=1500, null=True, blank=True)
 

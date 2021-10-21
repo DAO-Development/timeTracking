@@ -29,9 +29,9 @@ Vue.use(YimoVueEditor, {
             }
             return res.data
         } else if (type === 'error') {
-            //todo toast
+            alert("Ошибка загрузки")
         } else if (type === 'timeout') {
-            //todo toast
+            alert("Время ожидания превышено")
         }
         return 'upload failed__'
     }

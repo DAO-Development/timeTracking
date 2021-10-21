@@ -125,9 +125,11 @@ class ObjectsPostSerializer(serializers.ModelSerializer):
 class ObjectUserSerializer(serializers.ModelSerializer):
     """Сериализация рабочих на объектах"""
 
+    user_profile_id = UserProfileSerializer()
+
     class Meta:
         model = ObjectUser
-        fields = ('id', 'user_profile_id', 'objects_id')
+        fields = '__all__'
 
 
 class ObjectUserPostSerializer(serializers.ModelSerializer):
@@ -135,7 +137,7 @@ class ObjectUserPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ObjectUser
-        fields = ('user_profile_id', 'objects_id')
+        fields = ('user_profile_id', 'objects_id', 'start_date', 'end_date')
 
 
 class ObjectPhotoSerializer(serializers.ModelSerializer):
