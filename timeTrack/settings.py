@@ -194,8 +194,8 @@ DJOSER = {
 
 django_heroku.settings(locals())
 
-try:
-    from .local_settings import *
-except ImportError:
-    from .prod_settings import *
-# from .prod_settings import *
+# try:
+#     from .local_settings import *
+# except ImportError:
+#     from .prod_settings import *
+from .prod_settings import *
