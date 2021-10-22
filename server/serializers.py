@@ -137,7 +137,7 @@ class ObjectUserPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ObjectUser
-        fields = ('user_profile_id', 'objects_id', 'start_date', 'end_date')
+        fields = ('user_profile_id', 'objects_id', 'start_date', 'end_date', 'comment')
 
 
 class ObjectPhotoSerializer(serializers.ModelSerializer):

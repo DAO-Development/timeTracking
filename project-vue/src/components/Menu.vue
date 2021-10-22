@@ -55,9 +55,13 @@ export default {
       this.loadUser()
     }
     switch (this.$router.getMatchedComponents()[0].name) {
+      case "Index":
+        this.selectedItem = -1
+        this.page = "Главная"
+        break
       case "Home":
         this.selectedItem = 0
-        this.page = "Главная"
+        this.page = "Профиль"
         break
       case "News":
         this.selectedItem = 1
@@ -97,6 +101,10 @@ export default {
       if ($(".menu").hasClass("open"))
         $(".menu").removeClass("open")
       switch (selected) {
+        case -1:
+          this.$router.push({name: "Index"})
+          this.selectedItem = -1
+          break
         case 0:
           this.$router.push({name: "Home"})
           this.selectedItem = 0

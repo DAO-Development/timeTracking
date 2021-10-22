@@ -220,20 +220,20 @@ class ObjectUserView(APIView):
         return Response({"data": serializer.data})
 
     def put(self, request):
-        id = int(request.data['id'])
-        if id == 0:
+        if request.data["id"] == "0":
+            end_date = request.data['end_date']
+            if request.data['end_date'] == "":
+                end_date = None
             serializer = ObjectUserPostSerializer(data={
-                "user_profile_id": request.data['user_profile_id'],
-                "object_id": request.data['object_id'],
+                "user_profile_id": int(request.data['user_profile_id']),
+                "objects_id": int(request.data['objects_id']),
                 "start_date": request.data['start_date'],
-                "end_date": request.data['end_date'],
+                "end_date": end_date,
                 "comment": request.data['comment'],
             })
         else:
             saved_object = get_object_or_404(ObjectUser.objects.all(), id=request.data["id"])
             serializer = ObjectUserSerializer(saved_object, data=request.data, partial=True)
-        # else:
-        #     serializer = ObjectUserPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

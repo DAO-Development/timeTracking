@@ -174,18 +174,21 @@
           </ul>
           <h3>Работники</h3>
           <v-list three-line class="workers__list content-list">
-            <template v-for="profile in objectWorkers">
-              <v-list-item :key="profile.id">
-                <!--                <v-list-item-content @click="openProfile(profile)">-->
+            <template v-for="worker in objectWorkers">
+              <v-list-item :key="worker.id">
+<!--                                <v-list-item-content @click="openProfile(profile)">-->
                 <v-list-item-content>
-                  <v-list-item-title>{{ profile.name }} {{ profile.lastname }}</v-list-item-title>
+                  <v-list-item-title>{{ worker.user_profile_id.lastname }} {{
+                      worker.user_profile_id.name
+                    }}
+                  </v-list-item-title>
                   <v-list-item-subtitle>
-                    <span>{{ profile.position }}</span><br>
-                    <span>{{ profile.auth_user_id.email }}</span>
+                    <span>{{ worker.start_date }} - {{ worker.end_date }}</span><br>
+                    <span>{{ worker.comment }}</span>
                   </v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action>
-                  <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(profile)">
+                  <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(worker)">
                     $deleteIcon
                   </v-icon>
                 </v-list-item-action>
@@ -426,7 +429,9 @@ export default {
         date_end: '',
         active: false,
         client_id: '',
-        contact_id: '',
+        contact_id: {
+          email: ''
+        },
         work_description: null,
         habitation: null,
         accident_insurance: null,
@@ -666,13 +671,15 @@ export default {
     },
     putObjectUser() {
       this.addWorker.object_id = this.currentObject.id
+      if (this.addWorker.end_date === "")
+        this.addWorker.end_date = null
       $.ajax({
         url: this.$hostname + "time-tracking/objects/employees",
         type: "PUT",
         data: {
           id: this.addWorker.id,
           user_profile_id: this.addWorker.user_profile_id,
-          object_id: this.addWorker.object_id,
+          objects_id: this.addWorker.object_id,
           start_date: this.addWorker.start_date,
           end_date: this.addWorker.end_date,
           comment: this.addWorker.comment,
