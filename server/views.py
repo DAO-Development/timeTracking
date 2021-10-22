@@ -240,11 +240,10 @@ class ObjectUserView(APIView):
         else:
             return Response(status=400)
 
-
-def delete(self, request):
-    object_user = get_object_or_404(Objects.objects.all(), id=request.data['id'])
-    object_user.delete()
-    return Response(status=204)
+    def delete(self, request):
+        object_user = get_object_or_404(ObjectUser.objects.all(), id=request.data['id'])
+        object_user.delete()
+        return Response(status=204)
 
 
 class ObjectPhotoView(APIView):

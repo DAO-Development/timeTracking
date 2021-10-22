@@ -176,8 +176,7 @@
           <v-list three-line class="workers__list content-list">
             <template v-for="worker in objectWorkers">
               <v-list-item :key="worker.id">
-<!--                                <v-list-item-content @click="openProfile(profile)">-->
-                <v-list-item-content>
+                <v-list-item-content @click="openWorker(worker)">
                   <v-list-item-title>{{ worker.user_profile_id.lastname }} {{
                       worker.user_profile_id.name
                     }}
@@ -188,8 +187,11 @@
                   </v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action>
-                  <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(worker)">
-                    $deleteIcon
+                  <v-icon color="grey lighten-1" @click="openConfirmDeleteWorkerDialog(worker)">
+                    $edit
+                  </v-icon>
+                  <v-icon color="grey lighten-1" @click="openConfirmDeleteWorkerDialog(worker)">
+                    $waste
                   </v-icon>
                 </v-list-item-action>
               </v-list-item>
@@ -362,6 +364,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="confirmDeleteWorkerDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Удаление работника с объекта
+        </v-card-title>
+        <v-card-text>Вы действительно хотите удалить работника с объекта? Отменить это действие будет невозможно
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmDeleteWorkerDialog = false">Отменить</v-btn>
+          <v-btn color="primary" text @click="deleteObjectUser">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="confirmArchiveDialog" max-width="500">
       <v-card>
         <v-card-title>
@@ -469,6 +485,7 @@ export default {
       addWorkerForm: false,
       confirmArchiveDialog: false,
       confirmDeleteDialog: false,
+      confirmDeleteWorkerDialog: false,
       reqRules: [
         v => !!v || 'Необходимо заполнить поле'
       ],
@@ -627,6 +644,23 @@ export default {
       this.currentObject = item
       this.photo = this.loadPhoto(item.id)
       this.all = false
+      this.loadWorkers()
+    },
+    loadPhoto(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/photos/" + id,
+        type: "GET",
+        success: (response) => {
+          this.photos = response.data.data
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    loadWorkers() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects/employees/" + this.currentObject.id,
         type: "GET",
@@ -655,20 +689,6 @@ export default {
         },
       })
     },
-    loadPhoto(id) {
-      $.ajax({
-        url: this.$hostname + "time-tracking/objects/photos/" + id,
-        type: "GET",
-        success: (response) => {
-          this.photos = response.data.data
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
-    },
     putObjectUser() {
       this.addWorker.object_id = this.currentObject.id
       if (this.addWorker.end_date === "")
@@ -686,6 +706,8 @@ export default {
         },
         success: (response) => {
           console.log(response)
+          this.loadWorkers()
+          this.addWorkerForm = false
         },
         error: (response) => {
           this.alertError = true
@@ -693,6 +715,28 @@ export default {
           console.log(response.data)
         },
       })
+    },
+    deleteObjectUser() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/employees",
+        type: "DELETE",
+        data: {
+          id: this.addWorker.id,
+        },
+        success: (response) => {
+          console.log(response)
+          this.loadWorkers()
+          this.confirmDeleteWorkerDialog = false
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    openWorker(worker) {
+      console.log(worker)
     },
     openAddForm() {
       this.formTitle = "Добавление объекта"
@@ -724,6 +768,10 @@ export default {
       } else
         this.openConfirmArchiveDialog()
     },
+    openConfirmDeleteWorkerDialog(item) {
+      this.addWorker = item
+      this.confirmDeleteWorkerDialog = true
+    },
     closeForm() {
       this.addForm = false
       this.newObject = {
@@ -745,6 +793,7 @@ export default {
         health_insurance: null,
       }
       this.addWorker = {
+        id: 0,
         user_profile_id: 0,
         object_id: 0,
         start_date: null,

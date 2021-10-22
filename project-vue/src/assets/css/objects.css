@@ -12,6 +12,10 @@
     max-width: 45%;
 }
 
+.objects-open .workers__list .v-list-item__action path {
+    fill: grey;
+}
+
 @media screen and (max-width: 768px) {
     .objects-open .objects-open__slider {
         max-width: 70%;
