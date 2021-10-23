@@ -9,56 +9,7 @@
         </div>
       </div>
       <div class="documents-all all">
-        <v-data-table :headers="headers" :items="documents">
-          <!--          <template v-slot:top>-->
-          <!--            <v-toolbar flat>-->
-          <!--              <v-toolbar-title>My CRUD</v-toolbar-title>-->
-          <!--              <v-divider class="mx-4" inset vertical></v-divider>-->
-          <!--              <v-spacer></v-spacer>-->
-          <!--              <v-dialog v-model="addForm" max-width="500px">-->
-          <!--                <template v-slot:activator="{ on, attrs }">-->
-          <!--                  <v-btn color="primary" dark v-bind="attrs" v-on="on">-->
-          <!--                    New Item-->
-          <!--                  </v-btn>-->
-          <!--                </template>-->
-          <!--                <v-card>-->
-          <!--                  <v-card-title>-->
-          <!--                    <span class="text-h5">{{ formTitle }}</span>-->
-          <!--                  </v-card-title>-->
-
-          <!--                  <v-card-text>-->
-          <!--                    <v-container>-->
-          <!--                      <v-row>-->
-          <!--                        <v-text-field v-model="newDocument.name" outlined></v-text-field>-->
-          <!--                        <v-text-field v-model="newDocument.path" outlined></v-text-field>-->
-          <!--                      </v-row>-->
-          <!--                    </v-container>-->
-          <!--                  </v-card-text>-->
-
-          <!--                  <v-card-actions>-->
-          <!--                    <v-spacer></v-spacer>-->
-          <!--                    <v-btn color="secondary" @click="this.addForm = false">-->
-          <!--                      Отменить-->
-          <!--                    </v-btn>-->
-          <!--                    <v-btn color="primary" @click="putDocument">-->
-          <!--                      Сохранить-->
-          <!--                    </v-btn>-->
-          <!--                  </v-card-actions>-->
-          <!--                </v-card>-->
-          <!--              </v-dialog>-->
-          <!--              <v-dialog v-model="confirmDeleteDialog" max-width="500px">-->
-          <!--                <v-card>-->
-          <!--                  <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>-->
-          <!--                  <v-card-actions>-->
-          <!--                    <v-spacer></v-spacer>-->
-          <!--                    <v-btn color="blue darken-1" text @click="confirmDeleteDialog = false">Cancel</v-btn>-->
-          <!--                    <v-btn color="blue darken-1" text @click="deleteDocument">OK</v-btn>-->
-          <!--                    <v-spacer></v-spacer>-->
-          <!--                  </v-card-actions>-->
-          <!--                </v-card>-->
-          <!--              </v-dialog>-->
-          <!--            </v-toolbar>-->
-          <!--          </template>-->
+        <v-data-table :headers="headers" :items="documents" item-key="id" @click:row="downloadFile">
           <template v-slot:item.actions="{ item }">
             <v-icon small class="mr-2" @click="openEditForm(item)">mdi-pencil</v-icon>
             <v-icon small @click="openConfirmDeleteDialog(item)">mdi-delete</v-icon>
@@ -148,7 +99,7 @@ export default {
   components: {BackIcon},
   props: {
     type: String,
-    id: String
+    id: [String, Number],
   },
   data() {
     return {
@@ -263,6 +214,23 @@ export default {
           console.log(response.data)
         },
       })
+    },
+    downloadFile(item) {
+      const axios = require('axios')
+      axios({
+        url: this.$hostname + 'media' + item.path,
+        method: 'GET',
+        responseType: 'blob',
+      }).then((response) => {
+        var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        var fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', item.path);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      });
     },
     openAddForm() {
       this.editFile = true
