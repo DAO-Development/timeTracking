@@ -8,7 +8,7 @@
           <back-icon/>
         </div>
       </div>
-      <div class="news-all" v-if="all">
+      <div class="news-all all" v-if="all">
         <div class="news-all__grid">
           <template v-for="item in news">
             <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)" v-if="item.photo_path"

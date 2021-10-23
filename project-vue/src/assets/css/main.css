@@ -466,7 +466,7 @@
         align-items: baseline;
     }
 
-    .content-list__btns {
+    .all .content-list__btns {
         position: fixed;
         bottom: 0;
         width: 100%;
@@ -491,6 +491,7 @@
         height: 100%;
         background-color: #FFFFFF;
         transition: 0.3s ease-in-out;
+        overflow: hidden;
     }
 
     .summary-box__title .content-list__filters-mobile {
@@ -549,7 +550,7 @@
         font-size: 18px;
     }
 
-    .v-application .addition-btn > span {
+    .v-application .summary-box__title .addition-btn > span {
         display: none;
     }
 

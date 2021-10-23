@@ -11,7 +11,7 @@
              @click="openFilters">Фильтры
         </div>
       </div>
-      <div class="workers-all" v-if="all">
+      <div class="workers-all all" v-if="all">
         <div class="content-list__filters">
           <v-icon color="grey lighten-1" @click="closeFilters">
             $deleteIcon

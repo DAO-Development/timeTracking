@@ -11,7 +11,7 @@
              @click="openFilters">Фильтры
         </div>
       </div>
-      <div class="objects-all" v-if="all">
+      <div class="objects-all all" v-if="all">
         <div class="content-list__filters">
           <v-icon color="grey lighten-1" @click="closeFilters">
             $deleteIcon
@@ -177,9 +177,8 @@
             <template v-for="worker in objectWorkers">
               <v-list-item :key="worker.id">
                 <v-list-item-content @click="openWorker(worker)">
-                  <v-list-item-title>{{ worker.user_profile_id.lastname }} {{
-                      worker.user_profile_id.name
-                    }}
+                  <v-list-item-title>{{ worker.user_profile_id.lastname }} {{ worker.user_profile_id.name }}
+                    ({{ worker.user_profile_id.phone }})
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     <span>{{ worker.start_date }} - {{ worker.end_date }}</span><br>
@@ -187,7 +186,7 @@
                   </v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action>
-                  <v-icon color="grey lighten-1" @click="openConfirmDeleteWorkerDialog(worker)">
+                  <v-icon color="grey lighten-1" @click="openEditWorkerForm(worker)">
                     $edit
                   </v-icon>
                   <v-icon color="grey lighten-1" @click="openConfirmDeleteWorkerDialog(worker)">
@@ -198,7 +197,7 @@
             </template>
           </v-list>
           <v-list class="content-list__btns">
-            <v-list-item class="content-list__btns-add" @click="addWorkerForm=true">
+            <v-list-item class="content-list__btns-add" @click="openAddWorkerForm">
               <v-list-item-icon>
                 <v-icon>mdi-plus</v-icon>
               </v-list-item-icon>
@@ -307,8 +306,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <!--        <h3>{{ formTitle }}</h3>-->
-        <h3>Добавление работника на объект</h3>
+        <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-form ref="workerForm">
             <v-select v-model="addWorker.user_profile_id" :items="workers" item-value="id" item-text="label"
@@ -461,7 +459,6 @@ export default {
         end_date: null,
         comment: null,
       },
-      photo: "/objects/A3DPhhAL6Zg.png",
       photos: "",
       clients: [],
       contacts: [],
@@ -642,7 +639,7 @@ export default {
     },
     openObject(item) {
       this.currentObject = item
-      this.photo = this.loadPhoto(item.id)
+      this.loadPhoto(item.id)
       this.all = false
       this.loadWorkers()
     },
@@ -690,31 +687,31 @@ export default {
       })
     },
     putObjectUser() {
-      this.addWorker.object_id = this.currentObject.id
-      if (this.addWorker.end_date === "")
-        this.addWorker.end_date = null
-      $.ajax({
-        url: this.$hostname + "time-tracking/objects/employees",
-        type: "PUT",
-        data: {
-          id: this.addWorker.id,
-          user_profile_id: this.addWorker.user_profile_id,
-          objects_id: this.addWorker.object_id,
-          start_date: this.addWorker.start_date,
-          end_date: this.addWorker.end_date,
-          comment: this.addWorker.comment,
-        },
-        success: (response) => {
-          console.log(response)
-          this.loadWorkers()
-          this.addWorkerForm = false
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
+      if (this.$refs.workerForm.validate()) {
+        this.addWorker.object_id = this.currentObject.id
+        $.ajax({
+          url: this.$hostname + "time-tracking/objects/employees",
+          type: "PUT",
+          data: {
+            id: this.addWorker.id,
+            user_profile_id: this.addWorker.user_profile_id,
+            objects_id: this.addWorker.object_id,
+            start_date: this.addWorker.start_date,
+            end_date: this.addWorker.end_date,
+            comment: this.addWorker.comment,
+          },
+          success: (response) => {
+            console.log(response)
+            this.loadWorkers()
+            this.addWorkerForm = false
+          },
+          error: (response) => {
+            this.alertError = true
+            this.alertMsg = "Непредвиденная ошибка"
+            console.log(response.data)
+          },
+        })
+      }
     },
     deleteObjectUser() {
       $.ajax({
@@ -748,6 +745,15 @@ export default {
       this.formBtnText = "Сохранить объект"
       this.newObject = item
       this.addForm = true
+    },
+    openAddWorkerForm() {
+      this.formTitle = "Добавление работника на объект"
+      this.addWorkerForm = true
+    },
+    openEditWorkerForm(worker) {
+      this.addWorker = worker
+      this.formTitle = "Редактирование работника на объекте"
+      this.addWorkerForm = true
     },
     openConfirmArchiveDialog() {
       if ((this.currentObject.active && !this.all) || (!this.currentObject.active && this.all)) {
