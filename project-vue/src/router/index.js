@@ -7,6 +7,7 @@ import RecoverPassword from "../views/RecoverPassword";
 import News from "../views/News";
 import Objects from "../views/Objects";
 import Workers from "../views/Workers";
+import Documents from "../views/Documents";
 
 Vue.use(VueRouter)
 
@@ -45,6 +46,12 @@ const routes = [
         path: '/workers',
         name: 'Workers',
         component: Workers
+    },
+    {
+        path: '/documents/:type&:id',
+        name: 'Documents',
+        component: Documents,
+        props: true
     },
 ]
 

@@ -7,6 +7,11 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('auth_user_id', 'name', 'lastname', 'position', 'active')
 
 
+class UserDocumentsAdmin(admin.ModelAdmin):
+    """Документы пользователей"""
+    list_display = ('name', 'create_date', 'user_profile_id')
+
+
 class FunctionsAdmin(admin.ModelAdmin):
     """Функции"""
     list_display = ('id', 'name')
@@ -24,7 +29,7 @@ class ClientsAdmin(admin.ModelAdmin):
 
 class ClientEmployeesAdmin(admin.ModelAdmin):
     """Штат клиентов"""
-    list_display = ('name', 'lastname', 'email', 'phone', 'client')
+    list_display = ('lastname', 'name', 'email', 'phone', 'client')
 
 
 class ObjectsAdmin(admin.ModelAdmin):
@@ -38,6 +43,7 @@ class ObjectUserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(UserDocuments, UserDocumentsAdmin)
 admin.site.register(Functions, FunctionsAdmin)
 admin.site.register(GroupFunctions, GroupFunctionsAdmin)
 admin.site.register(Client, ClientsAdmin)

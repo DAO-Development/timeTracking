@@ -52,6 +52,22 @@ class UserProfilePostSerializer(serializers.ModelSerializer):
                   'other_language', 'position', 'skills', 'boots', 'jacket', 'pants', 'shirt')
 
 
+class UserDocumentsSerializer(serializers.ModelSerializer):
+    """Сериализация документов пользователей"""
+
+    class Meta:
+        model = UserDocuments
+        fields = '__all__'
+
+
+class UserDocumentsPostSerializer(serializers.ModelSerializer):
+    """Сериализация документов пользователей"""
+
+    class Meta:
+        model = UserDocuments
+        fields = ('name', 'create_date', 'path', 'user_profile_id')
+
+
 class GroupSerializer(serializers.ModelSerializer):
     """Сериализация групп"""
 

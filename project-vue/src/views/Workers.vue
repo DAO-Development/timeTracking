@@ -28,7 +28,7 @@
                 <v-img v-if="profile.photo_path" :src="require('../../../media'+profile.photo_path)"></v-img>
               </v-list-item-avatar>
               <v-list-item-content @click="openProfile(profile)">
-                <v-list-item-title>{{ profile.name }} {{ profile.lastname }}</v-list-item-title>
+                <v-list-item-title>{{ profile.lastname }} {{ profile.name }}</v-list-item-title>
                 <v-list-item-subtitle>
                   <span>{{ profile.position }}</span><br>
                   <span>{{ profile.auth_user_id.email }}</span>
@@ -138,13 +138,6 @@
               <span class="profile__info-content">{{ currentProfile.bank_account }}</span>
             </li>
           </ul>
-
-          <div class="open__actions">
-            <div class="addition-btn" @click="full = !full">
-              <span v-if="full">Скрыть полную информацию</span>
-              <span v-if="!full">Показать полную информацию</span>
-            </div>
-          </div>
           <div class="profile__info profile__info-full" v-if="full">
             <h3>Адреса</h3>
             <ul>
@@ -226,6 +219,16 @@
                 <span class="profile__info-content">{{ currentProfile.skills }}</span>
               </li>
             </ul>
+          </div>
+          <div class="open__actions">
+            <div class="addition-btn" @click="full = !full">
+              <span v-if="full">Скрыть полную информацию</span>
+              <span v-if="!full">Показать полную информацию</span>
+            </div>
+            <div class="addition-btn"
+                 @click="$router.push({name: 'Documents', params: {type: 'worker', id: currentProfile.id}})">
+              Документы
+            </div>
           </div>
           <div class="news-open__actions open__actions">
             <div class="addition-btn" @click="openEditForm(currentProfile)">
@@ -812,6 +815,9 @@ export default {
       $('.content-list__filters').removeClass('open')
       $('.content-list__btns').removeClass('hidden')
     },
+    goDocuments() {
+      this.$router.push({name: 'Documents', params: {}})
+    }
   }
 }
 </script>

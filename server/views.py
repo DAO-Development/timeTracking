@@ -52,7 +52,7 @@ class ProfilesView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        user_profile = UserProfile.objects.all()
+        user_profile = UserProfile.objects.all().order_by('lastname').order_by('name')
         serializer = UserProfileSerializer(user_profile, many=True)
         return Response({"data": serializer.data})
 
@@ -85,6 +85,51 @@ class ProfilesView(APIView):
             return Response(status=201)
         else:
             return Response(status=400)
+
+
+class UserDocumentsView(APIView):
+    """Документы пользователей"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, ):
+        # return Response({"data": request.GET['id']})
+        profile = get_object_or_404(UserProfile.objects.all(), pk=request.GET['id'])
+        profile_serializer = UserProfileSerializer(profile)
+        documents = UserDocuments.objects.all().filter(user_profile_id=request.GET['id'])
+        serializer = UserDocumentsSerializer(documents, many=True)
+        return Response({"profile": profile_serializer.data, "documents": serializer.data}, status=200)
+
+    def put(self, request):
+        create_date = datetime.date.today()
+        name = ''
+        if len(request.FILES) == 1:
+            name = '/documents/' + request.FILES['document'].name
+            with open('media' + name, 'wb+') as destination:
+                for chunk in request.FILES['document'].chunks():
+                    destination.write(chunk)
+        else:
+            name = request.data['path']
+        data = {
+            "user_profile_id": int(request.data['user_profile_id']),
+            "name": request.data['name'],
+            "create_date": create_date,
+            "path": name,
+        }
+        if request.data["id"] == "0":
+            serializer = UserDocumentsSerializer(data=data)
+        else:
+            saved_object = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
+            serializer = UserDocumentsSerializer(saved_object, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        document = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
+        document.delete()
+        return Response(status=204)
 
 
 class GroupView(APIView):

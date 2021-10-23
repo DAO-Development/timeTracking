@@ -37,7 +37,7 @@
     }
 
     // The iframe transport accepts four additional options:
-    // options.fileInput: a jQuery collection of file input fields
+    // options.fileInput: a jQuery collection of file input fielpeds
     // options.paramName: the parameter name for the file form data,
     //  overrides the name property of the file input field(s),
     //  can be a string or an array of strings.

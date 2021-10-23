@@ -71,6 +71,11 @@ export default {
         this.selectedItem = this.items.length + 1
         this.page = "Настройки"
         break
+      case "Documents":
+        //@todo fix that later
+        this.selectedItem = -1
+        this.page = "Документы"
+        break
       default:
         var i = -1;
         this.items.forEach(item => {

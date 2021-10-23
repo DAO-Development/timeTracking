@@ -1,0 +1,295 @@
+<template>
+  <div class="documents flex-content">
+    <div class="summary-box">
+      <div class="summary-box__title">
+        <h3>Документы</h3>
+        <div class="addition-btn" @click="$router.go(-1)">
+          <span>Назад</span>
+          <back-icon/>
+        </div>
+      </div>
+      <div class="documents-all all">
+        <v-data-table :headers="headers" :items="documents">
+          <!--          <template v-slot:top>-->
+          <!--            <v-toolbar flat>-->
+          <!--              <v-toolbar-title>My CRUD</v-toolbar-title>-->
+          <!--              <v-divider class="mx-4" inset vertical></v-divider>-->
+          <!--              <v-spacer></v-spacer>-->
+          <!--              <v-dialog v-model="addForm" max-width="500px">-->
+          <!--                <template v-slot:activator="{ on, attrs }">-->
+          <!--                  <v-btn color="primary" dark v-bind="attrs" v-on="on">-->
+          <!--                    New Item-->
+          <!--                  </v-btn>-->
+          <!--                </template>-->
+          <!--                <v-card>-->
+          <!--                  <v-card-title>-->
+          <!--                    <span class="text-h5">{{ formTitle }}</span>-->
+          <!--                  </v-card-title>-->
+
+          <!--                  <v-card-text>-->
+          <!--                    <v-container>-->
+          <!--                      <v-row>-->
+          <!--                        <v-text-field v-model="newDocument.name" outlined></v-text-field>-->
+          <!--                        <v-text-field v-model="newDocument.path" outlined></v-text-field>-->
+          <!--                      </v-row>-->
+          <!--                    </v-container>-->
+          <!--                  </v-card-text>-->
+
+          <!--                  <v-card-actions>-->
+          <!--                    <v-spacer></v-spacer>-->
+          <!--                    <v-btn color="secondary" @click="this.addForm = false">-->
+          <!--                      Отменить-->
+          <!--                    </v-btn>-->
+          <!--                    <v-btn color="primary" @click="putDocument">-->
+          <!--                      Сохранить-->
+          <!--                    </v-btn>-->
+          <!--                  </v-card-actions>-->
+          <!--                </v-card>-->
+          <!--              </v-dialog>-->
+          <!--              <v-dialog v-model="confirmDeleteDialog" max-width="500px">-->
+          <!--                <v-card>-->
+          <!--                  <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>-->
+          <!--                  <v-card-actions>-->
+          <!--                    <v-spacer></v-spacer>-->
+          <!--                    <v-btn color="blue darken-1" text @click="confirmDeleteDialog = false">Cancel</v-btn>-->
+          <!--                    <v-btn color="blue darken-1" text @click="deleteDocument">OK</v-btn>-->
+          <!--                    <v-spacer></v-spacer>-->
+          <!--                  </v-card-actions>-->
+          <!--                </v-card>-->
+          <!--              </v-dialog>-->
+          <!--            </v-toolbar>-->
+          <!--          </template>-->
+          <template v-slot:item.actions="{ item }">
+            <v-icon small class="mr-2" @click="openEditForm(item)">mdi-pencil</v-icon>
+            <v-icon small @click="openConfirmDeleteDialog(item)">mdi-delete</v-icon>
+          </template>
+          <template v-slot:no-data>
+            Документы не загружены
+          </template>
+        </v-data-table>
+        <!--        <v-list three-line class="documents_list content-list">-->
+        <!--          <template v-for="profile in profiles">-->
+        <!--            <v-list-item :key="profile.id"-->
+        <!--                         v-if="profile.active !== archive && profile.auth_user_id.email.includes(filter.email) && (profile.name + ' ' + profile.lastname).includes(filter.name)  && (profile.position===filter.position || filter.position === 'Все')">-->
+        <!--              <v-list-item-avatar class="content-list__image">-->
+        <!--                <v-img v-if="profile.photo_path" :src="require('../../../media'+profile.photo_path)"></v-img>-->
+        <!--              </v-list-item-avatar>-->
+        <!--              <v-list-item-content @click="openProfile(profile)">-->
+        <!--                <v-list-item-title>{{ profile.lastname }} {{ profile.name }}</v-list-item-title>-->
+        <!--                <v-list-item-subtitle>-->
+        <!--                  <span>{{ profile.position }}</span><br>-->
+        <!--                  <span>{{ profile.auth_user_id.email }}</span>-->
+        <!--                </v-list-item-subtitle>-->
+        <!--              </v-list-item-content>-->
+        <!--              <v-list-item-action>-->
+        <!--                <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(profile)">-->
+        <!--                  $deleteIcon-->
+        <!--                </v-icon>-->
+        <!--              </v-list-item-action>-->
+        <!--            </v-list-item>-->
+        <!--          </template>-->
+        <!--        </v-list>-->
+        <v-list class="content-list__btns">
+          <v-list-item class="content-list__btns-add" @click="openAddForm">
+            <v-list-item-icon>
+              <v-icon>mdi-plus</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Добавить документ</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </div>
+    </div>
+    <v-dialog v-model="addForm" max-width="500">
+      <v-card>
+        <v-card-title>
+          {{ formTitle }}
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form" :model="currentDocument">
+            <v-text-field v-model="currentDocument.name" placeholder="Название документа*" outlined
+                          :rules="reqRules" required></v-text-field>
+            <v-btn v-if="!editFile" text @click="editFile=true">Изменить файл</v-btn>
+            <v-file-input v-if="editFile" v-model="currentDocument.path" placeholder="Выберите документ*" accept="*"
+                          prepend-icon="" outlined @change="showDoc" :rules="reqRules"></v-file-input>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="putDocument">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="confirmDeleteDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Удаление документа
+        </v-card-title>
+        <v-card-text>
+          Вы действительно хотите удалить выбранный документ? Отменить это действие будет невозможно
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>
+          <v-btn color="primary" text @click="deleteDocument">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
+<script>
+import BackIcon from "../components/icons/backIcon";
+import $ from "jquery";
+
+export default {
+  name: "Documents",
+  components: {BackIcon},
+  props: {
+    type: String,
+    id: String
+  },
+  data() {
+    return {
+      profile: {},
+      documents: [],
+      currentDocument: {
+        id: 0,
+        name: null,
+        create_date: null,
+        path: null,
+      },
+      headers: [
+        {text: 'Название', align: 'start', sortable: true, value: 'name',},
+        {text: 'Дата создания', value: 'create_date'},
+        {text: '', value: 'actions', sortable: false},
+      ],
+      formTitle: "Добавить документ",
+      editFile: false,
+      addForm: false,
+      confirmDeleteDialog: false,
+      reqRules: [
+        v => !!v || 'Необходимо заполнить поле'
+      ],
+    }
+  },
+  created() {
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      this.$emit('set-auth')
+      $.ajaxSetup({
+        headers: {"Authorization": "Token " + localStorage.getItem("auth_token") || sessionStorage.getItem('auth_token')}
+      })
+      this.loadData()
+      // } else if (sessionStorage.getItem('auth_token')) {
+      //   this.$emit('set-auth')
+      //   $.ajaxSetup({
+      //     headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
+      //   })
+      //   this.loadData()
+    } else {
+      this.$router.push({name: "Index"})
+    }
+  },
+  methods: {
+    showDoc() {
+      console.log(this.currentDocument.path.type)
+    },
+    loadData() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/documents/" + this.type,
+        type: "GET",
+        data: {
+          "id": this.id
+        },
+        success: (response) => {
+          this.documents = response.data.documents
+          this.profile = response.data.profile
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    putDocument() {
+      if (this.$refs.form.validate()) {
+        const axios = require('axios')
+        // чтение файла в formData
+        let fd = new FormData();
+        if (this.editFile) {
+          let document = this.currentDocument.path;
+          if (document !== undefined) {
+            fd.append('document', document)
+          } else {
+            console.log("ERROR")
+            return
+          }
+        } else
+          fd.append('path', this.currentDocument.path)
+        fd.append('id', this.currentDocument.id)
+        fd.append('create_date', this.currentDocument.create_date)
+        fd.append('name', this.currentDocument.name)
+        fd.append('user_profile_id', this.id)
+        axios({
+          method: 'put',
+          url: this.$hostname + "time-tracking/documents/" + this.type,
+          headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+          data: fd
+        })
+            .then(response => {
+              console.log(response.data.data)
+              this.addForm = false
+              this.loadData()
+            });
+      }
+    },
+    deleteDocument() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/documents/" + this.type,
+        type: "DELETE",
+        data: {
+          "id": this.currentDocument.id
+        },
+        success: () => {
+          console.log("Документ удален")
+          this.confirmDeleteDialog = false
+          this.loadData()
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    openAddForm() {
+      this.editFile = true
+      this.formTitle = "Добавить документ"
+      this.currentDocument = {
+        id: 0,
+        name: null,
+        create_date: null,
+        path: null,
+      }
+      this.addForm = true
+    },
+    openEditForm(item) {
+      this.editFile = false
+      this.formTitle = "Редактировать документ"
+      this.currentDocument = item
+      // this.currentDocument.path = require('../../../media' + this.currentDocument.path)
+      this.addForm = true
+    },
+    openConfirmDeleteDialog(item) {
+      this.currentDocument = item
+      this.confirmDeleteDialog = true
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
