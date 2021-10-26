@@ -155,10 +155,12 @@ class GroupsView(APIView):
 
 class NewsView(APIView):
     """Новости"""
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
-    def get(self, request):
+    def get(self, request, id=None):
         news = News.objects.all()
+        if id is not None:
+            news = news.filter(pk=id)
         serializer = NewsSerializer(news, many=True)
         return Response({"data": serializer.data})
 
