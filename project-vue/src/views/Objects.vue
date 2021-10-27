@@ -206,18 +206,40 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
-          <h3>Фото объекта</h3>
-          <v-slide-group class="pa-4 objects-open__slider" v-model="photos" active-class="slide-active" show-arrows>
-            <v-slide-item v-for="ph in photos" :key="ph.id">
-              <v-card class="ma-4" height="250" width="300">
-                <v-row class="fill-height" align="center" justify="center">
-                  <v-scale-transition>
-                    <v-img :src="require('../../../media'+ph.photo_path)"></v-img>
-                  </v-scale-transition>
-                </v-row>
-              </v-card>
-            </v-slide-item>
-          </v-slide-group>
+          <!--          <h3>Фото объекта</h3>-->
+          <!--          <v-slide-group class="pa-4 objects-open__slider" v-model="photos" active-class="slide-active" show-arrows>-->
+          <!--            <v-slide-item v-for="ph in photos" :key="ph.id">-->
+          <!--              <v-card class="ma-4" height="250" width="300">-->
+          <!--                <v-row class="fill-height" align="center" justify="center">-->
+          <!--                  <v-scale-transition>-->
+          <!--                    <v-img :src="require('../../../media'+ph.photo_path)"></v-img>-->
+          <!--                  </v-scale-transition>-->
+          <!--                </v-row>-->
+          <!--              </v-card>-->
+          <!--            </v-slide-item>-->
+          <!--          </v-slide-group>-->
+          <h3>Комментарии</h3>
+          <div class="objects-open__comments">
+            <div class="objects-open__comments-single" v-for="com in comments" :key="com.id">
+              <h4> {{ com.user_profile_id.lastname }} {{ com.user_profile_id.name }}
+                ({{ com.user_profile_id.position }})</h4>
+              <div v-html="com.text"></div>
+              <div class="open__actions">
+                <div class="addition-btn">
+                  Ответить
+                </div>
+                <div class="addition-btn">
+                  Удалить
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="objects-open__comments-add">
+            <v-editor v-model="newComment.text" :config="editorConfig"></v-editor>
+            <v-btn class="action-btn" color="secondary" @click="addComment">
+              Добавить
+            </v-btn>
+          </div>
         </div>
       </div>
     </div>
@@ -459,7 +481,13 @@ export default {
         end_date: null,
         comment: null,
       },
+      newComment: {
+        text: "",
+        object_comments_id: null,
+        objects_id: null
+      },
       photos: "",
+      comments: [],
       clients: [],
       contacts: [],
       workers: [],
@@ -489,6 +517,46 @@ export default {
       alertError: false,
       alertSuccess: false,
       alertMsg: '',
+      editorConfig: {
+        printLog: false,
+        uploadImgUrl: 'http://localhost:8000/time-tracking/images/upload',
+        menus: [
+          'source',
+          '|',
+          'bold',
+          'underline',
+          'italic',
+          'strikethrough',
+          'eraser',
+          'forecolor',
+          'bgcolor',
+          '|',
+          'quote',
+          'fontfamily',
+          'fontsize',
+          'head',
+          'unorderlist',
+          'orderlist',
+          'alignleft',
+          'aligncenter',
+          'alignright',
+          '|',
+          'link',
+          'unlink',
+          'table',
+          // 'emotion',
+          '|',
+          // 'img',
+          // 'video',
+          'insertcode',
+          '|',
+          'undo',
+          'redo',
+          'fullscreen'
+        ],
+        useLang: 'en',
+        pasteText: true,
+      },
     }
   },
   created() {
@@ -642,6 +710,7 @@ export default {
       this.loadPhoto(item.id)
       this.all = false
       this.loadWorkers()
+      this.loadComments()
     },
     loadPhoto(id) {
       $.ajax({
@@ -678,6 +747,20 @@ export default {
           this.workers.forEach(worker => {
             worker.label = worker.lastname + ' ' + worker.name + ', ' + worker.position
           })
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    loadComments() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/comments/" + this.currentObject.id,
+        type: "GET",
+        success: (response) => {
+          this.comments = response.data.data
         },
         error: (response) => {
           this.alertError = true
@@ -734,6 +817,23 @@ export default {
     },
     openWorker(worker) {
       console.log(worker)
+    },
+    addComment() {
+      this.newComment.objects_id = this.currentObject.id
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/comments",
+        type: "POST",
+        data: this.newComment,
+        success: (response) => {
+          console.log(response)
+          this.loadComments()
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
     },
     openAddForm() {
       this.formTitle = "Добавление объекта"

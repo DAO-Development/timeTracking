@@ -16,9 +16,12 @@ urlpatterns = [
     # path('objects/<int:id>', ObjectsView.as_view()),
     path('objects/employees', ObjectUserView.as_view()),
     path('objects/employees/<int:objects_id>', ObjectUserView.as_view()),
+    path('objects/comments', ObjectCommentsView.as_view()),
+    path('objects/comments/<int:objects_id>', ObjectCommentsView.as_view()),
     path('objects/photos/<int:objects_id>', ObjectPhotoView.as_view()),
     path('clients', ClientView.as_view()),
     path('clients-employees', ClientEmployeesView.as_view()),
     path('clients-employees/<int:client_id>', ClientEmployeesView.as_view()),
     path('documents/worker', UserDocumentsView.as_view()),
+    path('images/upload', ImagesView.as_view()),
 ]

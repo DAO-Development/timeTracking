@@ -42,6 +42,11 @@ class ObjectUserAdmin(admin.ModelAdmin):
     list_display = ('user_profile_id', 'objects_id')
 
 
+class ObjectCommentsAdmin(admin.ModelAdmin):
+    """Комментарии к объектам"""
+    list_display = ('id', 'user_profile_id', 'objects_id')
+
+
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(UserDocuments, UserDocumentsAdmin)
 admin.site.register(Functions, FunctionsAdmin)
@@ -50,3 +55,4 @@ admin.site.register(Client, ClientsAdmin)
 admin.site.register(ClientEmployees, ClientEmployeesAdmin)
 admin.site.register(Objects, ObjectsAdmin)
 admin.site.register(ObjectUser, ObjectUserAdmin)
+admin.site.register(ObjectComments, ObjectCommentsAdmin)

@@ -323,6 +323,40 @@ class ObjectPhotoView(APIView):
         return Response(status=204)
 
 
+class ObjectCommentsView(APIView):
+    """Комментарии к объектам"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, objects_id=None):
+        comments = ObjectComments.objects.all()
+        if objects_id is not None:
+            comments = comments.filter(objects_id=objects_id)
+        serializer = ObjectCommentsSerializer(comments, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+        object_comments_id = request.data['object_comments_id']
+        if request.data['object_comments_id'] == "":
+            object_comments_id = None
+
+        return Response(
+            {"text": request.data['text'], "objects_id": int(request.data['objects_id']), "user_profile": user_profile,
+             "comment_id": object_comments_id})
+        serializer = ObjectsPostSerializer(data={
+            'text': request.data['text'],
+            'object_comments_id': object_comments_id,
+            'user_profile_id': int(user_profile),
+            'objects_id': int(request.data['objects_id'])
+        })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+
 class ClientView(APIView):
     """Клиенты"""
     permission_classes = [permissions.IsAuthenticated]
@@ -343,3 +377,11 @@ class ClientEmployeesView(APIView):
             employees = employees.filter(client=client_id)
         serializer = ClientEmployeesSerializer(employees, many=True)
         return Response({"data": serializer.data})
+
+
+class ImagesView(APIView):
+    """Загрузка изображений из редактора"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        return Response({"message": "upload"})

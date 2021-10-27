@@ -170,3 +170,22 @@ class ObjectPhotoPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjectPhoto
         fields = ('photo_path', 'objects_id')
+
+
+class ObjectCommentsSerializer(serializers.ModelSerializer):
+    """Сериализация комментариев к объектам"""
+
+    objects_id = ObjectsSerializer()
+    user_profile_id = UserProfileSerializer()
+
+    class Meta:
+        model = ObjectComments
+        fields = '__all__'
+
+
+class ObjectCommentsPostSerializer(serializers.ModelSerializer):
+    """Сериализация комментариев к объектам"""
+
+    class Meta:
+        model = ObjectComments
+        fields = ('text', 'user_profile_id', 'objects_id', 'object_comments_id')
