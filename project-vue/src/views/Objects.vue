@@ -827,6 +827,11 @@ export default {
         success: (response) => {
           console.log(response)
           this.loadComments()
+          this.newComment = {
+            text: "",
+            object_comments_id: null,
+            objects_id: null
+          }
         },
         error: (response) => {
           this.alertError = true

@@ -338,17 +338,11 @@ class ObjectCommentsView(APIView):
         user = UserSerializer(request.user)
         user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
         object_comments_id = request.data['object_comments_id']
-        if request.data['object_comments_id'] == "":
-            object_comments_id = None
-
-        return Response(
-            {"text": request.data['text'], "objects_id": int(request.data['objects_id']), "user_profile": user_profile,
-             "comment_id": object_comments_id})
-        serializer = ObjectsPostSerializer(data={
+        serializer = ObjectCommentsPostSerializer(data={
             'text': request.data['text'],
             'object_comments_id': object_comments_id,
-            'user_profile_id': int(user_profile),
-            'objects_id': int(request.data['objects_id'])
+            'user_profile_id': user_profile,
+            'objects_id': request.data['objects_id']
         })
         if serializer.is_valid():
             serializer.save()
