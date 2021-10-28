@@ -3,7 +3,6 @@
     <v-container>
       <div class="flex-main">
         <Menu v-if="auth" class="flex-sidebar"/>
-        <!--      <Menu v-if="auth"></Menu>-->
         <router-view v-on:set-auth="setAuth" v-on:set-admin="setAdmin"/>
       </div>
     </v-container>

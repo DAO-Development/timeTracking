@@ -328,6 +328,8 @@ class ObjectCommentsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, id=None):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
         comments = ObjectComments.objects.all()
         if id is not None:
             comments = comments.filter(objects_id=id).filter(object_comments_id__isnull=True)
@@ -337,7 +339,7 @@ class ObjectCommentsView(APIView):
             children_serializer = ObjectCommentsSerializer(children, many=True)
             data.update({com.id: children_serializer.data})
         serializer = ObjectCommentsSerializer(comments, many=True)
-        return Response({"comments": serializer.data, "data": data})
+        return Response({"profile": user_profile, "comments": serializer.data, "data": data})
 
     def post(self, request):
         user = UserSerializer(request.user)

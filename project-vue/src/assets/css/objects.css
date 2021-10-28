@@ -40,7 +40,17 @@
     margin: 10px 0;
 }
 
-.objects-open__comments-add-actions .objects-open__comments-add-answerfor > * {
+.objects-open__comments-add-actions .objects-open__comments-add-answerfor {
+    display: flex;
+    align-items: flex-start;
+}
+
+.objects-open__comments-add-actions .objects-open__comments-add-answerfor .v-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.objects-open__comments-add-actions .objects-open__comments-add-answerfor .comments__answer {
     color: #6386B9;
     opacity: 0.5;
 }

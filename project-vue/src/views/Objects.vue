@@ -228,7 +228,8 @@
                 <div class="addition-btn" @click="answer=com.text; newComment.object_comments_id=com.id">
                   Ответить
                 </div>
-                <div class="addition-btn" @click="deleteComment(com.id)">
+                <div class="addition-btn" @click="deleteComment(com.id)"
+                     v-if="com.user_profile_id.id === comments.profile">
                   Удалить
                 </div>
               </div>
@@ -238,7 +239,8 @@
                   ({{ ans.user_profile_id.position }})</h4>
                 <div v-html="ans.text"></div>
                 <div class="open__actions">
-                  <div class="addition-btn" @click="deleteComment(ans.id)">
+                  <div class="addition-btn" @click="deleteComment(ans.id)"
+                       v-if="ans.user_profile_id.id === comments.profile">
                     Удалить
                   </div>
                 </div>
@@ -249,8 +251,10 @@
             <v-editor v-model="newComment.text" :config="editorConfig"></v-editor>
             <div class="objects-open__comments-add-actions">
               <div class="objects-open__comments-add-answerfor" v-if="newComment.object_comments_id != null">
-                Ответ на:
-                <div v-html="answer"></div>
+                <div>Ответ на:
+                  <div class="comments__answer" v-html="answer"></div>
+                </div>
+                <v-icon @click="newComment.object_comments_id=null" style="width: 16px">$deleteIcon</v-icon>
               </div>
               <v-btn class="action-btn" color="secondary" @click="addComment">
                 Добавить
