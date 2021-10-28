@@ -21,6 +21,34 @@
     fill: grey;
 }
 
+.objects-open__comments {
+    margin-bottom: 20px;
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: scroll;
+    border: 1px solid;
+}
+
+.objects-open__comments-answers {
+    margin-left: 30px
+}
+
+.objects-open__comments-add-actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    margin: 10px 0;
+}
+
+.objects-open__comments-add-actions .objects-open__comments-add-answerfor > * {
+    color: #6386B9;
+    opacity: 0.5;
+}
+
+.objects-open__comments-add-actions .action-btn {
+    margin-left: auto;
+}
+
 @media screen and (max-width: 1200px) {
 
     .objects-open .workers__list {

@@ -220,25 +220,42 @@
           <!--          </v-slide-group>-->
           <h3>Комментарии</h3>
           <div class="objects-open__comments">
-            <div class="objects-open__comments-single" v-for="com in comments" :key="com.id">
+            <div class="objects-open__comments-single" v-for="com in comments.comments" :key="com.id">
               <h4> {{ com.user_profile_id.lastname }} {{ com.user_profile_id.name }}
                 ({{ com.user_profile_id.position }})</h4>
               <div v-html="com.text"></div>
               <div class="open__actions">
-                <div class="addition-btn">
+                <div class="addition-btn" @click="answer=com.text; newComment.object_comments_id=com.id">
                   Ответить
                 </div>
-                <div class="addition-btn">
+                <div class="addition-btn" @click="deleteComment(com.id)">
                   Удалить
+                </div>
+              </div>
+              <v-divider></v-divider>
+              <div class="objects-open__comments-answers" v-for="ans in comments.data[com.id]" :key="ans.id">
+                <h4> {{ ans.user_profile_id.lastname }} {{ ans.user_profile_id.name }}
+                  ({{ ans.user_profile_id.position }})</h4>
+                <div v-html="ans.text"></div>
+                <div class="open__actions">
+                  <div class="addition-btn" @click="deleteComment(ans.id)">
+                    Удалить
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div class="objects-open__comments-add">
             <v-editor v-model="newComment.text" :config="editorConfig"></v-editor>
-            <v-btn class="action-btn" color="secondary" @click="addComment">
-              Добавить
-            </v-btn>
+            <div class="objects-open__comments-add-actions">
+              <div class="objects-open__comments-add-answerfor" v-if="newComment.object_comments_id != null">
+                Ответ на:
+                <div v-html="answer"></div>
+              </div>
+              <v-btn class="action-btn" color="secondary" @click="addComment">
+                Добавить
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -486,6 +503,7 @@ export default {
         object_comments_id: null,
         objects_id: null
       },
+      answer: "",
       photos: "",
       comments: [],
       clients: [],
@@ -760,7 +778,7 @@ export default {
         url: this.$hostname + "time-tracking/objects/comments/" + this.currentObject.id,
         type: "GET",
         success: (response) => {
-          this.comments = response.data.data
+          this.comments = response.data
         },
         error: (response) => {
           this.alertError = true
@@ -832,6 +850,21 @@ export default {
             object_comments_id: null,
             objects_id: null
           }
+        },
+        error: (response) => {
+          this.alertError = true
+          this.alertMsg = "Непредвиденная ошибка"
+          console.log(response.data)
+        },
+      })
+    },
+    deleteComment(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/comments/" + id,
+        type: "DELETE",
+        data: this.newComment,
+        success: () => {
+          this.loadComments()
         },
         error: (response) => {
           this.alertError = true

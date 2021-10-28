@@ -318,7 +318,7 @@ class ObjectPhotoView(APIView):
             return Response(status=400)
 
     def delete(self, request, id):
-        object_photo = get_object_or_404(Objects.objects.all(), id=id)
+        object_photo = get_object_or_404(ObjectPhoto.objects.all(), id=id)
         object_photo.delete()
         return Response(status=204)
 
@@ -327,12 +327,17 @@ class ObjectCommentsView(APIView):
     """Комментарии к объектам"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, objects_id=None):
+    def get(self, request, id=None):
         comments = ObjectComments.objects.all()
-        if objects_id is not None:
-            comments = comments.filter(objects_id=objects_id)
+        if id is not None:
+            comments = comments.filter(objects_id=id).filter(object_comments_id__isnull=True)
+        data = {}
+        for com in comments:
+            children = ObjectComments.objects.filter(object_comments_id=com.id)
+            children_serializer = ObjectCommentsSerializer(children, many=True)
+            data.update({com.id: children_serializer.data})
         serializer = ObjectCommentsSerializer(comments, many=True)
-        return Response({"data": serializer.data})
+        return Response({"comments": serializer.data, "data": data})
 
     def post(self, request):
         user = UserSerializer(request.user)
@@ -349,6 +354,11 @@ class ObjectCommentsView(APIView):
             return Response(status=201)
         else:
             return Response(status=400)
+
+    def delete(self, request, id):
+        object_comment = get_object_or_404(ObjectComments.objects.all(), id=id)
+        object_comment.delete()
+        return Response(status=204)
 
 
 class ClientView(APIView):
