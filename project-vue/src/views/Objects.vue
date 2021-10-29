@@ -446,6 +446,12 @@ import BackIcon from "../components/icons/backIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
 
+const socket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/'
+);
+
 export default {
   name: "Objects",
   components: {EditIcon, WasteIcon, BackIcon, /*AddPhotoIcon*/},
@@ -509,7 +515,10 @@ export default {
       },
       answer: "",
       photos: "",
-      comments: [],
+      comments: {
+        comments: [],
+        data: {}
+      },
       clients: [],
       contacts: [],
       workers: [],
@@ -589,6 +598,7 @@ export default {
       })
       this.loadData()
       this.loadClients()
+
     } else if (sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       $.ajaxSetup({
@@ -596,11 +606,22 @@ export default {
       })
       this.loadData()
       this.loadClients()
+      this.initSocket()
     } else {
       this.$router.push({name: "Login"})
     }
   },
   methods: {
+    initSocket() {
+      socket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        console.log(data.message);
+      };
+
+      socket.onclose = function () {
+        console.error('Chat socket closed unexpectedly');
+      };
+    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects",
@@ -732,7 +753,10 @@ export default {
       this.loadPhoto(item.id)
       this.all = false
       this.loadWorkers()
-      this.loadComments()
+      this.loadComments(false)
+      setInterval(() => {
+        this.loadComments(true)
+      }, 25000)
     },
     loadPhoto(id) {
       $.ajax({
@@ -777,12 +801,31 @@ export default {
         },
       })
     },
-    loadComments() {
+    loadComments(check) {
       $.ajax({
         url: this.$hostname + "time-tracking/objects/comments/" + this.currentObject.id,
         type: "GET",
         success: (response) => {
-          this.comments = response.data
+          console.log(this.comments)
+          console.log(response.data)
+          console.log(this.comments.comments.length < response.data.comments.length)
+          if (!check)
+            this.comments = response.data
+          else if (this.comments !== undefined && check) {
+            let k = false
+            if (this.comments.comments.length < response.data.comments.length
+                || this.comments.data.length < response.data.data.length)
+              k = true
+            else
+              for (let i = 0; i !== this.comments.data.length; i++) {
+                if (this.comments.data[i].length < this.response.data.data[i].length)
+                  k = true
+              }
+            if (k) {
+              this.comments = response.data
+              alert("Новый комментарий!")
+            }
+          }
         },
         error: (response) => {
           this.alertError = true
@@ -846,9 +889,11 @@ export default {
         url: this.$hostname + "time-tracking/objects/comments",
         type: "POST",
         data: this.newComment,
-        success: (response) => {
-          console.log(response)
-          this.loadComments()
+        success: () => {
+          socket.onopen = () => socket.send(JSON.stringify({
+            'message': this.newComment.text
+          }));
+          this.loadComments(false)
           this.newComment = {
             text: "",
             object_comments_id: null,
@@ -868,7 +913,7 @@ export default {
         type: "DELETE",
         data: this.newComment,
         success: () => {
-          this.loadComments()
+          this.loadComments(false)
         },
         error: (response) => {
           this.alertError = true

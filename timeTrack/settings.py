@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "rest_framework.authtoken",
     'djoser',
+    'channels',
 
     'server',
     'start',
@@ -90,17 +91,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'timeTrack.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
+ASGI_APPLICATION = 'timeTrack.asgi.application'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
