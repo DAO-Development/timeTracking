@@ -105,7 +105,10 @@ class ClientPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = '__all__'
+        fields = (
+            'name', 'short_name', 'ogrn', 'business_address', 'warehouse_address', 'phone', 'email', 'site',
+            'logo_path', 'vat', 'branch', 'bank_account', 'bank', 'bic', 'account_operator', 'index_operator',
+            'electronic_number', 'account_email')
 
 
 class ClientEmployeesSerializer(serializers.ModelSerializer):
@@ -116,6 +119,14 @@ class ClientEmployeesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientEmployees
         fields = '__all__'
+
+
+class ClientEmployeesPostSerializer(serializers.ModelSerializer):
+    """Сериализация сотрудников клиентов для POST-запросов"""
+
+    class Meta:
+        model = ClientEmployees
+        fields = ('name', 'lastname', 'position', 'phone', 'work_phone', 'email', 'work_email', 'client', 'photo_path')
 
 
 class ObjectsSerializer(serializers.ModelSerializer):

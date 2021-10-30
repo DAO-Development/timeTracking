@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -368,9 +366,31 @@ class ClientView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        clients = Client.objects.all()
+        clients = Client.objects.all().order_by('name')
         serializer = ClientSerializer(clients, many=True)
         return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = ClientPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
+        serializer = ClientSerializer(saved_client, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
+        saved_client.delete()
+        return Response(status=204)
 
 
 class ClientEmployeesView(APIView):
@@ -383,6 +403,28 @@ class ClientEmployeesView(APIView):
             employees = employees.filter(client=client_id)
         serializer = ClientEmployeesSerializer(employees, many=True)
         return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = ClientEmployeesPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
+        serializer = ClientSerializer(saved_employee, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
+        saved_employee.delete()
+        return Response(status=204)
 
 
 class ImagesView(APIView):
