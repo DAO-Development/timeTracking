@@ -90,6 +90,12 @@ TEMPLATES = [
     },
 ]
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
 WSGI_APPLICATION = 'timeTrack.wsgi.application'
 ASGI_APPLICATION = 'timeTrack.asgi.application'
 

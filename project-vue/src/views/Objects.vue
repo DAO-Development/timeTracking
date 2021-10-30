@@ -754,9 +754,9 @@ export default {
       this.all = false
       this.loadWorkers()
       this.loadComments(false)
-      setInterval(() => {
-        this.loadComments(true)
-      }, 25000)
+      // setInterval(() => {
+      //   this.loadComments(true)
+      // }, 25000)
     },
     loadPhoto(id) {
       $.ajax({
@@ -806,26 +806,26 @@ export default {
         url: this.$hostname + "time-tracking/objects/comments/" + this.currentObject.id,
         type: "GET",
         success: (response) => {
-          console.log(this.comments)
-          console.log(response.data)
-          console.log(this.comments.comments.length < response.data.comments.length)
+          // console.log(this.comments)
+          // console.log(response.data)
+          // console.log(this.comments.comments.length < response.data.comments.length)
           if (!check)
             this.comments = response.data
-          else if (this.comments !== undefined && check) {
-            let k = false
-            if (this.comments.comments.length < response.data.comments.length
-                || this.comments.data.length < response.data.data.length)
-              k = true
-            else
-              for (let i = 0; i !== this.comments.data.length; i++) {
-                if (this.comments.data[i].length < this.response.data.data[i].length)
-                  k = true
-              }
-            if (k) {
-              this.comments = response.data
-              alert("Новый комментарий!")
-            }
-          }
+          // else if (this.comments !== undefined && check) {
+          //   let k = false
+          //   if (this.comments.comments.length < response.data.comments.length
+          //       || this.comments.data.length < response.data.data.length)
+          //     k = true
+          //   else
+          //     for (let i = 0; i !== this.comments.data.length; i++) {
+          //       if (this.comments.data[i].length < this.response.data.data[i].length)
+          //         k = true
+          //     }
+          //   if (k) {
+          //     this.comments = response.data
+          //     alert("Новый комментарий!")
+          //   }
+          // }
         },
         error: (response) => {
           this.alertError = true
@@ -890,9 +890,13 @@ export default {
         type: "POST",
         data: this.newComment,
         success: () => {
-          socket.onopen = () => socket.send(JSON.stringify({
+          console.log(socket.readyState)
+          console.log(socket.OPEN)
+          // socket.onopen = () =>
+              socket.send(JSON.stringify({
             'message': this.newComment.text
           }));
+          console.log(socket.readyState)
           this.loadComments(false)
           this.newComment = {
             text: "",
