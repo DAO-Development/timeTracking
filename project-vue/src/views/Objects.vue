@@ -446,11 +446,11 @@ import BackIcon from "../components/icons/backIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
 
-const socket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/'
-);
+// const socket = new WebSocket(
+//     'ws://'
+//     + window.location.host
+//     + '/ws/'
+// );
 
 export default {
   name: "Objects",
@@ -613,14 +613,14 @@ export default {
   },
   methods: {
     initSocket() {
-      socket.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        console.log(data.message);
-      };
-
-      socket.onclose = function () {
-        console.error('Chat socket closed unexpectedly');
-      };
+      // socket.onmessage = function (e) {
+      //   const data = JSON.parse(e.data);
+      //   console.log(data.message);
+      // };
+      //
+      // socket.onclose = function () {
+      //   console.error('Chat socket closed unexpectedly');
+      // };
     },
     loadData() {
       $.ajax({
@@ -890,13 +890,13 @@ export default {
         type: "POST",
         data: this.newComment,
         success: () => {
-          console.log(socket.readyState)
-          console.log(socket.OPEN)
+          // console.log(socket.readyState)
+          // console.log(socket.OPEN)
           // socket.onopen = () =>
-              socket.send(JSON.stringify({
-            'message': this.newComment.text
-          }));
-          console.log(socket.readyState)
+          //     socket.send(JSON.stringify({
+          //   'message': this.newComment.text
+          // }));
+          // console.log(socket.readyState)
           this.loadComments(false)
           this.newComment = {
             text: "",
