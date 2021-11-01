@@ -81,8 +81,8 @@
         <v-card-actions>
           <div class="addition-btn" @click="photoDialog=true">
             <add-photo-icon/>
-            <span v-if="newNew.photo_path == null">Загрузить обложку</span>
-            <span v-if="newNew.photo_path != null">Сменить обложку</span>
+            <span v-if="photoField == null">Загрузить обложку</span>
+            <span v-if="photoField != null">Сменить обложку</span>
           </div>
           <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="addNew">{{ formBtnText }}</v-btn>
@@ -95,7 +95,7 @@
           Сменить фото
         </v-card-title>
         <v-card-text>
-          <v-file-input v-model="newNew.photo_path" placeholder="Обложка новости" accept="image/*"
+          <v-file-input v-model="photoField" placeholder="Обложка новости" accept="image/*"
                         prepend-icon="" outlined></v-file-input>
         </v-card-text>
         <v-card-actions>
@@ -114,6 +114,8 @@ import EditIcon from "../components/icons/editIcon";
 import BackIcon from "../components/icons/backIcon";
 import AddPhotoIcon from "../components/icons/addPhotoIcon"
 
+//todo добавить loader на процессы добавления и редактирования (картинка тормозит)
+
 export default {
   name: "News",
   components: {BackIcon, EditIcon, WasteIcon, AddPhotoIcon},
@@ -128,6 +130,7 @@ export default {
         text: '',
         photo_path: null,
       },
+      photoField: null,
       currentNew: {
         id: 0,
         title: '',
@@ -231,20 +234,15 @@ export default {
     },
     addNew() {
       if (this.$refs.form.validate()) {
-        console.log(this.newNew.id + " " + this.newNew.title)
-        console.log(this.newNew.text)
         if (this.newNew.id > 0)
           this.editNew()
         else {
           const axios = require('axios')
           // чтение файла в formData
           let fd = new FormData();
-          let photo = this.newNew.photo_path;
-          if (this.newNew.photo_path !== undefined) {
+          let photo = this.photoField;
+          if (this.photoField !== undefined) {
             fd.append('image', photo)
-          } else {
-            console.log("ERROR")
-            return
           }
           fd.append('title', this.newNew.title)
           fd.append('text', this.newNew.text)
@@ -270,12 +268,10 @@ export default {
       const axios = require('axios')
       // чтение файла в formData
       let fd = new FormData();
-      let photo = this.newNew.photo_path;
-      if (this.newNew.photo_path !== null) {
+      let photo = this.photoField;
+      console.log(this.currentNew.photo_path)
+      if (this.photoField !== null) {
         fd.append('image', photo)
-      } else {
-        console.log("ERROR")
-        return
       }
       fd.append('title', this.newNew.title)
       fd.append('text', this.newNew.text)
@@ -291,6 +287,10 @@ export default {
             this.photoDialog = false
             this.closeForm()
             this.loadData()
+            if (this.photoField !== null) {
+              this.currentNew.photo_path = "/news/" + this.photoField.name
+              this.photoField = null
+            }
           });
     },
     deleteNew(id) {
@@ -337,8 +337,8 @@ export default {
       }
     },
     closePhotoForm() {
-      if (this.newNew.photo_path !== null)
-        this.currentNew.photo_path = '/news/' + this.newNew.photo_path.name
+      // if (this.newNew.photo_path !== null)
+      //   this.currentNew.photo_path = '/news/' + this.newNew.photo_path.name
       this.photoDialog = false
     },
     openNew(item) {

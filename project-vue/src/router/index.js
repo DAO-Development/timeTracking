@@ -9,6 +9,8 @@ import Objects from "../views/Objects";
 import Workers from "../views/Workers";
 import Documents from "../views/Documents";
 import NewOpen from "../views/NewOpen";
+import Clients from "../views/Clients";
+import ClientOpen from "../views/ClientOpen";
 
 Vue.use(VueRouter)
 
@@ -58,6 +60,17 @@ const routes = [
         path: '/news/:id',
         name: 'NewOpen',
         component: NewOpen,
+        props: true
+    },
+    {
+        path: '/clients',
+        name: 'Clients',
+        component: Clients
+    },
+    {
+        path: '/clients/:id',
+        name: 'ClientOpen',
+        component: ClientOpen,
         props: true
     },
 ]

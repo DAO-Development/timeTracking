@@ -169,7 +169,6 @@ class NewsView(APIView):
             with open('media' + name, 'wb+') as destination:
                 for chunk in request.FILES['image'].chunks():
                     destination.write(chunk)
-
         serializer = NewsPostSerializer(data={
             "title": request.data["title"],
             "text": request.data["text"],

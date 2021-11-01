@@ -506,7 +506,7 @@ export default {
         v => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'Некорректный E-mail',
       ],
       phoneRules: [
-        v => !!v || '',
+        // v => !!v || '',
         v => /^(\+)?((\d{2,3}) ?\d|\d)(([ -]?\d)|( ?(\d{2,3}) ?)){5,12}\d$/.test(v) || 'Некорректный номер телефона'
       ],
       phoneFinRules: [
@@ -516,20 +516,14 @@ export default {
     }
   },
   created() {
-    if (localStorage.getItem('auth_token')) {
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token')) {
       this.$emit('set-auth')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + localStorage.getItem("auth_token")}
-      })
-      this.loadData()
-    } else if (sessionStorage.getItem('auth_token')) {
-      this.$emit('set-auth')
-      $.ajaxSetup({
-        headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
+        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token'))}
       })
       this.loadData()
     } else {
-      this.$router.push({name: "Login"})
+      this.$router.push({name: "Index"})
     }
   },
   methods: {
@@ -815,9 +809,6 @@ export default {
       $('.content-list__filters').removeClass('open')
       $('.content-list__btns').removeClass('hidden')
     },
-    goDocuments() {
-      this.$router.push({name: 'Documents', params: {}})
-    }
   }
 }
 </script>
