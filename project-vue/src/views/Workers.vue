@@ -143,7 +143,8 @@
             <ul>
               <li>
                 <span class="profile__info-title">Адрес в своей стране</span>
-                <span class="profile__info-content" v-if="currentProfile.address_own !== null">{{
+                <span class="profile__info-content"
+                      v-if="currentProfile.address_own !== null && currentProfile.address_own.city !== ''">{{
                     currentProfile.address_own.index
                   }} {{ currentProfile.address_own.country }}, г.{{
                     currentProfile.address_own.city
@@ -153,7 +154,8 @@
               </li>
               <li>
                 <span class="profile__info-title">Адрес в Финляндии</span>
-                <span class="profile__info-content" v-if="currentProfile.address_fin !== null">{{
+                <span class="profile__info-content"
+                      v-if="currentProfile.address_fin !== null && currentProfile.address_fin.city !== ''">{{
                     currentProfile.address_fin.index
                   }} {{ currentProfile.address_fin.country }}, г.{{
                     currentProfile.address_fin.city

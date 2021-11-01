@@ -110,7 +110,7 @@
             <v-row>
               <v-text-field placeholder="Телефон*" v-model="newClient.phone" :rules="phoneRules" required
                             outlined></v-text-field>
-              <v-text-field placeholder="Почта*" v-model="newClient.email" :rules="emailRules" required
+              <v-text-field placeholder="Почта*" v-model="newClient.email" :rules="emailReqRules" required
                             outlined></v-text-field>
             </v-row>
             <v-text-field placeholder="Сайт" v-model="newClient.site" outlined></v-text-field>
@@ -130,8 +130,7 @@
             <v-row>
               <v-text-field placeholder="Номер эл. счетов" v-model="newClient.electronic_number"
                             outlined></v-text-field>
-              <v-text-field placeholder="Email для счетов" v-model="newClient.account_email" :rules="emailRules"
-                            outlined></v-text-field>
+              <v-text-field placeholder="Email для счетов" v-model="newClient.account_email" outlined></v-text-field>
             </v-row>
           </v-form>
           <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
@@ -223,8 +222,8 @@ export default {
       currentClient: 0,
       selectsVat: [
         {text: '0%', value: 0},
-        {text: '10%', value: 0},
-        {text: '20%', value: 0},
+        {text: '10%', value: 10},
+        {text: '20%', value: 20},
       ],
       filter: {
         name: "",
@@ -244,8 +243,11 @@ export default {
       reqRules: [
         v => !!v || 'Необходимо заполнить поле'
       ],
-      emailRules: [
+      emailReqRules: [
         v => !!v || 'Необходимо заполнить поле',
+        v => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'Некорректный E-mail',
+      ],
+      emailRules: [
         v => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'Некорректный E-mail',
       ],
       phoneRules: [
@@ -289,8 +291,28 @@ export default {
         $.ajax({
           url: this.$hostname + "time-tracking/clients",
           type: "POST",
-          data: this.newClient,
+          data: {
+            name: this.newClient.name,
+            short_name: this.newClient.short_name,
+            ogrn: this.newClient.ogrn,
+            business_address: JSON.stringify(this.newClient.business_address),
+            warehouse_address: JSON.stringify(this.newClient.warehouse_address),
+            phone: this.newClient.phone,
+            email: this.newClient.email,
+            site: this.newClient.site,
+            vat: this.newClient.vat,
+            branch: this.newClient.branch,
+            bank_account: this.newClient.bank_account,
+            bank: this.newClient.bank,
+            bic: this.newClient.bic,
+            account_operator: this.newClient.account_operator,
+            index_operator: this.newClient.index_operator,
+            electronic_number: this.newClient.electronic_number,
+            account_email: this.newClient.account_email,
+            logo_path: this.newClient.logo_path,
+          },
           success: () => {
+            this.closeForm()
             this.loadData()
           },
           error: (response) => {
