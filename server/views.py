@@ -364,8 +364,12 @@ class ClientView(APIView):
     """Клиенты"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        clients = Client.objects.all().order_by('name')
+    def get(self, request, id=None):
+        clients = Client.objects.all()
+        if id is not None:
+            clients = clients.filter(pk=id)
+        else:
+            clients = clients.order_by('name')
         serializer = ClientSerializer(clients, many=True)
         return Response({"data": serializer.data})
 
@@ -379,7 +383,14 @@ class ClientView(APIView):
 
     def put(self, request):
         saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
-        serializer = ClientSerializer(saved_client, data=request.data, partial=True)
+        data = request.data
+        if len(request.FILES) == 1:
+            name = '/clients/' + request.FILES['image'].name
+            with open('media' + name, 'wb+') as destination:
+                for chunk in request.FILES['image'].chunks():
+                    destination.write(chunk)
+            data = {"logo_path": name}
+        serializer = ClientSerializer(saved_client, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

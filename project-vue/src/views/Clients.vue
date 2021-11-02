@@ -22,7 +22,7 @@
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="client.logo_path" :src="require('../../../media'+client.logo_path)"></v-img>
               </v-list-item-avatar>
-              <v-list-item-content @click="$router.push({name: 'ClientOpen', props: {id: client.id}})">
+              <v-list-item-content @click="$router.push({name: 'ClientOpen', params: {id: client.id}})">
                 <v-list-item-title>{{ client.name }}</v-list-item-title>
                 <v-list-item-subtitle>
                   <span>{{ client.phone }}</span><br>
@@ -156,21 +156,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!--    <v-dialog v-model="photoDialog" max-width="500">-->
-    <!--      <v-card>-->
-    <!--        <v-card-title>-->
-    <!--          Сменить фото-->
-    <!--        </v-card-title>-->
-    <!--        <v-card-text>-->
-    <!--          <v-file-input v-model="photoField" placeholder="Фото профиля" accept="image/*"-->
-    <!--                        prepend-icon="" outlined></v-file-input>-->
-    <!--        </v-card-text>-->
-    <!--        <v-card-actions>-->
-    <!--          <v-spacer></v-spacer>-->
-    <!--          <v-btn color="primary" text @click="savePhoto">Сохранить</v-btn>-->
-    <!--        </v-card-actions>-->
-    <!--      </v-card>-->
-    <!--    </v-dialog>-->
   </div>
 </template>
 
@@ -237,7 +222,6 @@ export default {
       formBtnText: "Добавить работника",
       addForm: false,
       confirmDeleteDialog: false,
-      photoDialog: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
