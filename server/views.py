@@ -403,6 +403,14 @@ class ClientView(APIView):
         return Response(status=204)
 
 
+class ClientBranchesView(APIView):
+    """Получение всех существующих отраслей клиентов"""
+
+    def get(self, request):
+        branches = Client.objects.all().values_list('branch', flat=True).distinct('branch')
+        return Response({"branches": branches})
+
+
 class ClientEmployeesView(APIView):
     """Сотрудники фирм-клиентов"""
     permission_classes = [permissions.IsAuthenticated]

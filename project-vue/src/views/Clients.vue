@@ -13,12 +13,13 @@
             $deleteIcon
           </v-icon>
           <v-text-field placeholder="Название" v-model="filter.name" outlined></v-text-field>
-          <!--          <v-select v-model="filter.position" :items="selects" placeholder="Должность" outlined></v-select>-->
-          <!--          <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>-->
+          <v-select v-model="filter.branch" :items="['Все'].concat(selectsBranch)" placeholder="Отрасль"
+                    outlined></v-select>
         </div>
         <v-list three-line class="clients__list content-list">
           <template v-for="client in clients">
-            <v-list-item :key="client.id">
+            <v-list-item :key="client.id"
+                         v-if="client.name.includes(filter.name) && (client.branch === filter.branch || filter.branch === 'Все')">
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="client.logo_path" :src="require('../../../media'+client.logo_path)"></v-img>
               </v-list-item-avatar>
@@ -67,8 +68,8 @@
                             required outlined></v-text-field>
             </v-row>
             <v-row>
-              <v-text-field placeholder="Отрасль" v-model="newClient.branch" :rules="reqRules" required
-                            outlined></v-text-field>
+              <v-combobox placeholder="Отрасль*" v-model="newClient.branch" :items="selectsBranch" :rules="reqRules"
+                          required outlined></v-combobox>
               <v-text-field placeholder="ОГРН*" v-model="newClient.ogrn" :rules="reqRules" required
                             outlined></v-text-field>
             </v-row>
@@ -210,16 +211,14 @@ export default {
         {text: '10%', value: 10},
         {text: '20%', value: 20},
       ],
+      selectsBranch: [],
       filter: {
         name: "",
-        position: "Все",
-        email: ""
+        branch: "Все"
       },
-
       photoField: null,
-
-      formTitle: "Добавление работника",
-      formBtnText: "Добавить работника",
+      formTitle: "Добавление клиента",
+      formBtnText: "Добавить клиента",
       addForm: false,
       confirmDeleteDialog: false,
       alertError: false,
@@ -258,6 +257,22 @@ export default {
         type: "GET",
         success: (response) => {
           this.clients = response.data.data
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients/branches",
+        type: "GET",
+        success: (response) => {
+          this.selectsBranch = response.data.branches
         },
         error: (response) => {
           console.log(response)
@@ -349,6 +364,7 @@ export default {
     },
     closeForm() {
       this.addForm = false
+      this.alertError = false
       this.newClient = {
         name: '',
         short_name: '',

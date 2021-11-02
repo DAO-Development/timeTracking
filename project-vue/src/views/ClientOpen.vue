@@ -56,7 +56,8 @@
             <ul>
               <li>
                 <span class="profile__info-title">Юридический адрес</span>
-                <span class="profile__info-content">{{
+                <span class="profile__info-content"
+                      v-if="currentClient.business_address !== null || currentClient.business_address.city !== ''">{{
                     currentClient.business_address.index
                   }} {{ currentClient.business_address.country }}, г.{{
                     currentClient.business_address.city
@@ -67,7 +68,7 @@
               <li>
                 <span class="profile__info-title">Адрес доставки</span>
                 <span class="profile__info-content"
-                      v-if="currentClient.warehouse_address !== null && currentClient.warehouse_address.city !== ''">{{
+                      v-if="currentClient.warehouse_address.city !== ''">{{
                     currentClient.warehouse_address.index
                   }} {{ currentClient.warehouse_address.country }}, г.{{
                     currentClient.warehouse_address.city
@@ -154,8 +155,8 @@
                             required outlined></v-text-field>
             </v-row>
             <v-row>
-              <v-text-field placeholder="Отрасль" v-model="currentClient.branch" :rules="reqRules" required
-                            outlined></v-text-field>
+              <v-combobox placeholder="Отрасль*" v-model="currentClient.branch" :items="selectsBranch" :rules="reqRules"
+                          required outlined></v-combobox>
               <v-text-field placeholder="ОГРН*" v-model="currentClient.ogrn" :rules="reqRules" required
                             outlined></v-text-field>
             </v-row>
@@ -329,6 +330,7 @@ export default {
         {text: '10%', value: 10},
         {text: '20%', value: 20},
       ],
+      selectsBranch: [],
       photoField: null,
       full: false,
       formTitle: "Редактирование клиента",
@@ -358,6 +360,7 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token'))}
       })
       this.loadData()
+      this.loadBranches()
     } else {
       this.$router.push({name: "Index"})
     }
@@ -369,6 +372,35 @@ export default {
         type: "GET",
         success: (response) => {
           this.currentClient = response.data.data[0]
+          if (this.currentClient.warehouse_address == null) {
+            this.currentClient.warehouse_address = {
+              index: '',
+              country: '',
+              city: '',
+              street: '',
+              house: '',
+              entrance: '',
+              flat: '',
+            }
+          }
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadBranches() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients/branches",
+        type: "GET",
+        success: (response) => {
+          this.selectsBranch = response.data.branches
         },
         error: (response) => {
           console.log(response)
