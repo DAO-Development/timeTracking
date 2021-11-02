@@ -66,7 +66,8 @@
               </li>
               <li>
                 <span class="profile__info-title">Адрес доставки</span>
-                <span class="profile__info-content" v-if="currentClient.address_fin !== null">{{
+                <span class="profile__info-content"
+                      v-if="currentClient.warehouse_address !== null && currentClient.warehouse_address.city !== ''">{{
                     currentClient.warehouse_address.index
                   }} {{ currentClient.warehouse_address.country }}, г.{{
                     currentClient.warehouse_address.city
@@ -125,22 +126,126 @@
           <div class="news-open__actions open__actions">
             <div class="addition-btn" @click="openEditForm">
               <edit-icon/>
-              Редактировать работника
+              Редактировать клиента
             </div>
-            <div class="addition-btn" @click="this.confirmDeleteDialog = true">
+            <div class="addition-btn" @click="confirmDeleteDialog = true">
               <waste-icon/>
-              Удалить работника
+              Удалить клиента
             </div>
           </div>
         </div>
       </div>
     </div>
+    <v-dialog v-model="addForm">
+      <v-card>
+        <v-toolbar flat>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="addForm=false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <h3>{{ formTitle }}</h3>
+        <v-card-text>
+          <v-form ref="addForm" :model="currentClient">
+            <v-row>
+              <v-text-field placeholder="Название юрлица*" v-model="currentClient.name" :rules="reqRules" required
+                            outlined></v-text-field>
+              <v-text-field placeholder="Краткое название*" v-model="currentClient.short_name" :rules="reqRules"
+                            required outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Отрасль" v-model="currentClient.branch" :rules="reqRules" required
+                            outlined></v-text-field>
+              <v-text-field placeholder="ОГРН*" v-model="currentClient.ogrn" :rules="reqRules" required
+                            outlined></v-text-field>
+            </v-row>
+            <h4>Юридический адрес</h4>
+            <v-row>
+              <v-text-field placeholder="Страна*" v-model="currentClient.business_address.country" :rules="reqRules"
+                            required outlined></v-text-field>
+              <v-text-field placeholder="Город*" v-model="currentClient.business_address.city" :rules="reqRules"
+                            required outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Улица*" v-model="currentClient.business_address.street" :rules="reqRules"
+                            required outlined></v-text-field>
+              <v-text-field placeholder="Индекс*" v-model="currentClient.business_address.index" :rules="reqRules"
+                            required outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Дом*" v-model="currentClient.business_address.house" :rules="reqRules"
+                            required outlined></v-text-field>
+              <v-text-field placeholder="Подъезд" v-model="currentClient.business_address.entrance"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Квартира" v-model="currentClient.business_address.flat"
+                            outlined></v-text-field>
+            </v-row>
+            <h4>Адрес доставки</h4>
+            <v-row>
+              <v-text-field placeholder="Страна" v-model="currentClient.warehouse_address.country"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Город" v-model="currentClient.warehouse_address.city" outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Улица" v-model="currentClient.warehouse_address.street"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Индекс" v-model="currentClient.warehouse_address.index"
+                            outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Дом" v-model="currentClient.warehouse_address.house" outlined></v-text-field>
+              <v-text-field placeholder="Подъезд" v-model="currentClient.warehouse_address.entrance"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Квартира" v-model="currentClient.warehouse_address.flat"
+                            outlined></v-text-field>
+            </v-row>
+            <h4>Контакты</h4>
+            <v-row>
+              <v-text-field placeholder="Телефон*" v-model="currentClient.phone" :rules="phoneRules" required
+                            outlined></v-text-field>
+              <v-text-field placeholder="Почта*" v-model="currentClient.email" :rules="emailRules" required
+                            outlined></v-text-field>
+            </v-row>
+            <v-text-field placeholder="Сайт" v-model="currentClient.site" outlined></v-text-field>
+            <h4>Банковская информация</h4>
+            <v-text-field placeholder="Номер счета в банке*" v-model="currentClient.bank_account"
+                          outlined></v-text-field>
+            <v-row>
+              <v-text-field placeholder="Банк" v-model="currentClient.bank" outlined></v-text-field>
+              <v-text-field placeholder="BIC/SWIFT" v-model="currentClient.bic" outlined></v-text-field>
+            </v-row>
+            <v-select v-model="currentClient.vat" :items="selectsVat" placeholder="НДС" item-text="text"
+                      item-value="value"
+                      outlined></v-select>
+            <v-row>
+              <v-text-field placeholder="Оператор эл. счетов" v-model="currentClient.account_operator"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Индекс посредника" v-model="currentClient.index_operator"
+                            outlined></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field placeholder="Номер эл. счетов" v-model="currentClient.electronic_number"
+                            outlined></v-text-field>
+              <v-text-field placeholder="Email для счетов" v-model="currentClient.account_email"
+                            outlined></v-text-field>
+            </v-row>
+          </v-form>
+          <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
+            {{ alertMsg }}
+          </v-alert>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="action-btn" color="primary" @click="editClient">{{ formBtnText }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="confirmDeleteDialog" max-width="500">
       <v-card>
         <v-card-title>
-          Удаление работника
+          Удаление клиента
         </v-card-title>
-        <v-card-text>Вы действительно хотите удалить профиль? Отменить это действие будет невозможно</v-card-text>
+        <v-card-text>Вы действительно хотите удалить клиента? Отменить это действие будет невозможно</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>
@@ -278,9 +383,11 @@ export default {
     },
     editClient() {
       if (this.$refs.addForm.validate()) {
+        this.currentClient.business_address = JSON.stringify(this.currentClient.business_address)
+        this.currentClient.warehouse_address = JSON.stringify(this.currentClient.warehouse_address)
         $.ajax({
           url: this.$hostname + "time-tracking/clients",
-          type: "POST",
+          type: "PUT",
           data: this.currentClient,
           success: () => {
             this.addForm = false
@@ -309,7 +416,8 @@ export default {
           id: this.currentClient.id
         },
         success: () => {
-          this.loadData()
+          this.confirmDeleteDialog = false
+          this.$router.push({name: 'Clients'})
         },
         error: (response) => {
           console.log(response)

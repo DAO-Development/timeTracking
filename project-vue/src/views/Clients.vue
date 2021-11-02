@@ -323,6 +323,7 @@ export default {
         },
         success: () => {
           this.loadData()
+          this.confirmDeleteDialog = false
         },
         error: (response) => {
           console.log(response)
