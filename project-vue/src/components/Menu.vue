@@ -98,6 +98,7 @@ export default {
       {text: 'Объекты', name: 'Objects'},
       {text: 'Работники', name: 'Workers'},
       {text: 'Клиенты', name: 'Clients'},
+      {text: 'Контакты', name: 'Contacts'},
       // {text: 'Калькулятор'},
     ],
     page: '',

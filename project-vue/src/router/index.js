@@ -11,6 +11,8 @@ import Documents from "../views/Documents";
 import NewOpen from "../views/NewOpen";
 import Clients from "../views/Clients";
 import ClientOpen from "../views/ClientOpen";
+import Contacts from "../views/Contacts";
+import ContactOpen from "../views/ContactOpen";
 
 Vue.use(VueRouter)
 
@@ -71,6 +73,23 @@ const routes = [
         path: '/clients/:id',
         name: 'ClientOpen',
         component: ClientOpen,
+        props: true
+    },
+    {
+        path: '/contacts',
+        name: 'Contacts',
+        component: Contacts
+    },
+    {
+        path: '/contacts-:idClient',
+        name: 'Contacts',
+        component: Contacts,
+        props: true
+    },
+    {
+        path: '/contacts/:id',
+        name: 'ContactOpen',
+        component: ContactOpen,
         props: true
     },
 ]

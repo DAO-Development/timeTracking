@@ -407,7 +407,7 @@ class ClientBranchesView(APIView):
     """Получение всех существующих отраслей клиентов"""
 
     def get(self, request):
-        branches = Client.objects.all().values_list('branch', flat=True).distinct('branch')
+        branches = Client.objects.all().values_list('branch', flat=True).distinct('branch').order_by('branch')
         return Response({"branches": branches})
 
 
@@ -423,7 +423,17 @@ class ClientEmployeesView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = ClientEmployeesPostSerializer(data=request.data)
+        serializer = ClientEmployeesPostSerializer(data={
+            'name': request.data['name'],
+            'lastname': request.data['lastname'],
+            'position': request.data['position'],
+            'phone': request.data['phone'],
+            'work_phone': request.data['work_phone'],
+            'email': request.data['email'],
+            'work_email': request.data['work_email'],
+            'client': int(request.data['client']),
+            'photo_path': request.data['photo_path']
+        })
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
@@ -443,6 +453,15 @@ class ClientEmployeesView(APIView):
         saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
         saved_employee.delete()
         return Response(status=204)
+
+
+class ClientEmployeesPositionView(APIView):
+    """Получение всех существующих должностей в штатах фирм-клиентов"""
+
+    def get(self, request):
+        positions = ClientEmployees.objects.all().values_list('position', flat=True).distinct('position').order_by(
+            'position')
+        return Response({"positions": positions})
 
 
 class ImagesView(APIView):
