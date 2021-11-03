@@ -415,25 +415,17 @@ class ClientEmployeesView(APIView):
     """Сотрудники фирм-клиентов"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, client_id=None):
+    def get(self, request, id=None):
         employees = ClientEmployees.objects.all()
-        if client_id is not None:
-            employees = employees.filter(client=client_id)
+        if id is not None:
+            employees = employees.filter(pk=id)
+        else:
+            employees = employees.order_by('lastname').order_by('name')
         serializer = ClientEmployeesSerializer(employees, many=True)
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = ClientEmployeesPostSerializer(data={
-            'name': request.data['name'],
-            'lastname': request.data['lastname'],
-            'position': request.data['position'],
-            'phone': request.data['phone'],
-            'work_phone': request.data['work_phone'],
-            'email': request.data['email'],
-            'work_email': request.data['work_email'],
-            'client': int(request.data['client']),
-            'photo_path': request.data['photo_path']
-        })
+        serializer = ClientEmployeesPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
@@ -442,7 +434,14 @@ class ClientEmployeesView(APIView):
 
     def put(self, request):
         saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
-        serializer = ClientSerializer(saved_employee, data=request.data, partial=True)
+        data = request.data
+        if len(request.FILES) == 1:
+            name = '/contacts/' + request.FILES['image'].name
+            with open('media' + name, 'wb+') as destination:
+                for chunk in request.FILES['image'].chunks():
+                    destination.write(chunk)
+            data = {"photo_path": name}
+        serializer = ClientEmployeesSerializer(saved_employee, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

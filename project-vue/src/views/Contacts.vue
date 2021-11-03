@@ -2,7 +2,7 @@
   <div class="contacts flex-content">
     <div class="summary-box">
       <div class="summary-box__title">
-        <h3>Клиенты</h3>
+        <h3>Контакты</h3>
         <div class=" addition-btn content-list__filters-mobile" @click="openFilters">
           Фильтры
         </div>
@@ -23,7 +23,7 @@
             <v-list-item :key="contact.id"
                          v-if="(contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position === filter.position || filter.position === 'Все')">
               <v-list-item-avatar class="content-list__image">
-                <v-img v-if="contact.logo_path" :src="require('../../../media'+contact.logo_path)"></v-img>
+                <v-img v-if="contact.photo_path" :src="require('../../../media'+contact.photo_path)"></v-img>
               </v-list-item-avatar>
               <v-list-item-content @click="$router.push({name: 'ContactOpen', params: {id: contact.id}})">
                 <v-list-item-title>{{ contact.lastname }} {{ contact.name }}</v-list-item-title>
@@ -71,8 +71,7 @@
             </v-row>
             <v-row>
               <v-combobox placeholder="Фирма*" v-model="newContact.client" :items="selectsClient" item-text="name"
-                          item-value="id" :rules="reqRules" required outlined
-                          @change="change"></v-combobox>
+                          item-value="id" :rules="reqRules" required outlined></v-combobox>
               <v-combobox placeholder="Должность*" v-model="newContact.position" :items="selectsPosition"
                           :rules="reqRules" required outlined></v-combobox>
             </v-row>
@@ -128,7 +127,7 @@ export default {
   },
   data() {
     return {
-      page: 'clients',
+      page: 'contacts',
       contacts: [],
       newContact: {
         name: '',
@@ -182,9 +181,6 @@ export default {
     }
   },
   methods: {
-    change() {
-      console.log(this.newContact.client)
-    },
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/clients-employees",

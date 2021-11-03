@@ -2,7 +2,7 @@
   <div class="contacts flex-content">
     <div class="summary-box">
       <div class="summary-box__title">
-        <h3>Клиенты</h3>
+        <h3>Контакты</h3>
         <div class="addition-btn" @click="$router.go(-1)">
           <span>К списку контактов</span>
           <back-icon/>
@@ -11,127 +11,57 @@
       <div class="clients-open workers-open">
         <div class="profile__image clients-open__image">
           <v-img
-              v-if="currentClient.logo_path" :lazy-src="require('../../../media'+currentClient.logo_path)"
-              :src="require('../../../media'+currentClient.logo_path)"></v-img>
+              v-if="currentContact.photo_path" :lazy-src="require('../../../media'+currentContact.photo_path)"
+              :src="require('../../../media'+currentContact.photo_path)"></v-img>
           <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
         </div>
         <div class="profile__info">
           <h3>Общая информация</h3>
           <ul>
             <li>
-              <span class="profile__info-title">Название</span>
-              <span class="profile__info-content">{{ currentClient.name }}</span>
+              <span class="profile__info-title">Имя</span>
+              <span class="profile__info-content">{{ currentContact.name }}</span>
             </li>
             <li>
-              <span class="profile__info-title">Краткое название</span>
-              <span class="profile__info-content">{{ currentClient.short_name }}</span>
+              <span class="profile__info-title">Фамилия</span>
+              <span class="profile__info-content">{{ currentContact.lastname }}</span>
             </li>
             <li>
-              <span class="profile__info-title">Отрасль</span>
-              <span class="profile__info-content">{{ currentClient.branch }}</span>
+              <span class="profile__info-title">Должность</span>
+              <span class="profile__info-content">{{ currentContact.position }}</span>
             </li>
             <li>
-              <span class="profile__info-title">ОГРН</span>
-              <span class="profile__info-content">{{ currentClient.ogrn }}</span>
+              <span class="profile__info-title">Фирма</span>
+              <span class="profile__info-content">{{ currentContact.client.name }}</span>
             </li>
           </ul>
           <h3>Контакты</h3>
           <ul>
             <li>
               <span class="profile__info-title">Телефон</span>
-              <span class="profile__info-content">{{ currentClient.phone }}</span>
+              <span class="profile__info-content">{{ currentContact.phone }}</span>
+            </li>
+            <li>
+              <span class="profile__info-title">Рабочий телефон</span>
+              <span class="profile__info-content">{{ currentContact.work_phone }}</span>
             </li>
             <li>
               <span class="profile__info-title">E-mail</span>
-              <span class="profile__info-content">{{ currentClient.email }}</span>
+              <span class="profile__info-content">{{ currentContact.email }}</span>
             </li>
             <li>
-              <span class="profile__info-title">Сайт</span>
-              <span class="profile__info-content">{{ currentClient.site }}</span>
+              <span class="profile__info-title">Рабочий E-mail</span>
+              <span class="profile__info-content">{{ currentContact.work_email }}</span>
             </li>
           </ul>
-
-          <div class="profile__info profile__info-full" v-if="full">
-            <h3>Адреса</h3>
-            <ul>
-              <li>
-                <span class="profile__info-title">Юридический адрес</span>
-                <span class="profile__info-content"
-                      v-if="currentClient.business_address !== null || currentClient.business_address.city !== ''">{{
-                    currentClient.business_address.index
-                  }} {{ currentClient.business_address.country }}, г.{{
-                    currentClient.business_address.city
-                  }}, {{ currentClient.business_address.street }}, д.{{
-                    currentClient.business_address.house
-                  }}, {{ currentClient.business_address.entrance }}, кв.{{ currentClient.business_address.flat }}</span>
-              </li>
-              <li>
-                <span class="profile__info-title">Адрес доставки</span>
-                <span class="profile__info-content"
-                      v-if="currentClient.warehouse_address.city !== ''">{{
-                    currentClient.warehouse_address.index
-                  }} {{ currentClient.warehouse_address.country }}, г.{{
-                    currentClient.warehouse_address.city
-                  }}, {{ currentClient.warehouse_address.street }}, д.{{
-                    currentClient.warehouse_address.house
-                  }}, {{ currentClient.warehouse_address.entrance }}, кв.{{
-                    currentClient.warehouse_address.flat
-                  }}</span>
-              </li>
-            </ul>
-            <h3>Банковская информация</h3>
-            <ul>
-              <li>
-                <span class="profile__info-title">Банковский счет</span>
-                <span class="profile__info-content">{{ currentClient.bank_account }}</span>
-              </li>
-              <li>
-                <span class="profile__info-title">Банк</span>
-                <span class="profile__info-content">{{ currentClient.bank }}</span>
-              </li>
-              <li>
-                <span class="profile__info-title">BIC/SWIFT</span>
-                <span class="profile__info-content">{{ currentClient.bic }}</span>
-              </li>
-              <li>
-                <span class="profile__info-title">НДС</span>
-                <span class="profile__info-content">{{ currentClient.vat }}%</span>
-              </li>
-            </ul>
-            <h3>Электронные счета</h3>
-            <ul>
-              <li>
-                <span class="profile__info-title">Оператор электронных счетов</span>
-                <span class="profile__info-content">{{ currentClient.account_operator }}</span>
-              </li>
-              <li>
-                <span class="profile__info-title">Индекс посредника</span>
-                <span class="profile__info-content">{{ currentClient.index_operator }}</span>
-              </li>
-              <li>
-                <span class="profile__info-title">Номер электронных счетов</span>
-                <span class="profile__info-content">{{ currentClient.electronic_number }}</span>
-              </li>
-              <li>
-                <span class="profile__info-title">Email для счетов</span>
-                <span class="profile__info-content">{{ currentClient.account_email }}</span>
-              </li>
-            </ul>
-          </div>
-          <div class="open__actions">
-            <div class="addition-btn" @click="full = !full">
-              <span v-if="full">Скрыть полную информацию</span>
-              <span v-if="!full">Показать полную информацию</span>
-            </div>
-          </div>
           <div class="news-open__actions open__actions">
             <div class="addition-btn" @click="openEditForm">
               <edit-icon/>
-              Редактировать клиента
+              Редактировать контакт
             </div>
             <div class="addition-btn" @click="confirmDeleteDialog = true">
               <waste-icon/>
-              Удалить клиента
+              Удалить контакт
             </div>
           </div>
         </div>
@@ -141,34 +71,35 @@
       <v-card>
         <v-toolbar flat>
           <v-spacer></v-spacer>
-          <v-btn icon @click="closeForm">
+          <v-btn icon @click="addForm=false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
         <h3>{{ formTitle }}</h3>
         <v-card-text>
-          <v-form ref="addForm" :model="newContact">
+          <v-form ref="addForm" :model="currentContact">
             <v-row>
-              <v-text-field placeholder="Фамилия*" v-model="newContact.lastname" :rules="reqRules" required
+              <v-text-field placeholder="Фамилия*" v-model="currentContact.lastname" :rules="reqRules" required
                             outlined></v-text-field>
-              <v-text-field placeholder="Имя*" v-model="newContact.name" :rules="reqRules"
+              <v-text-field placeholder="Имя*" v-model="currentContact.name" :rules="reqRules"
                             required outlined></v-text-field>
             </v-row>
             <v-row>
-              <v-combobox placeholder="Фирма*" v-model="newContact.client" :items="selectsClient" item-text="name"
-                          item-value="id" :rules="reqRules" required outlined></v-combobox>
-              <v-combobox placeholder="Должность*" v-model="newContact.position" :items="selectsPosition"
+              <v-combobox placeholder="Фирма*" v-model="currentContact.client" :items="selectsClient"
+                          item-text="name" :rules="reqRules" required outlined></v-combobox>
+              <v-combobox placeholder="Должность*" v-model="currentContact.position" :items="selectsPosition"
                           :rules="reqRules" required outlined></v-combobox>
             </v-row>
             <h4>Контакты</h4>
             <v-row>
-              <v-text-field placeholder="Телефон" v-model="newContact.phone" outlined></v-text-field>
-              <v-text-field placeholder="Рабочий телефон*" v-model="newContact.work_phone" :rules="phoneRules"
+              <v-text-field placeholder="Телефон" v-model="currentContact.phone" outlined></v-text-field>
+              <v-text-field placeholder="Рабочий телефон*" v-model="currentContact.work_phone" :rules="phoneRules"
                             required outlined></v-text-field>
             </v-row>
             <v-row>
-              <v-text-field placeholder="Почта" v-model="newContact.email" required outlined></v-text-field>
-              <v-text-field placeholder="Рабочая почта*" v-model="newContact.work_email" :rules="emailRules" required
+              <v-text-field placeholder="Почта" v-model="currentContact.email" required outlined></v-text-field>
+              <v-text-field placeholder="Рабочая почта*" v-model="currentContact.work_email" :rules="emailRules"
+                            required
                             outlined></v-text-field>
             </v-row>
           </v-form>
@@ -178,7 +109,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="action-btn" color="primary" @click="addContact">{{ formBtnText }}</v-btn>
+          <v-btn class="action-btn" color="primary" @click="editContact">{{ formBtnText }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -193,7 +124,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>
-          <v-btn color="primary" text @click="deleteClient">Подтвердить</v-btn>
+          <v-btn color="primary" text @click="deleteContact">Подтвердить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -203,7 +134,7 @@
           Сменить фото
         </v-card-title>
         <v-card-text>
-          <v-file-input v-model="photoField" placeholder="Логотип организации" accept="image"
+          <v-file-input v-model="photoField" placeholder="Фото" accept="image"
                         prepend-icon="" outlined></v-file-input>
         </v-card-text>
         <v-card-actions>
@@ -217,13 +148,211 @@
 
 <script>
 import BackIcon from "../components/icons/backIcon";
+import $ from "jquery";
+import WasteIcon from "../components/icons/wasteIcon";
+import EditIcon from "../components/icons/editIcon";
 
 export default {
   name: "ContactOpen",
-  components: {BackIcon},
+  components: {EditIcon, WasteIcon, BackIcon},
   props: {
     id: [String, Number]
   },
+  data() {
+    return {
+      page: 'contacts',
+      currentContact: {
+        id: 0,
+        name: '',
+        lastname: '',
+        position: '',
+        phone: '',
+        work_phone: '',
+        email: '',
+        work_email: '',
+        client: {
+          name: '',
+        },
+        photo_path: ''
+      },
+      photoField: null,
+      selectsClient: [],
+      selectsPosition: [],
+      formTitle: "Добавление клиента",
+      formBtnText: "Добавить клиента",
+      addForm: false,
+      confirmDeleteDialog: false,
+      photoDialog: false,
+      alertError: false,
+      alertMsg: "",
+      reqRules: [
+        v => !!v || 'Необходимо заполнить поле'
+      ],
+      emailRules: [
+        v => !!v || 'Необходимо заполнить поле',
+        v => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'Некорректный E-mail',
+      ],
+      phoneRules: [
+        v => !!v || 'Необходимо заполнить поле',
+        v => /^(\+)?((\d{2,3}) ?\d|\d)(([ -]?\d)|( ?(\d{2,3}) ?)){5,12}\d$/.test(v) || 'Некорректный номер телефона'
+      ],
+    }
+  },
+  created: function () {
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token')) {
+      this.$emit('set-auth')
+      $.ajaxSetup({
+        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token'))}
+      })
+      this.loadData()
+    } else {
+      this.$router.push({name: "Index"})
+    }
+  },
+  methods: {
+    loadData() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients-employees/" + this.id,
+        type: "GET",
+        success: (response) => {
+          this.currentContact = response.data.data[0]
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadPositions() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients-employees/positions",
+        type: "GET",
+        success: (response) => {
+          this.selectsPosition = response.data.positions
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadClients() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients",
+        type: "GET",
+        success: (response) => {
+          this.selectsClient = response.data.data
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    editContact() {
+      if (this.$refs.addForm.validate()) {
+        this.currentContact.client = this.currentContact.client.id
+        $.ajax({
+          url: this.$hostname + "time-tracking/clients-employees",
+          type: "PUT",
+          data: this.currentContact,
+          success: () => {
+            this.closeForm()
+            this.loadData()
+          },
+          error: (response) => {
+            console.log(response)
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          }
+        })
+      } else {
+        this.alertMsg = "Заполните все обязательные поля"
+        this.alertError = true
+      }
+    },
+    deleteContact() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients-employees",
+        type: "DELETE",
+        data: {
+          id: this.currentContact.id
+        },
+        success: () => {
+          this.confirmDeleteDialog = false
+          this.$router.push({name: 'Contacts'})
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    savePhoto() {
+      const axios = require('axios')
+      // чтение файла в formData
+      let fd = new FormData();
+      let avatar = this.photoField;
+      if (avatar !== null && avatar !== undefined) {
+        fd.append('image', avatar)
+      } else {
+        console.log('ERROR')
+        return
+      }
+      fd.append('id', this.currentContact.id)
+      axios({
+        method: 'put',
+        url: this.$hostname + "time-tracking/clients-employees",
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
+      })
+          .then(response => {
+            console.log(response.data.data)
+            this.photoDialog = false
+            this.photoField = null
+            this.loadData()
+          });
+    },
+    openAddForm() {
+      this.formTitle = "Добавление контакта"
+      this.formBtnText = "Добавить контакт"
+      this.addForm = true
+    },
+    openEditForm() {
+      this.loadClients()
+      this.loadPositions()
+      this.formTitle = "Редактирование контакта"
+      this.formBtnText = "Сохранить"
+      this.addForm = true
+    },
+    openConfirmDeleteDialog() {
+      this.confirmDeleteDialog = true
+    },
+  }
 }
 </script>
 
