@@ -11,7 +11,7 @@
       <div class="news-open">
         <h4>{{ currentNew.title }}</h4>
         <div class="news-open__image">
-          <v-img v-if="currentNew.photo_path" :src="require('../../../media'+currentNew.photo_path)"></v-img>
+          <v-img v-if="currentNew.photo_path" :src="$hostname+'media'+currentNew.photo_path"></v-img>
         </div>
         <div class="news-open__text" v-html="currentNew.text"></div>
       </div>

@@ -23,6 +23,7 @@ urlpatterns = [
     path('clients/branches', ClientBranchesView.as_view()),
     path('clients/<int:id>', ClientView.as_view()),
     path('clients-employees', ClientEmployeesView.as_view()),
+    path('clients/employees/<int:idclient>', ClientEmployeesView.as_view()),
     path('clients-employees/<int:id>', ClientEmployeesView.as_view()),
     path('clients-employees/positions', ClientEmployeesPositionView.as_view()),
     path('documents/worker', UserDocumentsView.as_view()),

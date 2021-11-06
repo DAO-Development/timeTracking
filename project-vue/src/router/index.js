@@ -80,12 +80,12 @@ const routes = [
         name: 'Contacts',
         component: Contacts
     },
-    // {
-    //     path: '/contacts-:idClient',
-    //     name: 'Contacts',
-    //     component: Contacts,
-    //     props: true
-    // },
+    {
+        path: '/clients/contacts/:idClient',
+        name: 'ClientsEmployees',
+        component: Contacts,
+        props: true
+    },
     {
         path: '/contacts/:id',
         name: 'ContactOpen',

@@ -11,8 +11,8 @@
       <div class="clients-open workers-open">
         <div class="profile__image clients-open__image">
           <v-img
-              v-if="currentClient.logo_path" :lazy-src="require('../../../media'+currentClient.logo_path)"
-              :src="require('../../../media'+currentClient.logo_path)"></v-img>
+              v-if="currentClient.logo_path" :lazy-src="$hostname+'media'+currentClient.logo_path"
+              :src="$hostname+'media'+currentClient.logo_path"></v-img>
           <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
         </div>
         <div class="profile__info">
@@ -122,6 +122,9 @@
             <div class="addition-btn" @click="full = !full">
               <span v-if="full">Скрыть полную информацию</span>
               <span v-if="!full">Показать полную информацию</span>
+            </div>
+            <div class="addition-btn" @click="$router.push({name: 'ClientsEmployees', params: {idClient: id}})">
+              Контакты
             </div>
           </div>
           <div class="news-open__actions open__actions">
@@ -287,7 +290,7 @@ export default {
   data() {
     return {
       page: 'clients',
-      clients: [],
+      employees: [],
       currentClient: {
         id: 0,
         name: '',
@@ -360,7 +363,6 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token'))}
       })
       this.loadData()
-      this.loadBranches()
     } else {
       this.$router.push({name: "Index"})
     }
@@ -383,6 +385,24 @@ export default {
               flat: '',
             }
           }
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadEmployees() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients/employees/" + this.id,
+        type: "GET",
+        success: (response) => {
+          this.employees = response.data.data
         },
         error: (response) => {
           console.log(response)
@@ -492,6 +512,7 @@ export default {
       this.formTitle = "Редактирование клиента"
       this.formBtnText = "Сохранить"
       this.addForm = true
+      this.loadBranches()
     },
   },
 }

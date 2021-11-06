@@ -11,8 +11,8 @@
       <div class="clients-open workers-open">
         <div class="profile__image clients-open__image">
           <v-img
-              v-if="currentContact.photo_path" :lazy-src="require('../../../media'+currentContact.photo_path)"
-              :src="require('../../../media'+currentContact.photo_path)"></v-img>
+              v-if="currentContact.photo_path" :lazy-src="$hostname+'media'+currentContact.photo_path"
+              :src="$hostname+'media'+currentContact.photo_path"></v-img>
           <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
         </div>
         <div class="profile__info">

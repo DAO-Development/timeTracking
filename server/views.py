@@ -415,12 +415,14 @@ class ClientEmployeesView(APIView):
     """Сотрудники фирм-клиентов"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, id=None):
+    def get(self, request, id=None, idclient=None):
         employees = ClientEmployees.objects.all()
+        if idclient is not None:
+            employees = employees.filter(client_id=idclient).order_by('lastname', 'name')
         if id is not None:
             employees = employees.filter(pk=id)
         else:
-            employees = employees.order_by('lastname').order_by('name')
+            employees = employees.order_by('lastname', 'name')
         serializer = ClientEmployeesSerializer(employees, many=True)
         return Response({"data": serializer.data})
 

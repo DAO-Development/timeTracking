@@ -21,7 +21,7 @@
             <v-list-item :key="client.id"
                          v-if="client.name.includes(filter.name) && (client.branch === filter.branch || filter.branch === 'Все')">
               <v-list-item-avatar class="content-list__image">
-                <v-img v-if="client.logo_path" :src="require('../../../media'+client.logo_path)"></v-img>
+                <v-img v-if="client.logo_path" :src="$hostname+'media'+client.logo_path"></v-img>
               </v-list-item-avatar>
               <v-list-item-content @click="$router.push({name: 'ClientOpen', params: {id: client.id}})">
                 <v-list-item-title>{{ client.name }}</v-list-item-title>

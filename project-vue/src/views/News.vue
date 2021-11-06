@@ -12,7 +12,7 @@
         <div class="news-all__grid">
           <template v-for="item in news">
             <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)" v-if="item.photo_path"
-                    v-bind:style="{'background-image': 'url('+require('../../../media'+item.photo_path)+ ')', 'background-size': 'cover', 'background-position': 'center'}">
+                    v-bind:style="{'background-image': 'url('+$hostname+'media'+item.photo_path+ ')', 'background-size': 'cover', 'background-position': 'center'}">
               <div class="news-single__actions">
                 <v-icon @click="deleteNew(item.id)">$waste</v-icon>
                 <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
@@ -44,7 +44,7 @@
       <div class="news-open" v-else>
         <h4>{{ currentNew.title }}</h4>
         <div class="news-open__image">
-          <v-img v-if="currentNew.photo_path" :src="require('../../../media'+currentNew.photo_path)"></v-img>
+          <v-img v-if="currentNew.photo_path" :src="$hostname+'media'+currentNew.photo_path"></v-img>
         </div>
         <div class="news-open__text" v-html="currentNew.text"></div>
         <div class="news-open__actions open__actions">

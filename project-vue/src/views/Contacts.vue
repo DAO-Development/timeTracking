@@ -23,7 +23,7 @@
             <v-list-item :key="contact.id"
                          v-if="(contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position === filter.position || filter.position === 'Все')">
               <v-list-item-avatar class="content-list__image">
-                <v-img v-if="contact.photo_path" :src="require('../../../media'+contact.photo_path)"></v-img>
+                <v-img v-if="contact.photo_path" :src="$hostname+'media'+contact.photo_path"></v-img>
               </v-list-item-avatar>
               <v-list-item-content @click="$router.push({name: 'ContactOpen', params: {id: contact.id}})">
                 <v-list-item-title>{{ contact.lastname }} {{ contact.name }}</v-list-item-title>
@@ -182,8 +182,13 @@ export default {
   },
   methods: {
     loadData() {
+      let url = ""
+      if (this.idClient !== null && this.idClient !== undefined)
+        url = "time-tracking/clients/employees/" + this.idClient
+      else
+        url = "time-tracking/clients-employees"
       $.ajax({
-        url: this.$hostname + "time-tracking/clients-employees",
+        url: this.$hostname + url,
         type: "GET",
         success: (response) => {
           this.contacts = response.data.data
