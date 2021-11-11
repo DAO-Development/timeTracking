@@ -20,16 +20,20 @@ global.appUrl = "http://127.0.0.1:8000/";
 // Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
 Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 Vue.prototype.$admin = false
+Vue.prototype.$refresh = function () {
+  localStorage.clear()
+  sessionStorage.clear()
+  this.$router.push({name: "Index"})
+  $.ajaxSetup({
+    headers: {"Authorization": ""}
+  })
+}
 
 export default {
   name: 'App',
   components: {Menu},
   created() {
-    if (localStorage.getItem('auth_token')) {
-      this.auth = true
-    } else if (sessionStorage.getItem(('auth_token'))) {
-      this.auth = true
-    }
+    this.auth = !!(localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'));
   },
   data() {
     return {

@@ -53,7 +53,6 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/news",
         type: "GET",
-        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
           this.news = response.data.data
         },

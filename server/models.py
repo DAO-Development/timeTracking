@@ -71,7 +71,7 @@ class UserContracts(models.Model):
     create_date = models.DateField(verbose_name='Дата создания')
     path = models.CharField(verbose_name='Путь к файлу', max_length=250)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
-    user_profile_id = models.ForeignKey('UserProfile', models.CASCADE, verbose_name='Сотрудник')
+    user_profile_id = models.ForeignKey('UserProfile', models.RESTRICT, verbose_name='Сотрудник')
 
     class Meta:
         db_table = "user_contracts"
@@ -83,7 +83,7 @@ class UserDocuments(models.Model):
     create_date = models.DateField(verbose_name='Дата создания')
     path = models.CharField(verbose_name='Путь к файлу', max_length=250)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
-    user_profile_id = models.ForeignKey('UserProfile', models.CASCADE, verbose_name='Сотрудник')
+    user_profile_id = models.ForeignKey('UserProfile', models.RESTRICT, verbose_name='Сотрудник')
 
     class Meta:
         db_table = "user_documents"
@@ -135,7 +135,7 @@ class ClientEmployees(models.Model):
     work_phone = models.CharField(verbose_name='Рабочий телефон', max_length=45, null=True, blank=True)
     email = models.CharField(verbose_name='Email', max_length=100)
     work_email = models.CharField(verbose_name='Рабочий Email', max_length=100, null=True, blank=True)
-    client = models.ForeignKey(Client, models.CASCADE, verbose_name='Фирма', null=True, blank=True)
+    client = models.ForeignKey(Client, models.RESTRICT, verbose_name='Фирма', null=True, blank=True)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
 
     class Meta:
@@ -155,8 +155,8 @@ class Objects(models.Model):
     date_start = models.DateField(verbose_name='Начало работ')
     date_end = models.DateField(verbose_name='Конец работ')
     active = models.BooleanField(verbose_name='Объект сдан', default=False)
-    client_id = models.ForeignKey("Client", models.CASCADE, verbose_name='Клиент')
-    contact_id = models.ForeignKey("ClientEmployees", models.CASCADE, verbose_name='Контактное лицо')
+    client_id = models.ForeignKey("Client", models.RESTRICT, verbose_name='Клиент')
+    contact_id = models.ForeignKey("ClientEmployees", models.RESTRICT, verbose_name='Контактное лицо')
     work_description = models.TextField(verbose_name='Описание работ', max_length=1500, null=True, blank=True)
     habitation = models.CharField(verbose_name='Жилье', max_length=100, null=True, blank=True)
     accident_insurance = models.CharField(verbose_name='Страховка от несчастных случаев', max_length=100, null=True,
@@ -171,8 +171,8 @@ class Objects(models.Model):
 
 class ObjectUser(models.Model):
     """Рабочие на объектах"""
-    user_profile_id = models.ForeignKey("UserProfile", models.CASCADE, verbose_name='Пользователь')
-    objects_id = models.ForeignKey("Objects", models.CASCADE, verbose_name='Объект')
+    user_profile_id = models.ForeignKey("UserProfile", models.RESTRICT, verbose_name='Пользователь')
+    objects_id = models.ForeignKey("Objects", models.RESTRICT, verbose_name='Объект')
     start_date = models.DateField(verbose_name='Начало работ')
     end_date = models.DateField(verbose_name='Конец работ', null=True, blank=True)
     comment = models.TextField(verbose_name='Комментарий', max_length=1500, null=True, blank=True)
@@ -195,9 +195,9 @@ class ObjectPhoto(models.Model):
 class ObjectComments(models.Model):
     """Комментарии к объектам"""
     text = models.TextField(verbose_name="Текст комментария")
-    user_profile_id = models.ForeignKey("UserProfile", models.CASCADE, verbose_name='Пользователь')
+    user_profile_id = models.ForeignKey("UserProfile", models.RESTRICT, verbose_name='Пользователь')
     objects_id = models.ForeignKey("Objects", models.CASCADE, verbose_name='Объект')
-    object_comments_id = models.ForeignKey("ObjectComments", models.CASCADE, verbose_name='Родительский комментарий',
+    object_comments_id = models.ForeignKey("ObjectComments", models.RESTRICT, verbose_name='Родительский комментарий',
                                            null=True, blank=True)
 
     class Meta:
@@ -211,8 +211,8 @@ class TimeReport(models.Model):
     time_end = models.TimeField(verbose_name='Время конца')
     position = models.CharField(verbose_name='Должность', max_length=45)
     comment = models.TextField(verbose_name='Комментарий', max_length=1200)
-    user_profile_id = models.ForeignKey("UserProfile", models.CASCADE, verbose_name='Пользователь')
-    objects_id = models.ForeignKey("Objects", models.CASCADE, verbose_name='Объект')
+    user_profile_id = models.ForeignKey("UserProfile", models.RESTRICT, verbose_name='Пользователь')
+    objects_id = models.ForeignKey("Objects", models.RESTRICT, verbose_name='Объект')
 
     class Meta:
         db_table = "time_report"
