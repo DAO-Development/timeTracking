@@ -140,6 +140,19 @@ class GroupView(APIView):
         serializer = GroupSerializer(group, many=True)
         return Response({"data": serializer.data})
 
+    def post(self, request):
+        serializer = GroupPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        group = get_object_or_404(Group.objects.all(), id=request.data['id'])
+        group.delete()
+        return Response(status=204)
+
 
 class GroupsView(APIView):
     """Группы"""

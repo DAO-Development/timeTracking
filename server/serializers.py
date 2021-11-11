@@ -76,6 +76,30 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class GroupPostSerializer(serializers.ModelSerializer):
+    """Сериализация групп для POST-запросов"""
+
+    class Meta:
+        model = Group
+        fields = 'name'
+
+
+class GroupFunctionsSerializer(serializers.ModelSerializer):
+    """Сериализация функций групп"""
+
+    class Meta:
+        model = GroupFunctions
+        fields = '__all__'
+
+
+class GroupFunctionsPostSerializer(serializers.ModelSerializer):
+    """Сериализация функций групп для POST-запросов"""
+
+    class Meta:
+        model = GroupFunctions
+        fields = ('group_id', 'functions_id', 'edit', 'read')
+
+
 class NewsSerializer(serializers.ModelSerializer):
     """Сериализация новостей"""
 
