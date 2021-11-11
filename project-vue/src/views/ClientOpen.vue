@@ -132,7 +132,15 @@
               <edit-icon/>
               Редактировать клиента
             </div>
-            <div class="addition-btn" @click="confirmDeleteDialog = true">
+            <div class="addition-btn" v-if="currentClient.active" @click="archiveClientOpen">
+              <archive-icon/>
+              Архивировать клиента
+            </div>
+            <div class="addition-btn" v-if="!currentClient.active" @click="archiveClientOpen">
+              <archive-icon/>
+              Удалить из архива клиента
+            </div>
+            <div class="addition-btn" v-if="!currentClient.active" @click="confirmDeleteDialog = true">
               <waste-icon/>
               Удалить клиента
             </div>
@@ -280,10 +288,11 @@ import $ from "jquery";
 import BackIcon from "../components/icons/backIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
+import ArchiveIcon from "../components/icons/archiveIcon";
 
 export default {
   name: "ClientOpen",
-  components: {EditIcon, WasteIcon, BackIcon},
+  components: {ArchiveIcon, EditIcon, WasteIcon, BackIcon},
   props: {
     id: [String, Number],
   },
@@ -327,6 +336,7 @@ export default {
         electronic_number: '',
         account_email: '',
         logo_path: '',
+        active: true
       },
       selectsVat: [
         {text: '0%', value: 0},
@@ -434,7 +444,26 @@ export default {
         }
       })
     },
+    archiveClientOpen() {
+      this.currentClient.active = !this.currentClient.active
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients",
+        type: "PUT",
+        data: this.currentClient,
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
     editClient() {
+      console.log("edit")
       if (this.$refs.addForm.validate()) {
         this.currentClient.business_address = JSON.stringify(this.currentClient.business_address)
         this.currentClient.warehouse_address = JSON.stringify(this.currentClient.warehouse_address)
@@ -458,6 +487,7 @@ export default {
           }
         })
       } else {
+        console.log("Заполните обязательные поля")
         this.alertMsg = "Заполните обязательные поля"
         this.alertError = true
       }
@@ -475,7 +505,7 @@ export default {
         },
         error: (response) => {
           if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
+            this.alertMsg = "На этого клиента зарегистрированы объекты или контакты"
           } else if (response.status === 401) {
             this.$refresh()
           } else {

@@ -119,6 +119,7 @@ class Client(models.Model):
     index_operator = models.CharField(verbose_name='Индекс посредника', max_length=12, null=True, blank=True)
     electronic_number = models.CharField(verbose_name='Номер электронных счетов', max_length=31, null=True, blank=True)
     account_email = models.CharField(verbose_name='Email для счетов', max_length=100, null=True, blank=True)
+    active = models.BooleanField(verbose_name='Активен', default=True)
 
     class Meta:
         db_table = "client"
@@ -137,6 +138,7 @@ class ClientEmployees(models.Model):
     work_email = models.CharField(verbose_name='Рабочий Email', max_length=100, null=True, blank=True)
     client = models.ForeignKey(Client, models.RESTRICT, verbose_name='Фирма', null=True, blank=True)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
+    active = models.BooleanField(verbose_name='Активен', default=True)
 
     class Meta:
         db_table = "client_employees"

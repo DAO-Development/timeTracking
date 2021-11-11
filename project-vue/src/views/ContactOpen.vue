@@ -59,7 +59,15 @@
               <edit-icon/>
               Редактировать контакт
             </div>
-            <div class="addition-btn" @click="confirmDeleteDialog = true">
+            <div class="addition-btn" v-if="currentContact.active" @click="archiveContactOpen">
+              <archive-icon/>
+              Архивировать контакт
+            </div>
+            <div class="addition-btn" v-if="!currentContact.active" @click="archiveContactOpen">
+              <archive-icon/>
+              Удалить из архива
+            </div>
+            <div class="addition-btn" v-if="!currentContact.active" @click="confirmDeleteDialog = true">
               <waste-icon/>
               Удалить контакт
             </div>
@@ -151,10 +159,11 @@ import BackIcon from "../components/icons/backIcon";
 import $ from "jquery";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
+import ArchiveIcon from "../components/icons/archiveIcon";
 
 export default {
   name: "ContactOpen",
-  components: {EditIcon, WasteIcon, BackIcon},
+  components: {ArchiveIcon, EditIcon, WasteIcon, BackIcon},
   props: {
     id: [String, Number]
   },
@@ -173,7 +182,8 @@ export default {
         client: {
           name: '',
         },
-        photo_path: ''
+        photo_path: '',
+        active: true
       },
       photoField: null,
       selectsClient: [],
@@ -259,6 +269,24 @@ export default {
         },
         error: (response) => {
           console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    archiveContactOpen() {
+      this.currentContact.active = !this.currentContact.active
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients-employees",
+        type: "PUT",
+        data: this.currentContact,
+        error: (response) => {
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
           } else if (response.status === 401) {

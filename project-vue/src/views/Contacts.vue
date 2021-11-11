@@ -21,7 +21,7 @@
         <v-list three-line class="clients__list content-list">
           <template v-for="contact in contacts">
             <v-list-item :key="contact.id"
-                         v-if="(contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position === filter.position || filter.position === 'Все')">
+                         v-if="contact.active === !archive && (contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position === filter.position || filter.position === 'Все')">
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="contact.photo_path" :src="$hostname+'media'+contact.photo_path"></v-img>
               </v-list-item-avatar>
@@ -41,12 +41,28 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item class="content-list__btns-add" @click="openAddForm">
+          <v-list-item v-if="!archive" class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>Добавить клиента</v-list-item-title>
+              <v-list-item-title>Добавить контакт</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item v-if="!archive" class="content-list__btns-add" @click="archive=!archive">
+            <v-list-item-icon>
+              <v-icon>$archive</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Архив</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item v-else class="content-list__btns-add" @click="archive=!archive">
+            <v-list-item-icon>
+              <v-icon>$archive</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Выйти из архива</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -114,6 +130,23 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="confirmArchiveDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Архивирование контакта
+        </v-card-title>
+        <v-card-text>
+          Вы действительно хотите архивировать контакт? После подтверждения контакт будет перемещен в архив
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmArchiveDialog = false">
+            Отменить
+          </v-btn>
+          <v-btn color="primary" text @click="archiveContact">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -128,6 +161,7 @@ export default {
   data() {
     return {
       page: 'contacts',
+      archive: false,
       contacts: [],
       newContact: {
         name: '',
@@ -140,7 +174,10 @@ export default {
         client: '',
         photo_path: ''
       },
-      currentContact: 0,
+      currentContact: {
+        id: 0,
+        active: true
+      },
       filter: {
         name: "",
         client: "Все",
@@ -152,6 +189,7 @@ export default {
       formBtnText: "Добавить клиента",
       addForm: false,
       confirmDeleteDialog: false,
+      confirmArchiveDialog: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
@@ -274,12 +312,36 @@ export default {
         this.alertError = true
       }
     },
+    archiveContact() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients-employees",
+        type: "PUT",
+        data: {
+          id: this.currentContact.id,
+          active: !this.currentContact.active
+        },
+        success: () => {
+          this.loadData()
+          this.confirmArchiveDialog = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
     deleteContact() {
       $.ajax({
         url: this.$hostname + "time-tracking/clients-employees",
         type: "DELETE",
         data: {
-          id: this.currentContact
+          id: this.currentContact.id
         },
         success: () => {
           this.loadData()
@@ -325,8 +387,12 @@ export default {
       }
     },
     openConfirmDeleteDialog(item) {
-      this.currentContact = item.id
-      this.confirmDeleteDialog = true
+      this.currentContact.id = item.id
+      this.currentContact.active = item.active
+      if (this.archive)
+        this.confirmDeleteDialog = true
+      else
+        this.confirmArchiveDialog = true
     },
     openFilters() {
       console.log("open filters")

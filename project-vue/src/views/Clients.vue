@@ -19,7 +19,7 @@
         <v-list three-line class="clients__list content-list">
           <template v-for="client in clients">
             <v-list-item :key="client.id"
-                         v-if="client.name.includes(filter.name) && (client.branch === filter.branch || filter.branch === 'Все')">
+                         v-if="client.active === !archive && client.name.includes(filter.name) && (client.branch === filter.branch || filter.branch === 'Все')">
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="client.logo_path" :src="$hostname+'media'+client.logo_path"></v-img>
               </v-list-item-avatar>
@@ -39,12 +39,28 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item class="content-list__btns-add" @click="openAddForm">
+          <v-list-item v-if="!archive" class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>Добавить клиента</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item v-if="!archive" class="content-list__btns-add" @click="archive=!archive">
+            <v-list-item-icon>
+              <v-icon>$archive</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Архив</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item v-else class="content-list__btns-add" @click="archive=!archive">
+            <v-list-item-icon>
+              <v-icon>$archive</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Выйти из архива</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -157,6 +173,23 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="confirmArchiveDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Архивирование клиента
+        </v-card-title>
+        <v-card-text>
+          Вы действительно хотите архивировать клиента? После подтверждения клиент будет перемещен в архив
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmArchiveDialog = false">
+            Отменить
+          </v-btn>
+          <v-btn color="primary" text @click="archiveClient">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -168,6 +201,7 @@ export default {
   data() {
     return {
       page: 'clients',
+      archive: false,
       clients: [],
       newClient: {
         name: '',
@@ -205,7 +239,10 @@ export default {
         account_email: '',
         logo_path: '',
       },
-      currentClient: 0,
+      currentClient: {
+        id: 0,
+        active: true,
+      },
       selectsVat: [
         {text: '0%', value: 0},
         {text: '10%', value: 10},
@@ -221,6 +258,7 @@ export default {
       formBtnText: "Добавить клиента",
       addForm: false,
       confirmDeleteDialog: false,
+      confirmArchiveDialog: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
@@ -332,12 +370,36 @@ export default {
         this.alertError = true
       }
     },
+    archiveClient() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients",
+        type: "PUT",
+        data: {
+          id: this.currentClient.id,
+          active: !this.currentClient.active
+        },
+        success: () => {
+          this.loadData()
+          this.confirmArchiveDialog = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "На этого клиента зарегистрированы объекты или контакты"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
     deleteClient() {
       $.ajax({
         url: this.$hostname + "time-tracking/clients",
         type: "DELETE",
         data: {
-          id: this.currentClient
+          id: this.currentClient.id
         },
         success: () => {
           this.loadData()
@@ -345,7 +407,7 @@ export default {
         },
         error: (response) => {
           if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
+            this.alertMsg = "На этого клиента зарегистрированы объекты или контакты"
           } else if (response.status === 401) {
             this.$refresh()
           } else {
@@ -407,8 +469,12 @@ export default {
       }
     },
     openConfirmDeleteDialog(item) {
-      this.currentClient = item.id
-      this.confirmDeleteDialog = true
+      this.currentClient.id = item.id
+      this.currentClient.active = item.active
+      if (this.archive)
+        this.confirmDeleteDialog = true
+      else
+        this.confirmArchiveDialog = true
     },
     openFilters() {
       console.log("open filters")
