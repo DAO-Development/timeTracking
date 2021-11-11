@@ -18,28 +18,6 @@
             Документы не загружены
           </template>
         </v-data-table>
-        <!--        <v-list three-line class="documents_list content-list">-->
-        <!--          <template v-for="profile in profiles">-->
-        <!--            <v-list-item :key="profile.id"-->
-        <!--                         v-if="profile.active !== archive && profile.auth_user_id.email.includes(filter.email) && (profile.name + ' ' + profile.lastname).includes(filter.name)  && (profile.position===filter.position || filter.position === 'Все')">-->
-        <!--              <v-list-item-avatar class="content-list__image">-->
-        <!--                <v-img v-if="profile.photo_path" :src="require('../../../media'+profile.photo_path)"></v-img>-->
-        <!--              </v-list-item-avatar>-->
-        <!--              <v-list-item-content @click="openProfile(profile)">-->
-        <!--                <v-list-item-title>{{ profile.lastname }} {{ profile.name }}</v-list-item-title>-->
-        <!--                <v-list-item-subtitle>-->
-        <!--                  <span>{{ profile.position }}</span><br>-->
-        <!--                  <span>{{ profile.auth_user_id.email }}</span>-->
-        <!--                </v-list-item-subtitle>-->
-        <!--              </v-list-item-content>-->
-        <!--              <v-list-item-action>-->
-        <!--                <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(profile)">-->
-        <!--                  $deleteIcon-->
-        <!--                </v-icon>-->
-        <!--              </v-list-item-action>-->
-        <!--            </v-list-item>-->
-        <!--          </template>-->
-        <!--        </v-list>-->
         <v-list class="content-list__btns">
           <v-list-item class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
@@ -132,12 +110,6 @@ export default {
         headers: {"Authorization": "Token " + localStorage.getItem("auth_token") || sessionStorage.getItem('auth_token')}
       })
       this.loadData()
-      // } else if (sessionStorage.getItem('auth_token')) {
-      //   this.$emit('set-auth')
-      //   $.ajaxSetup({
-      //     headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
-      //   })
-      //   this.loadData()
     } else {
       this.$router.push({name: "Index"})
     }
@@ -158,9 +130,14 @@ export default {
           this.profile = response.data.profile
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -209,9 +186,14 @@ export default {
           this.loadData()
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -247,7 +229,6 @@ export default {
       this.editFile = false
       this.formTitle = "Редактировать документ"
       this.currentDocument = item
-      // this.currentDocument.path = require('../../../media' + this.currentDocument.path)
       this.addForm = true
     },
     openConfirmDeleteDialog(item) {

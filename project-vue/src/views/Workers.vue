@@ -537,9 +537,10 @@ export default {
           this.profiles = response.data.data
         },
         error: (response) => {
-          console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -565,9 +566,14 @@ export default {
               this.addProfile(response.data.data.id)
             },
             error: (response) => {
+              if (response.status === 500) {
+                this.alertMsg = "Ошибка соединения с сервером"
+              } else if (response.status === 401) {
+                this.$refresh()
+              } else {
+                this.alertMsg = "Непредвиденная ошибка"
+              }
               this.alertError = true
-              this.alertMsg = "Непредвиденная ошибка"
-              console.log(response.data)
             },
           })
         }
@@ -637,9 +643,14 @@ export default {
           }
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -659,9 +670,14 @@ export default {
           this.closeForm()
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -707,9 +723,14 @@ export default {
           this.confirmDeleteDialog = false
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },

@@ -423,9 +423,10 @@ export default {
           this.selectsBranch = response.data.branches
         },
         error: (response) => {
-          console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -446,9 +447,10 @@ export default {
             this.loadData()
           },
           error: (response) => {
-            console.log(response)
             if (response.status === 500) {
               this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
             } else {
               this.alertMsg = "Непредвиденная ошибка"
             }
@@ -472,9 +474,10 @@ export default {
           this.$router.push({name: 'Clients'})
         },
         error: (response) => {
-          console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -504,7 +507,6 @@ export default {
             console.log(response.data.data)
             this.photoDialog = false
             this.photoField = null
-            // this.currentClient.photo_path = response.data.data.name
             this.loadData()
           });
     },

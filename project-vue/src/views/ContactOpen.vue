@@ -221,6 +221,8 @@ export default {
           console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -239,6 +241,8 @@ export default {
           console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -257,6 +261,8 @@ export default {
           console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -279,6 +285,8 @@ export default {
             console.log(response)
             if (response.status === 500) {
               this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
             } else {
               this.alertMsg = "Непредвиденная ошибка"
             }
@@ -305,6 +313,8 @@ export default {
           console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }

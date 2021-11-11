@@ -220,9 +220,14 @@ export default {
           this.news = response.data.data
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -300,9 +305,14 @@ export default {
           this.all = true
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },

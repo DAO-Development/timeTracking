@@ -259,9 +259,10 @@ export default {
           this.clients = response.data.data
         },
         error: (response) => {
-          console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -275,9 +276,10 @@ export default {
           this.selectsBranch = response.data.branches
         },
         error: (response) => {
-          console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }
@@ -315,9 +317,10 @@ export default {
             this.loadData()
           },
           error: (response) => {
-            console.log(response)
             if (response.status === 500) {
               this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
             } else {
               this.alertMsg = "Непредвиденная ошибка"
             }
@@ -341,9 +344,10 @@ export default {
           this.confirmDeleteDialog = false
         },
         error: (response) => {
-          console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             this.alertMsg = "Непредвиденная ошибка"
           }

@@ -194,7 +194,6 @@ export default {
           this.contacts = response.data.data
         },
         error: (response) => {
-          console.log(response)
           if (response.status === 500) {
             this.alertMsg = "Ошибка соединения с сервером"
           } else if (response.status === 401) {

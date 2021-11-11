@@ -39,9 +39,14 @@ export default {
         console.log(this.currentNew)
       },
       error: (response) => {
+        if (response.status === 500) {
+          this.alertMsg = "Ошибка соединения с сервером"
+        } else if (response.status === 401) {
+          this.$refresh()
+        } else {
+          this.alertMsg = "Непредвиденная ошибка"
+        }
         this.alertError = true
-        this.alertMsg = "Непредвиденная ошибка"
-        console.log(response.data)
       },
     })
   },

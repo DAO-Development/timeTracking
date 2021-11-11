@@ -630,9 +630,14 @@ export default {
           this.objects = response.data.data
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -644,9 +649,14 @@ export default {
           this.clients = response.data.data
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -664,9 +674,14 @@ export default {
           })
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -699,9 +714,14 @@ export default {
               this.closeForm()
             },
             error: (response) => {
+              if (response.status === 500) {
+                this.alertMsg = "Ошибка соединения с сервером"
+              } else if (response.status === 401) {
+                this.$refresh()
+              } else {
+                this.alertMsg = "Непредвиденная ошибка"
+              }
               this.alertError = true
-              this.alertMsg = "Непредвиденная ошибка"
-              console.log(response.data)
             },
           })
         else
@@ -724,9 +744,14 @@ export default {
           }
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -742,9 +767,14 @@ export default {
           this.loadData()
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -766,9 +796,14 @@ export default {
           this.photos = response.data.data
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -780,9 +815,14 @@ export default {
           this.objectWorkers = response.data.data
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
       $.ajax({
@@ -795,9 +835,14 @@ export default {
           })
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -828,9 +873,14 @@ export default {
           // }
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -854,9 +904,14 @@ export default {
             this.addWorkerForm = false
           },
           error: (response) => {
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
             this.alertError = true
-            this.alertMsg = "Непредвиденная ошибка"
-            console.log(response.data)
           },
         })
       }
@@ -874,9 +929,14 @@ export default {
           this.confirmDeleteWorkerDialog = false
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -905,9 +965,14 @@ export default {
           }
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
@@ -920,9 +985,14 @@ export default {
           this.loadComments(false)
         },
         error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
           this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
         },
       })
     },
