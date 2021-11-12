@@ -51,8 +51,7 @@
           <template v-for="item in news">
             <v-card class="news-single" :key="item.id" color="primary" v-if="item.photo_path"
                     @click="$router.push({name: 'NewOpen', params: {id: item.id}})"
-                    v-bind:style="{'background-image': 'url('+require('../../../media'+item.photo_path)+ ')',
-              'background-size': 'cover', 'background-position': 'center'}">
+                    v-bind:style="{'background-image': 'url('+$hostname+'media'+item.photo_path+ ')', 'background-size': 'cover', 'background-position': 'center'}">
               <div class="news-single__title">{{ item.title }}</div>
               <div class="news-single__text" v-html="item.text"></div>
             </v-card>

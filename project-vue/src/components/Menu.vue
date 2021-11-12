@@ -66,7 +66,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(3)">
+          <v-list-item @click="goPage(4)">
             <v-list-item-icon>
               <v-icon>mdi-handshake</v-icon>
             </v-list-item-icon>
@@ -77,7 +77,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(3)">
+          <v-list-item @click="goPage(5)">
             <v-list-item-icon>
               <v-icon>mdi-account-box</v-icon>
             </v-list-item-icon>
@@ -88,7 +88,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(3)">
+          <v-list-item @click="goPage(6)">
             <v-list-item-icon>
               <v-icon>mdi-crane</v-icon>
             </v-list-item-icon>
@@ -99,7 +99,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(3)">
+          <v-list-item @click="goPage(7)">
             <v-list-item-icon>
               <v-icon>mdi-cash</v-icon>
             </v-list-item-icon>
@@ -108,7 +108,8 @@
             </v-list-item-content>
           </v-list-item>
 
-          <v-list-item @click="goPage(3+items.length)">
+          <v-list-item @click="goPage(8)">
+            <!--          <v-list-item @click="goPage(3+items.length)">-->
             <v-list-item-icon>
               <v-icon>mdi-cog-outline</v-icon>
             </v-list-item-icon>
@@ -116,7 +117,8 @@
               <v-list-item-title>Настройки</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="goPage(3+items.length+1)">
+          <v-list-item @click="goPage(9)">
+            <!--          <v-list-item @click="goPage(3+items.length+1)">-->
             <v-list-item-icon>
               <v-icon>$support</v-icon>
             </v-list-item-icon>
@@ -124,7 +126,8 @@
               <v-list-item-title>Поддержка</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="goPage(3+items.length+2)">
+          <v-list-item @click="goPage(10)">
+            <!--          <v-list-item @click="goPage(3+items.length+2)">-->
             <v-list-item-icon>
               <v-icon>mdi-calendar-range</v-icon>
             </v-list-item-icon>
@@ -132,7 +135,8 @@
               <v-list-item-title>Календарь</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="goPage(3+items.length+3)">
+          <v-list-item @click="goPage(11)">
+            <!--          <v-list-item @click="goPage(3+items.length+3)">-->
             <v-list-item-icon>
               <v-icon>mdi-exit-to-app</v-icon>
             </v-list-item-icon>
@@ -209,6 +213,9 @@ export default {
   }),
   methods: {
     goPage(selected) {
+      if (selected === this.selectedItem) {
+        return
+      }
       if ($(".menu").hasClass("open"))
         $(".menu").removeClass("open")
       switch (selected) {
@@ -224,18 +231,45 @@ export default {
           this.$router.push({name: "Profile"})
           this.selectedItem = 2
           break
-        case this.items.length + 3:
+        case 3:
+          this.$router.push({name: "Workers"})
+          this.selectedItem = 3
           break
-        case this.items.length + 4:
+        case 4:
+          this.$router.push({name: "Clients"})
+          this.selectedItem = 4
           break
-        case this.items.length + 5:
+        case 5:
+          this.$router.push({name: "Contacts"})
+          this.selectedItem = 5
           break
-        case this.items.length + 6:
+        case 6:
+          this.$router.push({name: "Objects"})
+          this.selectedItem = 6
+          break
+        case 7:
+          break
+        case 8:
+          break
+        case 9:
+          break
+        case 10:
+          this.$router.push({name: "Profile"})
+          this.selectedItem = 10
+          break
+          // case this.items.length + 3:
+          //   break
+          // case this.items.length + 4:
+          //   break
+          // case this.items.length + 5:
+          //   break
+          // case this.items.length + 6:
+        case 11:
           this.logout()
           break
-        default:
-          this.$router.push({name: this.items[selected - 3].name})
-          break
+          // default:
+          //   this.$router.push({name: this.items[selected - 3].name})
+          //   break
       }
     },
     logout() {

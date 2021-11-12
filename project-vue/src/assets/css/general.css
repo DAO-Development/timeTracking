@@ -46,11 +46,15 @@
 }
 
 .flex-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 130px;
-    min-height: 100vh;
+    height: 100vh;
 }
 
 .flex-content {
+    margin-left: 130px;
     width: 100%;
 }
 
