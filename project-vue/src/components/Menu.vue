@@ -10,38 +10,139 @@
              :lazy-src="require('../../../media'+user.photo_path)"
              :src="require('../../../media'+user.photo_path)"></v-img>
     </div>
-    <v-list dense nav class="menu-list" color="primary">
-      <h2 @click="goPage(-1)">Главная</h2>
-      <v-list-item-group v-model="selectedItem">
-        <v-list-item @click="goPage(0)">
-          <v-list-item-content>
-            <v-list-item-title>Профиль</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="goPage(1)">
-          <v-list-item-content>
-            <v-list-item-title>Новости</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-spacer></v-spacer>
-        <v-list-item v-for="(item, i) in items" :key="i" @click="goPage(i+2)">
-          <v-list-item-content>
-            <v-list-item-title v-text="item.text"></v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-spacer></v-spacer>
-        <v-list-item @click="goPage(2+items.length)">
-          <v-list-item-content>
-            <v-list-item-title>Настройки</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="goPage(2+items.length+1)">
-          <v-list-item-content>
-            <v-list-item-title>Выход</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-item-group>
-    </v-list>
+    <v-navigation-drawer color="primary" class="menu-list">
+      <v-list>
+        <v-list-item-group v-model="selectedItem">
+          <v-list-item @click="goPage(0)">
+            <v-list-item-icon>
+              <v-icon>mdi-home</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Главная</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item @click="goPage(1)">
+            <v-list-item-icon>
+              <v-icon>mdi-bullhorn</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Новости</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>$tile</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+          <v-list-item @click="goPage(2)">
+            <v-list-item-icon>
+              <v-icon>mdi-account</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Профиль</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>mdi-pencil</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+          <!--          <v-list-item v-for="(item, i) in items" :key="i" @click="goPage(i+3)">-->
+          <!--            <v-list-item-icon>-->
+          <!--              <v-icon></v-icon>-->
+          <!--            </v-list-item-icon>-->
+          <!--            <v-list-item-content>-->
+          <!--              <v-list-item-title v-text="item.text"></v-list-item-title>-->
+          <!--            </v-list-item-content>-->
+          <!--            <v-list-item-icon>-->
+          <!--              <v-icon>$tile</v-icon>-->
+          <!--            </v-list-item-icon>-->
+          <!--          </v-list-item>-->
+
+          <v-list-item @click="goPage(3)">
+            <v-list-item-icon>
+              <v-icon>mdi-account-group</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Работники</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>$tile</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+          <v-list-item @click="goPage(3)">
+            <v-list-item-icon>
+              <v-icon>mdi-handshake</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Клиенты</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>$tile</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+          <v-list-item @click="goPage(3)">
+            <v-list-item-icon>
+              <v-icon>mdi-account-box</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Контакты</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>$tile</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+          <v-list-item @click="goPage(3)">
+            <v-list-item-icon>
+              <v-icon>mdi-crane</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Объекты</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>$tile</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+          <v-list-item @click="goPage(3)">
+            <v-list-item-icon>
+              <v-icon>mdi-cash</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Бухгалтерия</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item @click="goPage(3+items.length)">
+            <v-list-item-icon>
+              <v-icon>mdi-cog-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Настройки</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item @click="goPage(3+items.length+1)">
+            <v-list-item-icon>
+              <v-icon>$support</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Поддержка</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item @click="goPage(3+items.length+2)">
+            <v-list-item-icon>
+              <v-icon>mdi-calendar-range</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Календарь</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item @click="goPage(3+items.length+3)">
+            <v-list-item-icon>
+              <v-icon>mdi-exit-to-app</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Выход</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-navigation-drawer>
   </div>
 </template>
 
@@ -56,25 +157,28 @@ export default {
     }
     switch (this.$router.getMatchedComponents()[0].name) {
       case "Index":
-        this.selectedItem = -1
-        this.page = "Главная"
-        break
-      case "Home":
         this.selectedItem = 0
-        this.page = "Профиль"
+        this.page = "Главная"
         break
       case "News":
         this.selectedItem = 1
         this.page = "Новости"
         break
+      case "Profile":
+        this.selectedItem = 2
+        this.page = "Профиль"
+        break
       case "Settings":
-        this.selectedItem = this.items.length + 1
+        this.selectedItem = this.items.length + 2
         this.page = "Настройки"
         break
-      case "Documents":
-        //@todo fix that later
-        this.selectedItem = -1
-        this.page = "Документы"
+      case "Support":
+        this.selectedItem = this.items.length + 3
+        this.page = "Поддержка"
+        break
+      case "Calendar":
+        this.selectedItem = this.items.length + 4
+        this.page = "Календарь"
         break
       default:
         var i = -1;
@@ -82,7 +186,7 @@ export default {
           i++
           if (item.name === this.$router.getMatchedComponents()[0].name) {
             this.page = item.text
-            this.selectedItem = i + 2
+            this.selectedItem = i + 3
           }
         })
         console.log(this.selectedItem)
@@ -108,24 +212,29 @@ export default {
       if ($(".menu").hasClass("open"))
         $(".menu").removeClass("open")
       switch (selected) {
-        case -1:
-          this.$router.push({name: "Index"})
-          this.selectedItem = -1
-          break
         case 0:
-          this.$router.push({name: "Home"})
+          this.$router.push({name: "Index"})
           this.selectedItem = 0
           break
         case 1:
           this.$router.push({name: "News"})
+          this.selectedItem = 1
           break
-        case this.items.length + 2:
+        case 2:
+          this.$router.push({name: "Profile"})
+          this.selectedItem = 2
           break
         case this.items.length + 3:
+          break
+        case this.items.length + 4:
+          break
+        case this.items.length + 5:
+          break
+        case this.items.length + 6:
           this.logout()
           break
         default:
-          this.$router.push({name: this.items[selected - 2].name})
+          this.$router.push({name: this.items[selected - 3].name})
           break
       }
     },

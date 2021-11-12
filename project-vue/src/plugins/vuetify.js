@@ -9,6 +9,8 @@ import addNewIcon from "../components/icons/addNewIcon";
 import wasteIcon from "../components/icons/wasteIcon";
 import editIcon from "../components/icons/editIcon";
 import archiveIcon from "../components/icons/archiveIcon";
+import supportIcon from "../components/icons/supportIcon";
+import tileIcon from "../components/icons/tileIcon";
 
 Vue.use(Vuetify);
 
@@ -59,6 +61,12 @@ export default new Vuetify({
             },
             pdf: {
                 component: pdfIcon
+            },
+            support: {
+                component: supportIcon
+            },
+            tile: {
+                component: tileIcon
             },
             waste: {
                 component: wasteIcon

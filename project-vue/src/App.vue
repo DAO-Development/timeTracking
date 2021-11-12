@@ -1,10 +1,8 @@
 <template>
   <v-app>
-    <v-container>
-      <div class="flex-main">
-        <Menu v-if="auth" class="flex-sidebar"/>
-        <router-view v-on:set-auth="setAuth" v-on:set-admin="setAdmin"/>
-      </div>
+    <v-container class="flex-main">
+      <Menu v-if="auth" class="flex-sidebar"/>
+      <router-view v-on:set-auth="setAuth" v-on:set-admin="setAdmin"/>
     </v-container>
   </v-app>
 </template>
@@ -16,10 +14,10 @@ import Menu from "./components/Menu";
 
 global.jQuery = global.$ = $;
 global.appUrl = "https://shielded-plateau-96200.herokuapp.com/";
-// global.appUrl = "http://127.0.0.1:8000/";
-Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
-Vue.prototype.$admin = false
+global.appUrl = "http://127.0.0.1:8000/";
+// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+// Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
   sessionStorage.clear()
@@ -52,13 +50,15 @@ export default {
 </script>
 
 <style>
-@import "assets/css/style.css";
-@import "assets/css/fotorama.css";
-@import "assets/css/datepicker.min.css";
-@import "assets/css/selectize.default.css";
-@import "assets/css/main.css";
-@import "assets/css/authorization.css";
-@import "assets/css/profile.css";
+@import "assets/css/general.css";
+@import "assets/css/menu.css";
+/*@import "assets/css/style.css";*/
+/*@import "assets/css/fotorama.css";*/
+/*@import "assets/css/datepicker.min.css";*/
+/*@import "assets/css/selectize.default.css";*/
+/*@import "assets/css/main.css";*/
+/*@import "assets/css/authorization.css";*/
+/*@import "assets/css/profile.css";*/
 @import "assets/css/news.css";
-@import "assets/css/objects.css";
+/*@import "assets/css/objects.css";*/
 </style>

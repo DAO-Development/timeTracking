@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Index from "../views/Index"
-import Home from "../views/Home"
+import Profile from "../views/Profile"
 import Login from "../views/Login"
 import RecoverPassword from "../views/RecoverPassword";
 import News from "../views/News";
@@ -24,8 +24,8 @@ const routes = [
     },
     {
         path: '/profile',
-        name: 'Home',
-        component: Home
+        name: 'Profile',
+        component: Profile
     },
     {
         path: '/login',

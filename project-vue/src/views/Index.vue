@@ -1,5 +1,15 @@
 <template>
   <div class="index news flex-content">
+    <div class="header">
+      <div class="header__left">
+        <img class="header__logo" src="src/assets/logo.png" loading="lazy" alt="logo.png">
+      </div>
+      <div class="header__right">
+        <div class="header__datetime">
+          <span>{{ date }}</span> <span>|</span> <span>{{ time }}</span>
+        </div>
+      </div>
+    </div>
     <div class="summary-box">
       <div class="summary-box__title">
         <h3>Главная</h3>
@@ -38,14 +48,36 @@ export default {
       this.auth = true
     }
     this.loadData()
+    this.refreshTime()
+    setInterval(() => {
+      this.refreshTime()
+    }, 1000)
+  },
+  computed: {
+    date: function () {
+      let now = new Date()
+      return now.getDate() + "." + (now.getMonth() + 1) + "." + now.getFullYear()
+    },
+    // time: function () {
+    //   let now = new Date()
+    //   return now.getHours() + ":" + now.getMinutes()
+    // }
   },
   data() {
     return {
       auth: false,
       news: {},
+      time: ''
     }
   },
   methods: {
+    refreshTime() {
+      let now = new Date()
+      let minutes = now.getMinutes()
+      if (minutes < 10)
+        minutes = "0" + minutes
+      this.time = now.getHours() + ":" + minutes
+    },
     goLogin() {
       this.$router.push({name: "Login"})
     },

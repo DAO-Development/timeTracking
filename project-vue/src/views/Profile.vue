@@ -152,10 +152,10 @@
 import $ from 'jquery'
 
 export default {
-  name: 'Home',
+  name: 'Profile',
   data() {
     return {
-      page: 'home',
+      page: 'profile',
       user: {
         auth_user_id: {
           email: ""

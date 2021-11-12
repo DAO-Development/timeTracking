@@ -1,0 +1,31 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    line-height: 15px;
+}
+
+.flex-main {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.flex-sidebar {
+    width: 130px;
+    min-height: 100vh;
+}
+
+.flex-content {
+    width: 100%;
+}
+
+.header {
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.summary-box {
+    padding: 30px 40px;
+}
