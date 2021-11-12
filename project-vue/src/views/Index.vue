@@ -2,19 +2,51 @@
   <div class="index news flex-content">
     <div class="header">
       <div class="header__left">
-        <img class="header__logo" src="src/assets/logo.png" loading="lazy" alt="logo.png">
+        <img class="header__logo" src="../assets/logo.png" alt="logo.png">
       </div>
       <div class="header__right">
         <div class="header__datetime">
-          <span>{{ date }}</span> <span>|</span> <span>{{ time }}</span>
+          <span>{{ date }}</span> <span class="line"></span> <span>{{ time }}</span>
         </div>
       </div>
     </div>
     <div class="summary-box">
-      <div class="summary-box__title">
-        <h3>Главная</h3>
+      <h1>Главная</h1>
+      <div v-if="auth" class="index__hello">
+        Добро пожаловать, {{ user.name }} {{ user.lastname }}
       </div>
-      <div class="news-all all">
+      <div v-if="auth" class="index__today">
+        <h2>На сегодня</h2>
+        <ul class="today-list">
+          <li>
+            <span class="today__unit bold-text">Новости:</span>
+            <span class="today__quantity">12 новостей</span>
+          </li>
+          <li>
+            <span class="today__unit bold-text">Работники:</span>
+            <span class="today__quantity">12 работников</span>
+            <span class="today__now">Новых на сегодня: </span>
+            <span class="today__now">Работает:</span>
+          </li>
+          <li>
+            <span class="today__unit bold-text">Клиенты:</span>
+            <span class="today__quantity">12 клиентов</span>
+            <span class="today__now">Новых на сегодня: </span>
+          </li>
+          <li>
+            <span class="today__unit bold-text">Объекты:</span>
+            <span class="today__quantity">12 объекта</span>
+            <span class="today__now">В работе:</span>
+          </li>
+          <li>
+            <span class="today__unit bold-text">Календарь:</span>
+            <span class="today__quantity">12 события</span>
+            <span class="today__now">На этой неделе: </span>
+            <span class="today__now">Сегодня:</span>
+          </li>
+        </ul>
+      </div>
+      <div v-if="!auth" class="news-all all">
         <div class="news-all__grid">
           <template v-for="item in news">
             <v-card class="news-single" :key="item.id" color="primary" v-if="item.photo_path"
@@ -58,15 +90,12 @@ export default {
       let now = new Date()
       return now.getDate() + "." + (now.getMonth() + 1) + "." + now.getFullYear()
     },
-    // time: function () {
-    //   let now = new Date()
-    //   return now.getHours() + ":" + now.getMinutes()
-    // }
   },
   data() {
     return {
       auth: false,
       news: {},
+      user: {},
       time: ''
     }
   },
@@ -82,18 +111,38 @@ export default {
       this.$router.push({name: "Login"})
     },
     loadData() {
-      $.ajax({
-        url: this.$hostname + "time-tracking/news",
-        type: "GET",
-        success: (response) => {
-          this.news = response.data.data
-        },
-        error: (response) => {
-          this.alertError = true
-          this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
-        },
-      })
+      if (this.auth)
+        $.ajax({
+          url: this.$hostname + "time-tracking/user",
+          type: "GET",
+          headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+          success: (response) => {
+            this.user = response.data.data
+          },
+          error: (response) => {
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          },
+        })
+      else
+        $.ajax({
+          url: this.$hostname + "time-tracking/news",
+          type: "GET",
+          success: (response) => {
+            this.news = response.data.data
+          },
+          error: (response) => {
+            this.alertError = true
+            this.alertMsg = "Непредвиденная ошибка"
+            console.log(response.data)
+          },
+        })
     },
   }
 }

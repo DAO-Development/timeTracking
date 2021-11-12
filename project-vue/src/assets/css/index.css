@@ -1,0 +1,9 @@
+.index__hello {
+    margin-bottom: 20px;
+}
+
+.index__today .today-list li {
+    display: grid;
+    grid-template-columns: 75px 90px 130px 100px;
+    grid-column-gap: 50px;
+}

@@ -52,12 +52,13 @@ export default {
 <style>
 @import "assets/css/general.css";
 @import "assets/css/menu.css";
+@import "assets/css/index.css";
 /*@import "assets/css/style.css";*/
 /*@import "assets/css/fotorama.css";*/
 /*@import "assets/css/datepicker.min.css";*/
 /*@import "assets/css/selectize.default.css";*/
 /*@import "assets/css/main.css";*/
-/*@import "assets/css/authorization.css";*/
+@import "assets/css/authorization.css";
 /*@import "assets/css/profile.css";*/
 @import "assets/css/news.css";
 /*@import "assets/css/objects.css";*/

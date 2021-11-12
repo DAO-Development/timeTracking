@@ -45,7 +45,7 @@ export default {
   },
   created() {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
-      this.$router.push({name: "Main"})
+      this.$router.push({name: "Index"})
     }
   },
   methods: {
