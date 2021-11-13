@@ -159,6 +159,7 @@ export default {
     if ($(window).width() <= '568') {
       this.loadUser()
     }
+    console.log(this.$router.getMatchedComponents())
     switch (this.$router.getMatchedComponents()[0].name) {
       case "Index":
         this.selectedItem = 0
@@ -172,32 +173,49 @@ export default {
         this.selectedItem = 2
         this.page = "Профиль"
         break
+      case "Workers":
+        this.selectedItem = 3
+        this.page = "Работники"
+        break
+      case "Clients":
+        this.selectedItem = 4
+        this.page = "Клиенты"
+        break
+      case "Contacts":
+        this.selectedItem = 5
+        this.page = "Контакты"
+        break
+      case "Objects":
+        this.selectedItem = 6
+        this.page = "Объекты"
+        break
       case "Settings":
-        this.selectedItem = this.items.length + 2
+        // this.selectedItem = this.items.length + 2
+        this.selectedItem = 8
         this.page = "Настройки"
         break
       case "Support":
-        this.selectedItem = this.items.length + 3
+        // this.selectedItem = this.items.length + 3
+        this.selectedItem = 9
         this.page = "Поддержка"
         break
       case "Calendar":
-        this.selectedItem = this.items.length + 4
+        // this.selectedItem = this.items.length + 4
+        this.selectedItem = 10
         this.page = "Календарь"
         break
-      default:
-        var i = -1;
-        this.items.forEach(item => {
-          i++
-          if (item.name === this.$router.getMatchedComponents()[0].name) {
-            this.page = item.text
-            this.selectedItem = i + 3
-          }
-        })
-        console.log(this.selectedItem)
-        console.log(this.page)
-
-        // this.page = this.items[this.selectedItem - 2].name
+        // default:
+        //   var i = -1;
+        //   this.items.forEach(item => {
+        //     i++
+        //     if (item.name === this.$router.getMatchedComponents()[0].name) {
+        //       this.page = item.text
+        //       this.selectedItem = i + 3
+        //     }
+        //   })
     }
+    console.log(this.selectedItem)
+    console.log(this.page)
   },
   data: () => ({
     user: {},
@@ -213,6 +231,7 @@ export default {
   }),
   methods: {
     goPage(selected) {
+      console.log("go page")
       if (selected === this.selectedItem) {
         return
       }
@@ -254,8 +273,8 @@ export default {
         case 9:
           break
         case 10:
-          this.$router.push({name: "Profile"})
-          this.selectedItem = 10
+          // this.$router.push({name: "Profile"})
+          // this.selectedItem = 10
           break
           // case this.items.length + 3:
           //   break

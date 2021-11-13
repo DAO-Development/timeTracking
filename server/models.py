@@ -36,6 +36,8 @@ class UserProfile(models.Model):
     pants = models.IntegerField(verbose_name='Штаны', null=True, blank=True)
     shirt = models.IntegerField(verbose_name='Футболка', null=True, blank=True)
 
+    create_date = models.DateField(verbose_name="Дата создания", null=True)
+
     class Meta:
         db_table = "user_profile"
         verbose_name = 'Профиль пользователя'
@@ -95,6 +97,8 @@ class News(models.Model):
     text = models.TextField(verbose_name='Текст новости', max_length=1200)
     photo_path = models.CharField(verbose_name='Обложка', max_length=250, null=True, blank=True)
 
+    create_date = models.DateField(verbose_name="Дата создания", null=True)
+
     class Meta:
         db_table = "news"
 
@@ -120,6 +124,8 @@ class Client(models.Model):
     electronic_number = models.CharField(verbose_name='Номер электронных счетов', max_length=31, null=True, blank=True)
     account_email = models.CharField(verbose_name='Email для счетов', max_length=100, null=True, blank=True)
     active = models.BooleanField(verbose_name='Активен', default=True)
+
+    create_date = models.DateField(verbose_name="Дата создания", null=True)
 
     class Meta:
         db_table = "client"
@@ -164,6 +170,8 @@ class Objects(models.Model):
     accident_insurance = models.CharField(verbose_name='Страховка от несчастных случаев', max_length=100, null=True,
                                           blank=True)
     health_insurance = models.CharField(verbose_name='Страховка здоровья', max_length=100, null=True, blank=True)
+
+    create_date = models.DateField(verbose_name="Дата создания", null=True)
 
     class Meta:
         db_table = "objects"

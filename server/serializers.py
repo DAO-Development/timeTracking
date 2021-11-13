@@ -42,14 +42,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserProfilePostSerializer(serializers.ModelSerializer):
-    """Сериализация профилей пользователей"""
+    """Сериализация профилей пользователей для POST-запросов"""
 
     class Meta:
         model = UserProfile
         fields = ('auth_user_id', 'name', 'lastname', 'photo_path', 'active', 'citizenship', 'birthdate',
                   'social_code_own', 'social_code_fin', 'address_own', 'address_fin', 'phone', 'phone_fin',
                   'bank_account', 'tax_number', 'auto', 'tool', 'english', 'estonian', 'finnish', 'russian',
-                  'other_language', 'position', 'skills', 'boots', 'jacket', 'pants', 'shirt')
+                  'other_language', 'position', 'skills', 'boots', 'jacket', 'pants', 'shirt', 'create_date')
 
 
 class UserDocumentsSerializer(serializers.ModelSerializer):
@@ -61,7 +61,7 @@ class UserDocumentsSerializer(serializers.ModelSerializer):
 
 
 class UserDocumentsPostSerializer(serializers.ModelSerializer):
-    """Сериализация документов пользователей"""
+    """Сериализация документов пользователей для POST-запросов"""
 
     class Meta:
         model = UserDocuments
@@ -105,7 +105,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ('id', 'title', 'text', 'photo_path')
+        fields = ('id', 'title', 'text', 'photo_path', 'create_date')
 
 
 class NewsPostSerializer(serializers.ModelSerializer):
@@ -113,7 +113,7 @@ class NewsPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ('title', 'text', 'photo_path')
+        fields = ('title', 'text', 'photo_path', 'create_date')
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -132,7 +132,7 @@ class ClientPostSerializer(serializers.ModelSerializer):
         fields = (
             'name', 'short_name', 'ogrn', 'business_address', 'warehouse_address', 'phone', 'email', 'site',
             'logo_path', 'vat', 'branch', 'bank_account', 'bank', 'bic', 'account_operator', 'index_operator',
-            'electronic_number', 'account_email')
+            'electronic_number', 'account_email', 'create_date')
 
 
 class ClientEmployeesSerializer(serializers.ModelSerializer):
@@ -170,7 +170,8 @@ class ObjectsPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Objects
         fields = ('index', 'city', 'street', 'house', 'entrance', 'flat', 'date_start', 'date_end',
-                  'active', 'client_id', 'contact_id', 'habitation', 'accident_insurance', 'health_insurance')
+                  'active', 'client_id', 'contact_id', 'habitation', 'accident_insurance', 'health_insurance',
+                  'create_date')
 
 
 class ObjectUserSerializer(serializers.ModelSerializer):

@@ -185,7 +185,8 @@ class NewsView(APIView):
         serializer = NewsPostSerializer(data={
             "title": request.data["title"],
             "text": request.data["text"],
-            "photo_path": name
+            "photo_path": name,
+            "create_date": datetime.date.today()
         })
         if serializer.is_valid():
             serializer.save()
@@ -387,6 +388,7 @@ class ClientView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
+        #todo добавить поле даты создания
         serializer = ClientPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
