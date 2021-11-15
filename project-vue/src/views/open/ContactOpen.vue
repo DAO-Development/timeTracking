@@ -209,16 +209,10 @@ export default {
     }
   },
   created: function () {
-    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token')) {
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token'))}
-      })
-      this.loadData()
-    } else if (sessionStorage.getItem('auth_token')) {
-      this.$emit('set-auth')
-      $.ajaxSetup({
-        headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
+        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
     } else {

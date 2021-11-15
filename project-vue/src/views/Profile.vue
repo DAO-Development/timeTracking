@@ -169,16 +169,10 @@ export default {
   },
   created() {
     console.log("init Profile")
-    if (localStorage.getItem('auth_token')) {
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + localStorage.getItem("auth_token")}
-      })
-      this.loadData()
-    } else if (sessionStorage.getItem('auth_token')) {
-      this.$emit('set-auth')
-      $.ajaxSetup({
-        headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
+        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
     } else {

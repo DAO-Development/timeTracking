@@ -76,9 +76,7 @@ export default {
   name: "Index",
   created() {
     console.log("init Index")
-    if (localStorage.getItem('auth_token')) {
-      this.auth = true
-    } else if (sessionStorage.getItem('auth_token')) {
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.auth = true
     }
     this.loadData()
