@@ -277,7 +277,8 @@ export default {
       ],
     }
   },
-  created: function () {
+  created() {
+    console.log("init Clients")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token')) {
       this.$emit('set-auth')
       $.ajaxSetup({

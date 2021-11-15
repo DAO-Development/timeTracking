@@ -155,11 +155,11 @@
 </template>
 
 <script>
-import BackIcon from "../components/icons/backIcon";
+import BackIcon from "../../components/icons/backIcon";
 import $ from "jquery";
-import WasteIcon from "../components/icons/wasteIcon";
-import EditIcon from "../components/icons/editIcon";
-import ArchiveIcon from "../components/icons/archiveIcon";
+import WasteIcon from "../../components/icons/wasteIcon";
+import EditIcon from "../../components/icons/editIcon";
+import ArchiveIcon from "../../components/icons/archiveIcon";
 
 export default {
   name: "ContactOpen",

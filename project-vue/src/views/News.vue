@@ -195,6 +195,7 @@ export default {
     }
   },
   created() {
+    console.log("init News")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       $.ajaxSetup({

@@ -168,19 +168,48 @@ export default {
     }
   },
   created() {
+    console.log("local " + localStorage.getItem('auth_token'))
+    console.log("session " + sessionStorage.getItem('auth-token'))
+    let tmp1 = false, tmp2 = false;
     if (localStorage.getItem('auth_token')) {
+      console.log("local +++")
+      tmp1 = true
+    } else if (sessionStorage.getItem('auth_token')) {
+      console.log("do svidanya")
+      tmp2 = true
+    }
+    if (sessionStorage.getItem('auth-token')) {
+      console.log("session +++")
+      tmp2 = true
+    }
+
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token')) {
+      console.log("double +++ ")
+    }
+
+    console.log(tmp1 + " | " + tmp2 + " = " + tmp1 || tmp2)
+
+
+    console.log(localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token'))
+    console.log("init Profile")
+    if (localStorage.getItem('auth_token')) {
+      console.log("А ЗДЕСЬБ ЛОКАЛКА ХХАХАХАХ")
       this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + localStorage.getItem("auth_token")}
       })
       this.loadData()
     } else if (sessionStorage.getItem('auth_token')) {
+      console.log("А ЗДЕСЬБ СЕССИОНКА ХХАХАХАХ")
+
       this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
       })
       this.loadData()
     } else {
+      console.log("А ЗДЕСЬБ НИЧЕГО БУГА ХХАХАХАХ")
+
       this.$router.push({name: "Index"})
     }
   },

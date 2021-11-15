@@ -285,10 +285,10 @@
 
 <script>
 import $ from "jquery";
-import BackIcon from "../components/icons/backIcon";
-import WasteIcon from "../components/icons/wasteIcon";
-import EditIcon from "../components/icons/editIcon";
-import ArchiveIcon from "../components/icons/archiveIcon";
+import BackIcon from "../../components/icons/backIcon";
+import WasteIcon from "../../components/icons/wasteIcon";
+import EditIcon from "../../components/icons/editIcon";
+import ArchiveIcon from "../../components/icons/archiveIcon";
 
 export default {
   name: "ClientOpen",

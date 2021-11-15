@@ -64,7 +64,7 @@ export default {
               localStorage.setItem("auth_token", response.data.attributes.auth_token)
             else
               sessionStorage.setItem("auth_token", response.data.attributes.auth_token)
-            this.$router.push({name: "Main"})
+            this.$router.push({name: "Index"})
           },
           error: (response) => {
             console.log(response)

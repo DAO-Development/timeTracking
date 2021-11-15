@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import BackIcon from "../components/icons/backIcon";
+import BackIcon from "../../components/icons/backIcon";
 import $ from "jquery";
 
 export default {

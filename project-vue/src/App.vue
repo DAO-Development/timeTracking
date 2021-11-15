@@ -2,7 +2,7 @@
   <v-app>
     <v-container class="flex-main">
       <Menu v-if="auth" class="flex-sidebar"/>
-      <router-view v-on:set-auth="setAuth" v-on:set-admin="setAdmin"/>
+      <router-view v-on:set-auth="setAuth" v-on:set-admin="setAdmin" :key="$route.path"/>
     </v-container>
   </v-app>
 </template>
@@ -29,6 +29,7 @@ export default {
   name: 'App',
   components: {Menu},
   created() {
+    console.log("init App")
     this.auth = !!(localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'));
   },
   data() {

@@ -591,6 +591,7 @@ export default {
     }
   },
   created() {
+    console.log("init Objects")
     if (localStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       $.ajaxSetup({
@@ -598,7 +599,6 @@ export default {
       })
       this.loadData()
       this.loadClients()
-
     } else if (sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       $.ajaxSetup({
@@ -606,7 +606,6 @@ export default {
       })
       this.loadData()
       this.loadClients()
-      this.initSocket()
     } else {
       this.$router.push({name: "Login"})
     }

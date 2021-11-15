@@ -8,11 +8,11 @@ import News from "../views/News";
 import Objects from "../views/Objects";
 import Workers from "../views/Workers";
 import Documents from "../views/Documents";
-import NewOpen from "../views/NewOpen";
+import NewOpen from "../views/open/NewOpen";
 import Clients from "../views/Clients";
-import ClientOpen from "../views/ClientOpen";
+import ClientOpen from "../views/open/ClientOpen";
 import Contacts from "../views/Contacts";
-import ContactOpen from "../views/ContactOpen";
+import ContactOpen from "../views/open/ContactOpen";
 
 Vue.use(VueRouter)
 
