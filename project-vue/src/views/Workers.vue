@@ -518,9 +518,6 @@ export default {
     }
   },
   created() {
-    console.log("local " + localStorage.getItem('auth_token'))
-    console.log("session " + sessionStorage.getItem('auth-token'))
-    console.log(localStorage.getItem('auth_token') || sessionStorage.getItem('auth-token'))
     console.log("init Workers")
     if (localStorage.getItem('auth_token')) {
       this.$emit('set-auth')
