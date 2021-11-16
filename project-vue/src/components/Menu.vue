@@ -156,10 +156,12 @@ import $ from "jquery";
 export default {
   name: "Menu",
   created() {
+    console.log("init Menu")
     if ($(window).width() <= '568') {
+      console.log("<= 568")
       this.loadUser()
     }
-    console.log(this.$router.getMatchedComponents())
+    console.log(this.$router.getMatchedComponents()[0].name)
     switch (this.$router.getMatchedComponents()[0].name) {
       case "Index":
         this.selectedItem = 0
@@ -295,6 +297,7 @@ export default {
       $.ajax({
         url: this.$hostname + "auth/token/logout/",
         type: "POST",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: () => {
           localStorage.clear()
           sessionStorage.clear()
@@ -315,18 +318,10 @@ export default {
         $(".menu").addClass("open")
     },
     loadUser() {
-      if (localStorage.getItem('auth_token')) {
-        $.ajaxSetup({
-          headers: {"Authorization": "Token " + localStorage.getItem("auth_token")}
-        })
-      } else if (sessionStorage.getItem('auth_token')) {
-        $.ajaxSetup({
-          headers: {"Authorization": "Token " + sessionStorage.getItem("auth_token")}
-        })
-      }
       $.ajax({
         url: this.$hostname + "time-tracking/user",
         type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
           this.user = response.data.data
           console.log(this.user.photo_path)
@@ -334,6 +329,8 @@ export default {
         error: (response) => {
           if (response.status === 500) {
             console.log("Ошибка соединения с сервером")
+          } else if (response.status === 401) {
+            this.$refresh()
           } else {
             console.log("Непредвиденная ошибка")
           }

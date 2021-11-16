@@ -388,7 +388,10 @@ class ClientView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        #todo добавить поле даты создания
+        # todo добавить поле даты создания
+        data = request.data
+        data['create_date'] = datetime.date.today()
+        return Response({"data": data})
         serializer = ClientPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

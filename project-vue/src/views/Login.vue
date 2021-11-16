@@ -33,7 +33,8 @@ export default {
       },
       checkbox: false,
       usernameRules: [
-        v => !!v || 'Необходимо заполнить имя пользователя'
+        v => !!v || 'Необходимо заполнить почту пользователя',
+        v => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'Некорректный E-mail',
       ],
       passwordRules: [
         v => !!v || 'Необходимо заполнить пароль',
@@ -60,6 +61,7 @@ export default {
             password: this.authForm.password,
           },
           success: (response) => {
+            this.$emit('set-auth')
             if (this.checkbox)
               localStorage.setItem("auth_token", response.data.attributes.auth_token)
             else

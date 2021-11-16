@@ -30,7 +30,8 @@ export default {
   components: {Menu},
   created() {
     console.log("init App")
-    this.auth = !!(localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'));
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))
+      this.auth = true
   },
   data() {
     return {
@@ -39,6 +40,7 @@ export default {
   },
   methods: {
     setAuth() {
+      console.log("auth")
       this.auth = true
     },
     setAdmin() {
