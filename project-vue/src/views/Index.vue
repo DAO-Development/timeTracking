@@ -11,23 +11,23 @@
         <ul class="today-list">
           <li>
             <span class="today__unit bold-text">Новости:</span>
-            <span class="today__quantity">12 новостей</span>
+            <span class="today__quantity">{{ statistics.news }} новостей</span>
           </li>
           <li>
             <span class="today__unit bold-text">Работники:</span>
-            <span class="today__quantity">12 работников</span>
-            <span class="today__now">Новых на сегодня: </span>
-            <span class="today__now">Работает:</span>
+            <span class="today__quantity">{{ statistics.workers.all }} работников</span>
+            <span class="today__now">Новых на сегодня: {{ statistics.workers.today }}</span>
+            <span class="today__now">Работает: {{ statistics.workers.in_work }}</span>
           </li>
           <li>
             <span class="today__unit bold-text">Клиенты:</span>
-            <span class="today__quantity">12 клиентов</span>
-            <span class="today__now">Новых на сегодня: </span>
+            <span class="today__quantity">{{ statistics.clients.all }} клиентов</span>
+            <span class="today__now">Новых на сегодня: {{ statistics.clients.today }}</span>
           </li>
           <li>
             <span class="today__unit bold-text">Объекты:</span>
-            <span class="today__quantity">12 объекта</span>
-            <span class="today__now">В работе:</span>
+            <span class="today__quantity">{{ statistics.objects.all }} объектов</span>
+            <span class="today__now">В работе: {{ statistics.objects.in_work }}</span>
           </li>
           <li>
             <span class="today__unit bold-text">Календарь:</span>
@@ -79,6 +79,7 @@ export default {
       auth: false,
       news: {},
       user: {},
+      statistics: {},
     }
   },
   methods: {
@@ -86,7 +87,7 @@ export default {
       this.$router.push({name: "Login"})
     },
     loadData() {
-      if (this.auth)
+      if (this.auth) {
         $.ajax({
           url: this.$hostname + "time-tracking/user",
           type: "GET",
@@ -105,7 +106,8 @@ export default {
             this.alertError = true
           },
         })
-      else
+        this.loadStatistics()
+      } else {
         $.ajax({
           url: this.$hostname + "time-tracking/news",
           type: "GET",
@@ -118,7 +120,28 @@ export default {
             console.log(response.data)
           },
         })
+      }
     },
+    loadStatistics() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/statistics",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          this.statistics = response.data
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    }
   }
 }
 </script>

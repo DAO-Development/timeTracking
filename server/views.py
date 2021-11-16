@@ -7,6 +7,28 @@ import datetime
 from server.serializers import *
 
 
+class MainView(APIView):
+    """Статистика для главной страницы"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        news = News.objects.all().count()
+        workers = UserProfile.objects.all().count()
+        new_workers = UserProfile.objects.filter(create_date=datetime.date.today()).count()
+        work_workers = ObjectUser.objects.filter(start_date__lte=datetime.date.today(),
+                                                 end_date__gte=datetime.date.today()).count()
+        clients = Client.objects.all().count()
+        new_clients = Client.objects.filter(create_date=datetime.date.today()).count()
+        objects = Objects.objects.all().count()
+        work_objects = Objects.objects.filter(date_start__lte=datetime.date.today(),
+                                              date_end__gte=datetime.date.today(), active=False).count()
+        return Response({"news": news,
+                         "workers": {"all": workers, "today": new_workers, "in_work": work_workers},
+                         "clients": {"all": clients, "today": new_clients},
+                         "objects": {"all": objects, "in_work": work_objects},
+                         })
+
+
 class UserView(APIView):
     """Пользователи"""
     permission_classes = [permissions.IsAuthenticated]
