@@ -1,15 +1,6 @@
 <template>
   <div class="index news flex-content">
-    <div class="header">
-      <div class="header__left">
-        <img class="header__logo" src="../assets/logo.png" alt="logo.png">
-      </div>
-      <div class="header__right">
-        <div class="header__datetime">
-          <span>{{ date }}</span> <span class="line"></span> <span>{{ time }}</span>
-        </div>
-      </div>
-    </div>
+    <Header/>
     <div class="summary-box">
       <h1>Главная</h1>
       <div v-if="auth" class="index__hello">
@@ -71,42 +62,26 @@
 
 <script>
 import $ from "jquery";
+import Header from "../components/Header";
 
 export default {
   name: "Index",
+  components: {Header},
   created() {
     console.log("init Index")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.auth = true
     }
     this.loadData()
-    this.refreshTime()
-    setInterval(() => {
-      this.refreshTime()
-    }, 1000)
-  },
-  computed: {
-    date: function () {
-      let now = new Date()
-      return now.getDate() + "." + (now.getMonth() + 1) + "." + now.getFullYear()
-    },
   },
   data() {
     return {
       auth: false,
       news: {},
       user: {},
-      time: ''
     }
   },
   methods: {
-    refreshTime() {
-      let now = new Date()
-      let minutes = now.getMinutes()
-      if (minutes < 10)
-        minutes = "0" + minutes
-      this.time = now.getHours() + ":" + minutes
-    },
     goLogin() {
       this.$router.push({name: "Login"})
     },

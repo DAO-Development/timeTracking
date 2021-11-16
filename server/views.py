@@ -57,7 +57,7 @@ class ProfilesView(APIView):
     def post(self, request):
         serializer = UserProfilePostSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(create_date=datetime.date.today())
             return Response({"data": serializer.data}, status=201)
         else:
             return Response(status=400)
@@ -241,7 +241,7 @@ class ObjectsView(APIView):
     def post(self, request):
         serializer = ObjectsPostSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(create_date=datetime.date.today())
             return Response(status=201)
         else:
             return Response(status=400)
@@ -388,13 +388,9 @@ class ClientView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        # todo добавить поле даты создания
-        data = request.data
-        data['create_date'] = datetime.date.today()
-        return Response({"data": data})
         serializer = ClientPostSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(create_date=datetime.date.today())
             return Response(status=201)
         else:
             return Response(status=400)
