@@ -10,7 +10,7 @@
              :lazy-src="require('../../../media'+user.photo_path)"
              :src="require('../../../media'+user.photo_path)"></v-img>
     </div>
-    <v-navigation-drawer color="primary" class="menu-list">
+    <v-navigation-drawer permanent color="primary" class="menu-list">
       <v-list>
         <v-list-item-group v-model="selectedItem">
           <v-list-item @click="goPage(0)">

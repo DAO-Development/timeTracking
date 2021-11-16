@@ -79,7 +79,12 @@ export default {
       auth: false,
       news: {},
       user: {},
-      statistics: {},
+      statistics: {
+        news: 0,
+        workers: {},
+        clients: {},
+        objects: {},
+      },
     }
   },
   methods: {
