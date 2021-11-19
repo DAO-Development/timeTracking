@@ -225,3 +225,19 @@ class ObjectCommentsPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjectComments
         fields = ('text', 'user_profile_id', 'objects_id', 'object_comments_id')
+
+
+class NotesSerializer(serializers.ModelSerializer):
+    """Сериализация виджета блокнота"""
+
+    class Meta:
+        model = Notes
+        fields = '__all__'
+
+
+class NotesPostSerializer(serializers.ModelSerializer):
+    """Сериализация виджета блокнота для POST-запросов"""
+
+    class Meta:
+        model = Notes
+        fields = ('color', 'text', 'user')

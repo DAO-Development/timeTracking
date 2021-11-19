@@ -3,40 +3,53 @@
     <Header/>
     <div class="summary-box">
       <h1>Главная</h1>
-      <div v-if="auth" class="index__hello">
-        Добро пожаловать, {{ user.name }} {{ user.lastname }}
-      </div>
-      <div v-if="auth" class="index__today">
-        <h2>На сегодня</h2>
-        <ul class="today-list">
-          <li>
-            <span class="today__unit bold-text">Новости:</span>
-            <span class="today__quantity">{{ statistics.news }} новостей</span>
-          </li>
-          <li>
-            <span class="today__unit bold-text">Работники:</span>
-            <span class="today__quantity">{{ statistics.workers.all }} работников</span>
-            <span class="today__now">Новых на сегодня: {{ statistics.workers.today }}</span>
-            <span class="today__now">Работает: {{ statistics.workers.in_work }}</span>
-          </li>
-          <li>
-            <span class="today__unit bold-text">Клиенты:</span>
-            <span class="today__quantity">{{ statistics.clients.all }} клиентов</span>
-            <span class="today__now">Новых на сегодня: {{ statistics.clients.today }}</span>
-          </li>
-          <li>
-            <span class="today__unit bold-text">Объекты:</span>
-            <span class="today__quantity">{{ statistics.objects.all }} объектов</span>
-            <span class="today__now">В работе: {{ statistics.objects.in_work }}</span>
-          </li>
-          <li>
-            <span class="today__unit bold-text">Календарь:</span>
-            <span class="today__quantity">12 события</span>
-            <span class="today__now">На этой неделе: </span>
-            <span class="today__now">Сегодня:</span>
-          </li>
-        </ul>
-      </div>
+      <section v-if="auth">
+        <div class="index__hello">
+          Добро пожаловать, {{ user.name }} {{ user.lastname }}
+        </div>
+        <div class="index__today">
+          <h2>На сегодня</h2>
+          <ul class="today-list">
+            <li>
+              <span class="today__unit bold-text">Новости:</span>
+              <span class="today__quantity">{{ statistics.news }} новостей</span>
+            </li>
+            <li>
+              <span class="today__unit bold-text">Работники:</span>
+              <span class="today__quantity">{{ statistics.workers.all }} работников</span>
+              <span class="today__now">Новых на сегодня: {{ statistics.workers.today }}</span>
+              <span class="today__now">Работает: {{ statistics.workers.in_work }}</span>
+            </li>
+            <li>
+              <span class="today__unit bold-text">Клиенты:</span>
+              <span class="today__quantity">{{ statistics.clients.all }} клиентов</span>
+              <span class="today__now">Новых на сегодня: {{ statistics.clients.today }}</span>
+            </li>
+            <li>
+              <span class="today__unit bold-text">Объекты:</span>
+              <span class="today__quantity">{{ statistics.objects.all }} объектов</span>
+              <span class="today__now">В работе: {{ statistics.objects.in_work }}</span>
+            </li>
+            <li>
+              <span class="today__unit bold-text">Календарь:</span>
+              <span class="today__quantity">12 события</span>
+              <span class="today__now">На этой неделе: </span>
+              <span class="today__now">Сегодня:</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section v-if="auth" class="widgets">
+        <div class="unit-title">
+          <h1>Виджеты</h1>
+          <v-btn color="primary" fab x-small @click="addWidgetForm = true">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </div>
+        <div class="index__widgets">
+
+        </div>
+      </section>
       <div v-if="!auth" class="news-all all">
         <div class="news-all__grid">
           <template v-for="item in news">
@@ -57,6 +70,40 @@
     </div>
 
     <v-btn v-if="!auth" class="action-btn" color="primary" @click="goLogin">Войти</v-btn>
+    <v-dialog max-width="500px" v-model="addWidgetForm">
+      <v-card>
+        <v-card-title>
+          Выберите виджет
+        </v-card-title>
+        <v-card-text>
+          <v-list dense>
+            <v-list-item-group>
+              <v-list-item @click="openAddNote">
+                <v-list-item-icon>
+                  <v-icon>mdi-text</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Блокнот</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog max-width="500px" v-model="addNoteForm">
+      <v-card>
+        <v-card-text>
+          <v-color-picker v-model="newNote.color"></v-color-picker>
+          <v-textarea v-model="newNote.text" filled color="primary"></v-textarea>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="secondary" @click="closeNoteForm">Отменить</v-btn>
+          <v-btn color="primary" @click="saveNote">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -85,6 +132,15 @@ export default {
         clients: {},
         objects: {},
       },
+      widgets: [],
+      notes: [],
+      newNote: {
+        id: 0,
+        color: "",
+        text: "",
+      },
+      addWidgetForm: false,
+      addNoteForm: false,
     }
   },
   methods: {
@@ -146,7 +202,23 @@ export default {
           this.alertError = true
         },
       })
-    }
+    },
+    saveNote() {
+      console.log(this.newNote.color)
+      console.log(this.newNote.text)
+    },
+    closeNoteForm() {
+      this.addNoteForm = false
+      this.newNote = {
+        id: 0,
+        color: "",
+        text: ""
+      }
+    },
+    openAddNote() {
+      this.addWidgetForm = false
+      this.addNoteForm = true
+    },
   }
 }
 </script>

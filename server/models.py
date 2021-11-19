@@ -228,3 +228,26 @@ class TimeReport(models.Model):
         db_table = "time_report"
         verbose_name = "Часовой отчет"
         verbose_name_plural = "Часовые отчеты"
+
+
+class Notes(models.Model):
+    """Виджеты"""
+    last_save = models.DateTimeField(verbose_name="Последнее сохранение")
+    color = models.CharField(verbose_name="Цвет блокнота", max_length=7)
+    text = models.TextField(verbose_name="Содержимое", max_length=1000)
+    user = models.ForeignKey(User, models.CASCADE, verbose_name='Пользователь')
+
+    class Meta:
+        db_table = "notes"
+        verbose_name = "Блокнот"
+        verbose_name_plural = "Блокноты"
+        
+# class WidgetUser(models.Model):
+#     """Виджеты"""
+#     name = models.CharField(verbose_name="Название виджета", max_length=120)
+#     user = models.ForeignKey("User", models.CASCADE, verbose_name='Пользователь')
+#
+#     class Meta:
+#         db_table = "time_report"
+#         verbose_name = "Часовой отчет"
+#         verbose_name_plural = "Часовые отчеты"

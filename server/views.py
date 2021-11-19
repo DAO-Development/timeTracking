@@ -112,7 +112,6 @@ class UserDocumentsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, ):
-        # return Response({"data": request.GET['id']})
         profile = get_object_or_404(UserProfile.objects.all(), pk=request.GET['id'])
         profile_serializer = UserProfileSerializer(profile)
         documents = UserDocuments.objects.all().filter(user_profile_id=request.GET['id'])
