@@ -440,6 +440,7 @@ class ClientView(APIView):
 
 class ClientBranchesView(APIView):
     """Получение всех существующих отраслей клиентов"""
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         branches = Client.objects.all().values_list('branch', flat=True).distinct('branch').order_by('branch')
@@ -493,11 +494,53 @@ class ClientEmployeesView(APIView):
 
 class ClientEmployeesPositionView(APIView):
     """Получение всех существующих должностей в штатах фирм-клиентов"""
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         positions = ClientEmployees.objects.all().values_list('position', flat=True).distinct('position').order_by(
             'position')
         return Response({"positions": positions})
+
+
+class NotesView(APIView):
+    """Виджет-блокнот"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        notes = Notes.objects.filter(user=UserSerializer(request.user).data['id'])
+        serializer = NotesSerializer(notes, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = NotesPostSerializer(data={
+            "text": request.data['text'],
+            "color": request.data['color'],
+            "user": UserSerializer(request.user).data['id'],
+            # "last_save": datetime.datetime.now()
+        })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved_note = get_object_or_404(Notes.objects.all(), id=request.data["id"])
+        serializer = NotesSerializer(saved_note, data={
+            "text": request.data['text'],
+            "color": request.data['color'],
+            "last_save": datetime.datetime.today()
+        })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_note = get_object_or_404(Notes.objects.all(), id=request.data["id"])
+        saved_note.delete()
+        return Response(status=204)
 
 
 class ImagesView(APIView):

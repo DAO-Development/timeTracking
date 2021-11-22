@@ -8,3 +8,69 @@
     grid-template-columns: 75px 90px 130px 100px;
     grid-column-gap: 50px;
 }
+
+.theme--light.v-text-field--filled.v-textarea > .v-input__control > .v-input__slot {
+    background: transparent;
+}
+
+.index__widgets {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px
+}
+
+.index__widgets .widgets-single {
+    width: 380px;
+    max-width: 380px;
+}
+
+.widgets-single__header {
+    display: flex;
+    justify-content: space-between;
+    align-content: flex-start;
+    margin-bottom: 15px;
+}
+
+.widgets-single__content {
+    padding: 20px;
+    min-height: 244px;
+    border: 1px solid #9E9E9E;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+.widgets-single__content .note__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 10px;
+    line-height: 11px;
+}
+
+.widgets-single__content .note__header > span {
+    font-style: italic;
+}
+
+.widgets-single__content .note__content {
+    padding: 20px;
+    width: 100%;
+    height: 173px;
+}
+
+.widgets-single__actions {
+    display: flex;
+    gap: 15px;
+}
+
+.widgets-single__actions .v-btn--fab.v-size--x-small {
+    width: 21px;
+    height: 21px;
+}
+
+.widgets-single__actions .v-btn--fab.v-size--x-small .v-icon {
+    width: 15px;
+    height: 15px;
+    font-size: 15px;
+}

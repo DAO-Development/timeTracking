@@ -47,7 +47,35 @@
           </v-btn>
         </div>
         <div class="index__widgets">
-
+          <template v-for="(note, i) in notes">
+            <div class="widgets-single" :key="note.id">
+              <div class="widgets-single__header">
+                <h3>Блокнот {{ i + 1 }}</h3>
+                <div class="widgets-single__actions">
+                  <v-btn color="error" fab x-small @click="addWidgetForm = true">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                  <v-btn color="primary" fab x-small @click="addWidgetForm = true">
+                    <v-icon>mdi-autorenew</v-icon>
+                  </v-btn>
+                </div>
+              </div>
+              <div class="widgets-single__content">
+                <div class="note__header">
+                  Последнее сохранение:
+                  <span>{{ note.last_save }}</span>
+                  <div class="widgets-single__actions">
+                    <v-btn color="secondary" fab x-small @click="addWidgetForm = true">
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </div>
+                </div>
+                <div class="note__content" :style="'background: '+note.color">
+                  {{ note.text }}
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
       </section>
       <div v-if="!auth" class="news-all all">
@@ -88,15 +116,22 @@
               </v-list-item>
             </v-list-item-group>
           </v-list>
-
         </v-card-text>
       </v-card>
     </v-dialog>
     <v-dialog max-width="500px" v-model="addNoteForm">
       <v-card>
         <v-card-text>
-          <v-color-picker v-model="newNote.color"></v-color-picker>
-          <v-textarea v-model="newNote.text" filled color="primary"></v-textarea>
+          <v-textarea v-model="newNote.text" filled :style="'background: '+color"></v-textarea>
+          <!--          <v-menu ref="menu_color" v-model="color" :close-on-content-click="true"-->
+          <!--                  :return-value.sync="color"-->
+          <!--                  transition="scale-transition" offset-y min-width="auto">-->
+          <!--            <template v-slot:activator="{ on, attrs }">-->
+          <!--              <v-text-field v-model="color" placeholder="Цвет" readonly v-bind="attrs"-->
+          <!--                            v-on="on" outlined></v-text-field>-->
+          <!--            </template>-->
+          <v-color-picker v-model="color"></v-color-picker>
+          <!--          </v-menu>-->
         </v-card-text>
         <v-card-actions>
           <v-btn color="secondary" @click="closeNoteForm">Отменить</v-btn>
@@ -141,7 +176,18 @@ export default {
       },
       addWidgetForm: false,
       addNoteForm: false,
+      hex: '#FFC6C6',
     }
+  },
+  computed: {
+    color: {
+      get() {
+        return this['hex']
+      },
+      set(v) {
+        this['hex'] = v
+      },
+    },
   },
   methods: {
     goLogin() {
@@ -168,6 +214,7 @@ export default {
           },
         })
         this.loadStatistics()
+        this.loadNotes()
       } else {
         $.ajax({
           url: this.$hostname + "time-tracking/news",
@@ -203,9 +250,78 @@ export default {
         },
       })
     },
+    loadNotes() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/notes",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          this.notes = response.data.data
+          this.notes.forEach(note => {
+            let date = new Date(note.last_save)
+            let text = ''
+            switch (date.getDay()) {
+              case 1:
+                text += 'Понедельник'
+                break
+              case 2:
+                text += 'Вторник'
+                break
+              case 3:
+                text += 'Среда'
+                break
+              case 4:
+                text += 'Четверг'
+                break
+              case 5:
+                text += 'Пятница'
+                break
+              case 6:
+                text += 'Суббота'
+                break
+              case 7:
+                text += 'Воскресенье'
+                break
+            }
+            note.last_save = text + ' ' + date.toISOString().substring(0, 10) + ' ' + date.toISOString().substring(11, 16)
+          })
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
     saveNote() {
-      console.log(this.newNote.color)
+      console.log(this.color)
       console.log(this.newNote.text)
+      this.newNote.color = this.color
+      $.ajax({
+        url: this.$hostname + "time-tracking/notes",
+        type: "POST",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        data: this.newNote,
+        success: () => {
+          // this.closeNoteForm()
+          this.loadNotes()
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
     },
     closeNoteForm() {
       this.addNoteForm = false
