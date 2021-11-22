@@ -308,7 +308,7 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         data: this.newNote,
         success: () => {
-          // this.closeNoteForm()
+          this.closeNoteForm()
           this.loadNotes()
         },
         error: (response) => {
