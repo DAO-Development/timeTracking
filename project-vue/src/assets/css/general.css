@@ -8,6 +8,11 @@
     box-sizing: border-box;
 }
 
+pre {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+}
+
 .v-application .container {
     margin: 0;
     padding: 0;
