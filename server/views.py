@@ -525,12 +525,13 @@ class NotesView(APIView):
             return Response(status=400)
 
     def put(self, request):
+        # @todo исправить timezone
         saved_note = get_object_or_404(Notes.objects.all(), id=request.data["id"])
         serializer = NotesSerializer(saved_note, data={
             "text": request.data['text'],
             "color": request.data['color'],
-            "last_save": datetime.datetime.today()
-        })
+            "last_save": request.data['last_save']
+        }, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

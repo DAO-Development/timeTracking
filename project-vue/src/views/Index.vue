@@ -52,10 +52,10 @@
               <div class="widgets-single__header">
                 <h3>Блокнот {{ i + 1 }}</h3>
                 <div class="widgets-single__actions">
-                  <v-btn color="error" fab x-small @click="addWidgetForm = true">
+                  <v-btn color="error" fab x-small @click="deleteNote(note.id)">
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
-                  <v-btn color="primary" fab x-small @click="addWidgetForm = true">
+                  <v-btn color="primary" fab x-small>
                     <v-icon>mdi-autorenew</v-icon>
                   </v-btn>
                 </div>
@@ -65,13 +65,13 @@
                   Последнее сохранение:
                   <span>{{ note.last_save }}</span>
                   <div class="widgets-single__actions">
-                    <v-btn color="secondary" fab x-small @click="addWidgetForm = true">
+                    <v-btn color="secondary" fab x-small @click="newNote = note; addNoteForm = true">
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
                   </div>
                 </div>
                 <div class="note__content" :style="'background: '+note.color">
-                  {{ note.text }}
+                  <pre>{{ note.text }}</pre>
                 </div>
               </div>
             </div>
@@ -122,6 +122,7 @@
     <v-dialog max-width="500px" v-model="addNoteForm">
       <v-card>
         <v-card-text>
+          <h2>Блокнот</h2>
           <v-textarea v-model="newNote.text" filled :style="'background: '+color"></v-textarea>
           <!--          <v-menu ref="menu_color" v-model="color" :close-on-content-click="true"-->
           <!--                  :return-value.sync="color"-->
@@ -173,6 +174,7 @@ export default {
         id: 0,
         color: "",
         text: "",
+        last_save: "",
       },
       addWidgetForm: false,
       addNoteForm: false,
@@ -299,16 +301,63 @@ export default {
       })
     },
     saveNote() {
-      console.log(this.color)
-      console.log(this.newNote.text)
       this.newNote.color = this.color
+      this.newNote.last_save = new Date().toISOString()
+      if (this.newNote.id === 0)
+        $.ajax({
+          url: this.$hostname + "time-tracking/notes",
+          type: "POST",
+          headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+          data: this.newNote,
+          success: () => {
+            this.closeNoteForm()
+            this.loadNotes()
+          },
+          error: (response) => {
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          },
+        })
+      else
+        this.putNote()
+    },
+    putNote() {
       $.ajax({
         url: this.$hostname + "time-tracking/notes",
-        type: "POST",
+        type: "PUT",
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         data: this.newNote,
         success: () => {
           this.closeNoteForm()
+          this.loadNotes()
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
+    deleteNote(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/notes",
+        type: "DELETE",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        data: {
+          id: id
+        },
+        success: () => {
           this.loadNotes()
         },
         error: (response) => {
