@@ -3,7 +3,7 @@
     <Header/>
     <section class="summary-box">
       <h1>Управление группами пользователей</h1>
-      <v-list>
+      <v-list class="groups__list">
         <v-list-group v-for="group in groups" :key="group.id" v-model="group.active" no-action>
           <template v-slot:activator>
             <v-list-item-content>
@@ -11,13 +11,11 @@
             </v-list-item-content>
           </template>
           <template v-for="func in functions[group.name]">
-            <v-list-item :key="func.text">
-              <v-list-item-content>
-                <v-list-item-title>{{ func.name }}</v-list-item-title>
-                Чтение: {{ func.read }}
-                Редактирование: {{ func.edit }}
-              </v-list-item-content>
-            </v-list-item>
+            <div class="groups-single__function" :key="func.text">
+              <span class="bold-text">{{ func.name }}</span>
+              <v-checkbox v-model="func.data.read" label="Чтение" @change="putFunction(func.data)"></v-checkbox>
+              <v-checkbox v-model="func.data.edit" label="Редактирование" @change="putFunction(func.data)"></v-checkbox>
+            </div>
           </template>
         </v-list-group>
       </v-list>
@@ -58,6 +56,27 @@ export default {
         success: (response) => {
           this.groups = response.data.groups
           this.functions = response.data.functions
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
+    putFunction(func) {
+      console.log(func)
+      $.ajax({
+        url: this.$hostname + "time-tracking/groups-functions",
+        type: "PUT",
+        data: func,
+        success: () => {
+          console.log("Даннные обновлены")
         },
         error: (response) => {
           if (response.status === 500) {

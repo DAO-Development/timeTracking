@@ -192,8 +192,7 @@ class GroupsView(APIView):
                     children = GroupFunctions.objects.get(group_id=group.id, functions_id=function.id)
                     children_serializer = GroupFunctionsSerializer(children)
                     data[group.name].update({function.text: {"name": function.text,
-                                                             "read": children_serializer.data['read'],
-                                                             "edit": children_serializer.data['edit']}})
+                                                             "data": children_serializer.data}})
         return Response({"groups": serializer.data, "functions": data})
 
 

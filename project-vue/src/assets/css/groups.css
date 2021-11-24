@@ -1,0 +1,5 @@
+.groups-single__function {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}

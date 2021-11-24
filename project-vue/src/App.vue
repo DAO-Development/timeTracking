@@ -63,4 +63,5 @@ export default {
 @import "assets/css/profile.css";
 @import "assets/css/news.css";
 @import "assets/css/objects.css";
+@import "assets/css/groups.css";
 </style>

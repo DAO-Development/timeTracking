@@ -97,7 +97,7 @@ class GroupFunctionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GroupFunctions
-        fields = ('read', 'edit')
+        fields = '__all__'
 
 
 class GroupFunctionsPostSerializer(serializers.ModelSerializer):
