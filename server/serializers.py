@@ -87,6 +87,8 @@ class GroupPostSerializer(serializers.ModelSerializer):
 class GroupFunctionsSerializer(serializers.ModelSerializer):
     """Сериализация функций групп"""
 
+    group_id = GroupSerializer()
+
     class Meta:
         model = GroupFunctions
         fields = '__all__'

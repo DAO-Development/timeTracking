@@ -185,6 +185,28 @@ class GroupsView(APIView):
         return Response({"data": serializer.data})
 
 
+class GroupFunctionsView(APIView):
+    """Функции групп"""
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get(self, request):
+        functions = GroupFunctions.objects.all()
+        serializer = GroupFunctionsSerializer(functions, many=True)
+        return Response({"data": serializer.data})
+
+    def put(self, request):
+        if request.data["id"] == "0":
+            serializer = GroupFunctionsPostSerializer(data=request.data)
+        else:
+            saved_function = get_object_or_404(GroupFunctions.objects.all(), id=request.data["id"])
+            serializer = GroupFunctionsSerializer(saved_function, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+
 class NewsView(APIView):
     """Новости"""
     permission_classes = [permissions.AllowAny]
