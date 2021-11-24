@@ -13,6 +13,8 @@ import Clients from "../views/Clients";
 import ClientOpen from "../views/open/ClientOpen";
 import Contacts from "../views/Contacts";
 import ContactOpen from "../views/open/ContactOpen";
+import Groups from "../views/Groups";
+import Settings from "../views/Settings";
 
 Vue.use(VueRouter)
 
@@ -91,6 +93,16 @@ const routes = [
         name: 'ContactOpen',
         component: ContactOpen,
         props: true
+    },
+    {
+        path: '/groups',
+        name: 'Groups',
+        component: Groups
+    },
+    {
+        path: '/settings',
+        name: 'Settings',
+        component: Settings
     },
 ]
 

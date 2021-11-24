@@ -182,7 +182,19 @@ class GroupsView(APIView):
     def get(self, request):
         groups = Group.objects.all()
         serializer = GroupSerializer(groups, many=True)
-        return Response({"data": serializer.data})
+        functions = Functions.objects.all()
+        data = {}
+        for group in groups:
+            data.update({group.name: {}})
+            for function in functions:
+                children = GroupFunctions.objects.filter(group_id=group.id, functions_id=function.id)
+                if len(children) == 1:
+                    children = GroupFunctions.objects.get(group_id=group.id, functions_id=function.id)
+                    children_serializer = GroupFunctionsSerializer(children)
+                    data[group.name].update({function.text: {"name": function.text,
+                                                             "read": children_serializer.data['read'],
+                                                             "edit": children_serializer.data['edit']}})
+        return Response({"groups": serializer.data, "functions": data})
 
 
 class GroupFunctionsView(APIView):
@@ -239,7 +251,6 @@ class NewsView(APIView):
 
     def put(self, request):
         saved_news = get_object_or_404(News.objects.all(), id=request.data["id"])
-        name = ''
         serializer = NewsSerializer(saved_news, data={
             "title": request.data["title"],
             "text": request.data["text"]

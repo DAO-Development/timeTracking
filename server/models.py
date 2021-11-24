@@ -59,8 +59,8 @@ class GroupFunctions(models.Model):
     """Доступные группам функции"""
     group_id = models.ForeignKey(Group, models.CASCADE, verbose_name='Группа')
     functions_id = models.ForeignKey('Functions', models.CASCADE, verbose_name='Функция')
-    read = models.BooleanField(verbose_name="Чтение", null=True, blank=True)
-    edit = models.BooleanField(verbose_name="Редактирование", null=True, blank=True)
+    read = models.BooleanField(verbose_name="Чтение", null=True, blank=True, default=False)
+    edit = models.BooleanField(verbose_name="Редактирование", null=True, blank=True, default=False)
 
     class Meta:
         db_table = "group_functions"

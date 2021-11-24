@@ -271,6 +271,8 @@ export default {
         case 7:
           break
         case 8:
+          this.$router.push({name: "Settings"})
+          this.selectedItem = 8
           break
         case 9:
           break
