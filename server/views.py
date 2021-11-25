@@ -162,6 +162,8 @@ class GroupView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
+        group = Group.objects.create(name=request.data['name'])
+        return Response(status=201)
         serializer = GroupPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -193,6 +195,13 @@ class GroupsView(APIView):
                     children_serializer = GroupFunctionsSerializer(children)
                     data[group.name].update({function.text: {"name": function.text,
                                                              "data": children_serializer.data}})
+                else:
+                    data[group.name].update({function.text: {"name": function.text,
+                                                             "data": {"id": 0,
+                                                                      "group_id": group.id,
+                                                                      "functions_id": function.id,
+                                                                      "read": False,
+                                                                      "edit": False}}})
         return Response({"groups": serializer.data, "functions": data})
 
 

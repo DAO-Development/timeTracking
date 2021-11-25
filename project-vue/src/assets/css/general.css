@@ -106,6 +106,16 @@ pre {
     padding: 30px 40px;
 }
 
+.v-application .v-btn.action-btn {
+    text-transform: none;
+    border-radius: 2px;
+}
+
+.v-application .v-btn.action-btn > span {
+    font-size: 13px;
+    line-height: 15px;
+}
+
 .unit-title {
     display: flex;
     align-items: flex-start;

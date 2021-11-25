@@ -1,15 +1,12 @@
-.v-application .action-btn {
-    width: 255px !important;
-    padding: 30px 33px !important;
-    border-radius: 10px;
-    font-family: "icomoon", sans-serif;
-    font-weight: 400;
-    text-transform: none !important;
-}
+/*.v-application .action-btn {*/
+/*    width: 255px !important;*/
+/*    padding: 30px 33px !important;*/
+/*    border-radius: 10px;*/
+/*}*/
 
-.v-application .v-btn > span {
-    font-size: 16px !important;
-}
+/*.v-application .v-btn > span {*/
+/*    font-size: 16px !important;*/
+/*}*/
 
 .v-application .addition-btn {
     display: flex;

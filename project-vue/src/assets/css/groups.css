@@ -1,5 +1,15 @@
-.groups-single__function {
-    display: flex;
-    gap: 10px;
+.groups-single__functions {
+    display: grid;
+    grid-template-columns: 110px 130px 150px;
     align-items: center;
+    margin-left: 20px;
+    font-size: 13px;
+    line-height: 15px;
+}
+
+.groups-single__functions label {
+    font-size: 13px;
+}
+
+.groups-single__action {
 }
