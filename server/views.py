@@ -157,13 +157,23 @@ class GroupView(APIView):
 
     def get(self, request):
         user = UserSerializer(request.user)
-        group = Group.objects.filter(user=user.data["id"])
-        serializer = GroupSerializer(group, many=True)
-        return Response({"data": serializer.data})
+        group = Group.objects.get(user=user.data["id"])
+        serializer = GroupSerializer(group)
+        functions = GroupFunctions.objects.filter(group_id=group.id)
+        functions_ser = GroupFunctionsSerializer(functions, many=True)
+        # return Response({"data": serializer.data, "functions": functions_ser.data})
+
+        read = []
+        edit = []
+        for func in functions:
+            if func.read:
+                # return Response({"data": "function read" + str(func.functions_id.id)})
+                read.append(Functions.objects.get(pk=func.functions_id.id).text)
+            if func.edit:
+                edit.append(Functions.objects.get(id=func.functions_id.id).text)
+        return Response({"read": read, "edit": edit})
 
     def post(self, request):
-        # group = Group.objects.create(name=request.data['name'])
-        # return Response(status=201)
         serializer = GroupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

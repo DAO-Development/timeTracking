@@ -55,7 +55,7 @@
           <!--            </v-list-item-icon>-->
           <!--          </v-list-item>-->
 
-          <v-list-item @click="goPage(3)">
+          <v-list-item @click="goPage(3)" v-if="group.read.indexOf('Работники') !== -1">
             <v-list-item-icon>
               <v-icon>mdi-account-group</v-icon>
             </v-list-item-icon>
@@ -66,7 +66,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(4)">
+          <v-list-item @click="goPage(4)" v-if="group.read.indexOf('Клиенты') !== -1">
             <v-list-item-icon>
               <v-icon>mdi-handshake</v-icon>
             </v-list-item-icon>
@@ -77,7 +77,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(5)">
+          <v-list-item @click="goPage(5)" v-if="group.read.indexOf('Контакты') !== -1">
             <v-list-item-icon>
               <v-icon>mdi-account-box</v-icon>
             </v-list-item-icon>
@@ -88,7 +88,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(6)">
+          <v-list-item @click="goPage(6)" v-if="group.read.indexOf('Объекты') !== -1">
             <v-list-item-icon>
               <v-icon>mdi-crane</v-icon>
             </v-list-item-icon>
@@ -99,7 +99,7 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(7)">
+          <v-list-item @click="goPage(7)" v-if="group.read.indexOf('Бухгалтерия') !== -1">
             <v-list-item-icon>
               <v-icon>mdi-cash</v-icon>
             </v-list-item-icon>
@@ -158,10 +158,10 @@ export default {
   created() {
     console.log("init Menu")
     if ($(window).width() <= '568') {
-      console.log("<= 568")
       this.loadUser()
     }
     console.log(this.$router.getMatchedComponents()[0].name)
+    this.loadGroup()
     switch (this.$router.getMatchedComponents()[0].name) {
       case "Index":
         this.selectedItem = 0
@@ -222,6 +222,7 @@ export default {
   data: () => ({
     user: {},
     selectedItem: 0,
+    group: {},
     items: [
       {text: 'Объекты', name: 'Objects'},
       {text: 'Работники', name: 'Workers'},
@@ -327,6 +328,26 @@ export default {
         success: (response) => {
           this.user = response.data.data
           console.log(this.user.photo_path)
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            console.log("Ошибка соединения с сервером")
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            console.log("Непредвиденная ошибка")
+          }
+        }
+      })
+    },
+    loadGroup() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/group",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          this.group = response.data
+          console.log(this.group.read)
         },
         error: (response) => {
           if (response.status === 500) {
