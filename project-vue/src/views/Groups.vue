@@ -126,7 +126,7 @@ export default {
         type: "PUT",
         data: func,
         success: () => {
-          console.log("Даннные обновлены")
+          console.log("Данные обновлены")
           this.loadData()
         },
         error: (response) => {

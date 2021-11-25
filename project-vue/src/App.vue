@@ -12,7 +12,7 @@ import $ from 'jquery';
 import Vue from 'vue';
 import Menu from "./components/Menu";
 
-global.jQuery = global.$ = $;
+// global.jQuery = global.$ = $;
 Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
 // Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 Vue.prototype.$admin = false
@@ -30,6 +30,7 @@ export default {
   components: {Menu},
   created() {
     console.log("init App")
+    console.log("Почему-то не работало")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))
       this.auth = true
   },
