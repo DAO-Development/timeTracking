@@ -162,9 +162,9 @@ class GroupView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        group = Group.objects.create(name=request.data['name'])
-        return Response(status=201)
-        serializer = GroupPostSerializer(data=request.data)
+        # group = Group.objects.create(name=request.data['name'])
+        # return Response(status=201)
+        serializer = GroupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

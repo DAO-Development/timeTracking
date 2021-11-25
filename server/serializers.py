@@ -73,15 +73,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
-        fields = ('id', 'name')
-
-
-class GroupPostSerializer(serializers.ModelSerializer):
-    """Сериализация групп для POST-запросов"""
-
-    class Meta:
-        model = Group
-        fields = 'name'
+        fields = '__all__'
 
 
 class FunctionSerializer(serializers.ModelSerializer):

@@ -127,6 +127,7 @@ export default {
         data: func,
         success: () => {
           console.log("Даннные обновлены")
+          this.loadData()
         },
         error: (response) => {
           if (response.status === 500) {
@@ -143,7 +144,7 @@ export default {
     addGroup() {
       if (this.$refs.addForm.validate()) {
         $.ajax({
-          url: this.$hostname + "admin/auth/group/add/",
+          url: this.$hostname + "time-tracking/group",
           type: "POST",
           data: this.newGroup,
           success: () => {
@@ -175,7 +176,7 @@ export default {
     deleteGroup() {
       console.log("Удаляется группа " + this.currentGroup)
       $.ajax({
-        url: this.$hostname + "time-tracking/groups",
+        url: this.$hostname + "time-tracking/group",
         type: "DELETE",
         data: {
           id: this.currentGroup
@@ -183,6 +184,7 @@ export default {
         success: () => {
           console.log("Даннные удалены")
           this.confirmDeleteGroup = false
+          this.loadData()
         },
         error: (response) => {
           if (response.status === 500) {
