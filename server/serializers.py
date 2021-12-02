@@ -92,14 +92,6 @@ class GroupFunctionsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class GroupFunctionsPostSerializer(serializers.ModelSerializer):
-    """Сериализация функций групп для POST-запросов"""
-
-    class Meta:
-        model = GroupFunctions
-        fields = ('group_id', 'functions_id', 'edit', 'read')
-
-
 class NewsSerializer(serializers.ModelSerializer):
     """Сериализация новостей"""
 

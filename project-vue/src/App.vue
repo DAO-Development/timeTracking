@@ -13,8 +13,10 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
-// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+Vue.prototype.$read = []
+Vue.prototype.$edit = []
 Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
@@ -28,11 +30,17 @@ Vue.prototype.$refresh = function () {
 export default {
   name: 'App',
   components: {Menu},
+  beforeMount() {
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      this.loadFunctions()
+    }
+  },
   created() {
     console.log("init App")
-    console.log("Почему-то не работало")
-    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.auth = true
+      this.loadFunctions()
+    }
   },
   data() {
     return {
@@ -46,6 +54,26 @@ export default {
     },
     setAdmin() {
       Vue.prototype.$admin = true
+    },
+    loadFunctions() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/group",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          this.$read = response.data.read
+          this.$edit = response.data.edit
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            console.log("Ошибка соединения с сервером")
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            console.log("Непредвиденная ошибка")
+          }
+        }
+      })
     }
   }
 };

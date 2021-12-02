@@ -157,11 +157,12 @@ export default {
   name: "Menu",
   created() {
     console.log("init Menu")
+    this.loadGroup()
+    console.log(this.$read)
     if ($(window).width() <= '568') {
       this.loadUser()
     }
     console.log(this.$router.getMatchedComponents()[0].name)
-    this.loadGroup()
     switch (this.$router.getMatchedComponents()[0].name) {
       case "Index":
         this.selectedItem = 0
@@ -176,53 +177,57 @@ export default {
         this.page = "Профиль"
         break
       case "Workers":
-        this.selectedItem = 3
+        console.log("работники - " + this.$funcs.read.indexOf('Работники'))
+        this.selectedItem = this.group.read.indexOf('Работники') + 1 + 2
         this.page = "Работники"
         break
       case "Clients":
-        this.selectedItem = 4
+        // this.selectedItem = 4
+        this.selectedItem = this.$funcs.read.indexOf('Клиенты') + 1 + 2
         this.page = "Клиенты"
         break
       case "Contacts":
-        this.selectedItem = 5
+        // this.selectedItem = 5
+        this.selectedItem = this.$funcs.read.indexOf('Контакты') + 1 + 2
         this.page = "Контакты"
         break
       case "Objects":
-        this.selectedItem = 6
+        // this.selectedItem = 6
+        this.selectedItem = this.$funcs.read.indexOf('Объекты') + 1 + 2
         this.page = "Объекты"
         break
+      case "Accounting":
+        // this.selectedItem = 7
+        this.selectedItem = this.$funcs.read.indexOf('Бухгалтерия') + 1 + 2
+        this.page = "Бухгалтерия"
+        break
       case "Settings":
-        // this.selectedItem = this.items.length + 2
-        this.selectedItem = 8
+        this.selectedItem = this.$funcs.read.length + 3
+        // this.selectedItem = 8
         this.page = "Настройки"
         break
       case "Support":
-        // this.selectedItem = this.items.length + 3
-        this.selectedItem = 9
+        this.selectedItem = this.$funcs.read.length + 4
         this.page = "Поддержка"
         break
       case "Calendar":
-        // this.selectedItem = this.items.length + 4
-        this.selectedItem = 10
+        // this.selectedItem = 10
+        this.selectedItem = this.$funcs.read.length + 5
         this.page = "Календарь"
         break
-        // default:
-        //   var i = -1;
-        //   this.items.forEach(item => {
-        //     i++
-        //     if (item.name === this.$router.getMatchedComponents()[0].name) {
-        //       this.page = item.text
-        //       this.selectedItem = i + 3
-        //     }
-        //   })
     }
     console.log(this.selectedItem)
     console.log(this.page)
   },
+  mounted() {
+  },
   data: () => ({
     user: {},
     selectedItem: 0,
-    group: {},
+    group: {
+      read: [],
+      edit: []
+    },
     items: [
       {text: 'Объекты', name: 'Objects'},
       {text: 'Работники', name: 'Workers'},
@@ -243,37 +248,29 @@ export default {
       switch (selected) {
         case 0:
           this.$router.push({name: "Index"})
-          this.selectedItem = 0
           break
         case 1:
           this.$router.push({name: "News"})
-          this.selectedItem = 1
           break
         case 2:
           this.$router.push({name: "Profile"})
-          this.selectedItem = 2
           break
         case 3:
           this.$router.push({name: "Workers"})
-          this.selectedItem = 3
           break
         case 4:
           this.$router.push({name: "Clients"})
-          this.selectedItem = 4
           break
         case 5:
           this.$router.push({name: "Contacts"})
-          this.selectedItem = 5
           break
         case 6:
           this.$router.push({name: "Objects"})
-          this.selectedItem = 6
           break
         case 7:
           break
         case 8:
           this.$router.push({name: "Settings"})
-          this.selectedItem = 8
           break
         case 9:
           break
@@ -347,7 +344,7 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
           this.group = response.data
-          console.log(this.group.read)
+          console.log(response.data.read)
         },
         error: (response) => {
           if (response.status === 500) {

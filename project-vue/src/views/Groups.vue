@@ -120,14 +120,15 @@ export default {
       })
     },
     putFunction(func) {
-      console.log(func)
       $.ajax({
         url: this.$hostname + "time-tracking/groups-functions",
         type: "PUT",
         data: func,
-        success: () => {
+        success: (response) => {
           console.log("Данные обновлены")
-          this.loadData()
+          func.id = response.data.id
+          console.log(func)
+          console.log(this.functions)
         },
         error: (response) => {
           if (response.status === 500) {

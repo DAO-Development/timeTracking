@@ -34,7 +34,7 @@
                   <span>{{ profile.auth_user_id.email }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action>
+              <v-list-item-action v-if="$parent.$parent.$edit.indexOf('Работники') !== -1">
                 <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(profile)">
                   $deleteIcon
                 </v-icon>
@@ -43,7 +43,8 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item v-if="!archive" class="content-list__btns-add" @click="openAddForm">
+          <v-list-item v-if="!archive && $parent.$parent.$edit.indexOf('Работники') !== -1"
+                       class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -109,7 +110,8 @@
             </li>
             <li>
               <span class="profile__info-title">Работает</span>
-              <v-checkbox v-model="currentProfile.active" @change="openConfirmArchiveDialog"></v-checkbox>
+              <v-checkbox v-model="currentProfile.active" :disabled="$parent.$parent.$edit.indexOf('Работники') === -1"
+                          @change="openConfirmArchiveDialog"></v-checkbox>
             </li>
           </ul>
           <h3>Контакты</h3>
@@ -232,7 +234,7 @@
               Документы
             </div>
           </div>
-          <div class="news-open__actions open__actions">
+          <div v-if="$parent.$parent.$edit.indexOf('Работники') !== -1" class="news-open__actions open__actions">
             <div class="addition-btn" @click="openEditForm(currentProfile)">
               <edit-icon/>
               Редактировать работника
@@ -517,9 +519,11 @@ export default {
       ],
     }
   },
-  created() {
-   console.log("init Workers")
+  mounted() {
+    console.log("init Workers")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      if (this.$parent.$parent.$read.indexOf('Работники') === -1)
+        this.$router.push({name: "Index"})
       this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}

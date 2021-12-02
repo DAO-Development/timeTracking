@@ -226,13 +226,13 @@ class GroupFunctionsView(APIView):
 
     def put(self, request):
         if request.data["id"] == "0":
-            serializer = GroupFunctionsPostSerializer(data=request.data)
+            serializer = GroupFunctionsSerializer(data=request.data)
         else:
             saved_function = get_object_or_404(GroupFunctions.objects.all(), id=request.data["id"])
             serializer = GroupFunctionsSerializer(saved_function, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=201)
+            return Response({"id": serializer.data["id"]}, status=201)
         else:
             return Response(status=400)
 

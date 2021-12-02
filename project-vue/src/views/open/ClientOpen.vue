@@ -13,7 +13,9 @@
           <v-img
               v-if="currentClient.logo_path" :lazy-src="$hostname+'media'+currentClient.logo_path"
               :src="$hostname+'media'+currentClient.logo_path"></v-img>
-          <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
+          <div v-if="$parent.$parent.$edit.indexOf('Клиенты') !== -1" class="profile__change-photo"
+               @click="photoDialog = true">Сменить фото
+          </div>
         </div>
         <div class="profile__info">
           <h3>Общая информация</h3>
@@ -127,7 +129,7 @@
               Контакты
             </div>
           </div>
-          <div class="news-open__actions open__actions">
+          <div class="news-open__actions open__actions" v-if="$parent.$parent.$edit.indexOf('Клиенты') !== -1">
             <div class="addition-btn" @click="openEditForm">
               <edit-icon/>
               Редактировать клиента
@@ -368,6 +370,8 @@ export default {
   },
   created() {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      if (this.$parent.$parent.$read.indexOf('Клиенты') === -1)
+        this.$router.push({name: "Index"})
       this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}

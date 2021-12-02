@@ -105,6 +105,8 @@ export default {
   },
   created() {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      if (this.$parent.$parent.$read.indexOf('Работники') === -1)
+        this.$router.push({name: "Index"})
       this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
