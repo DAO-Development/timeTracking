@@ -30,7 +30,7 @@
                   <span>{{ client.email }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action v-if="$parent.$parent.$edit.indexOf('Клиенты') !== -1">
+              <v-list-item-action v-if="$parent.$parent.edit.indexOf('Клиенты') !== -1">
                 <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(client)">
                   $deleteIcon
                 </v-icon>
@@ -39,7 +39,7 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item v-if="!archive && $parent.$parent.$edit.indexOf('Клиенты') !== -1" class="content-list__btns-add" @click="openAddForm">
+          <v-list-item v-if="!archive && $parent.$parent.edit.indexOf('Клиенты') !== -1" class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -280,7 +280,7 @@ export default {
   created() {
     console.log("init Clients")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
-      if (this.$parent.$parent.$read.indexOf('Клиенты') === -1)
+      if (this.$parent.$parent.read.indexOf('Клиенты') === -1)
         this.$router.push({name: "Index"})
       this.$emit('set-auth')
       $.ajaxSetup({

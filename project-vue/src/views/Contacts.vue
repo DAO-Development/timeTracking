@@ -32,7 +32,7 @@
                   <span>{{ contact.work_email }} {{ contact.work_phone }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action v-if="$parent.$parent.$edit.indexOf('Контакты') !== -1">
+              <v-list-item-action v-if="$parent.$parent.edit.indexOf('Контакты') !== -1">
                 <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(contact)">
                   $deleteIcon
                 </v-icon>
@@ -41,7 +41,7 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item v-if="!archive && $parent.$parent.$edit.indexOf('Контакты') !== -1"
+          <v-list-item v-if="!archive && $parent.$parent.edit.indexOf('Контакты') !== -1"
                        class="content-list__btns-add" @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
@@ -209,7 +209,7 @@ export default {
   created() {
     console.log("init Contacts")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
-      if (this.$parent.$parent.$read.indexOf('Контакты') === -1)
+      if (this.$parent.$parent.read.indexOf('Контакты') === -1)
         this.$router.push({name: "Index"})
       this.$emit('set-auth')
       $.ajaxSetup({

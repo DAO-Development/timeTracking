@@ -4,7 +4,7 @@
     <section class="summary-box">
       <h1>Настройки</h1>
       <v-list>
-        <v-list-item @click="$router.push({name: 'Groups'})">
+        <v-list-item v-if="$parent.$parent.admin" @click="$router.push({name: 'Groups'})">
           <v-list-item-icon>
             <v-icon>mdi-plus</v-icon>
           </v-list-item-icon>

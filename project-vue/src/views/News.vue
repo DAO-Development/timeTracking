@@ -31,7 +31,7 @@
           </template>
         </div>
         <v-list>
-          <v-list-item class="content-list__btns-add" @click="openAddForm">
+          <v-list-item class="content-list__btns-add" @click="openAddForm" v-if="$parent.$parent.admin">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -47,7 +47,7 @@
           <v-img v-if="currentNew.photo_path" :src="$hostname+'media'+currentNew.photo_path"></v-img>
         </div>
         <div class="news-open__text" v-html="currentNew.text"></div>
-        <div class="news-open__actions open__actions">
+        <div class="news-open__actions open__actions" v-if="$parent.$parent.admin">
           <div class="addition-btn" @click="openEditForm(currentNew.id, currentNew.title, currentNew.text)">
             <edit-icon/>
             Редактировать новость

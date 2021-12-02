@@ -127,8 +127,7 @@ export default {
         success: (response) => {
           console.log("Данные обновлены")
           func.id = response.data.id
-          console.log(func)
-          console.log(this.functions)
+          this.$emit('load-functions')
         },
         error: (response) => {
           if (response.status === 500) {

@@ -2,7 +2,10 @@
   <v-app>
     <v-container class="flex-main">
       <Menu v-if="auth" class="flex-sidebar"/>
-      <router-view v-on:set-auth="setAuth" v-on:set-admin="setAdmin" :key="$route.path"/>
+      <router-view v-on:set-auth="setAuth"
+                   v-on:set-admin="setAdmin"
+                   v-on:load-functions="loadFunctions"
+                   :key="$route.path"/>
     </v-container>
   </v-app>
 </template>
@@ -13,11 +16,9 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
-Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
-Vue.prototype.$read = []
-Vue.prototype.$edit = []
-Vue.prototype.$admin = false
+// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+// Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
   sessionStorage.clear()
@@ -30,21 +31,20 @@ Vue.prototype.$refresh = function () {
 export default {
   name: 'App',
   components: {Menu},
-  beforeMount() {
-    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
-      this.loadFunctions()
-    }
-  },
   created() {
     console.log("init App")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.auth = true
       this.loadFunctions()
+      this.loadUser()
     }
   },
   data() {
     return {
-      auth: false
+      auth: false,
+      admin: false,
+      read: [],
+      edit: [],
     }
   },
   methods: {
@@ -61,8 +61,8 @@ export default {
         type: "GET",
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
-          this.$read = response.data.read
-          this.$edit = response.data.edit
+          this.read = response.data.read
+          this.edit = response.data.edit
         },
         error: (response) => {
           if (response.status === 500) {
@@ -73,6 +73,27 @@ export default {
             console.log("Непредвиденная ошибка")
           }
         }
+      })
+    },
+    loadUser() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/user",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          this.admin = response.data.data.auth_user_id.is_staff
+          console.log(response.data.data.auth_user_id.is_staff)
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
       })
     }
   }

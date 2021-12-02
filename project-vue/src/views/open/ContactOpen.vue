@@ -13,7 +13,7 @@
           <v-img
               v-if="currentContact.photo_path" :lazy-src="$hostname+'media'+currentContact.photo_path"
               :src="$hostname+'media'+currentContact.photo_path"></v-img>
-          <div v-if="$parent.$parent.$edit.indexOf('Контакты') !== -1" class="profile__change-photo"
+          <div v-if="$parent.$parent.edit.indexOf('Контакты') !== -1" class="profile__change-photo"
                @click="photoDialog = true">Сменить фото
           </div>
         </div>
@@ -56,7 +56,7 @@
               <span class="profile__info-content">{{ currentContact.work_email }}</span>
             </li>
           </ul>
-          <div class="news-open__actions open__actions" v-if="$parent.$parent.$edit.indexOf('Контакты') !== -1">
+          <div class="news-open__actions open__actions" v-if="$parent.$parent.edit.indexOf('Контакты') !== -1">
             <div class="addition-btn" @click="openEditForm">
               <edit-icon/>
               Редактировать контакт
@@ -212,7 +212,7 @@ export default {
   },
   created: function () {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
-      if (this.$parent.$parent.$read.indexOf('Контакты') === -1)
+      if (this.$parent.$parent.read.indexOf('Контакты') === -1)
         this.$router.push({name: "Index"})
       this.$emit('set-auth')
       $.ajaxSetup({

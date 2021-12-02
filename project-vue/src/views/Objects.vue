@@ -43,14 +43,14 @@
                   <span>{{ object.client_id.name }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action v-if="$parent.$parent.$edit.indexOf('Объекты') !== -1">
+              <v-list-item-action v-if="$parent.$parent.edit.indexOf('Объекты') !== -1">
                 <v-icon color="grey lighten-1" @click="openConfirmDeleteDialog(object)">$deleteIcon</v-icon>
               </v-list-item-action>
             </v-list-item>
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item v-if="!archive && $parent.$parent.$edit.indexOf('Объекты') !== -1" class="content-list__btns-add"
+          <v-list-item v-if="!archive && $parent.$parent.edit.indexOf('Объекты') !== -1" class="content-list__btns-add"
                        @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
@@ -93,7 +93,7 @@
           <ul>
             <li>
               <span class="profile__info-title">Объект сдан</span>
-              <v-checkbox v-model="currentObject.active" :disabled="$parent.$parent.$edit.indexOf('Объекты') === -1"
+              <v-checkbox v-model="currentObject.active" :disabled="$parent.$parent.edit.indexOf('Объекты') === -1"
                           @change="openConfirmArchiveDialog"></v-checkbox>
             </li>
             <li>
@@ -198,7 +198,7 @@
               </v-list-item>
             </template>
           </v-list>
-          <v-list class="content-list__btns" v-if="$parent.$parent.$edit.indexOf('Объекты') !== -1">
+          <v-list class="content-list__btns" v-if="$parent.$parent.edit.indexOf('Объекты') !== -1">
             <v-list-item class="content-list__btns-add" @click="openAddWorkerForm">
               <v-list-item-icon>
                 <v-icon>mdi-plus</v-icon>
@@ -595,7 +595,7 @@ export default {
   created() {
     console.log("init Objects")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
-      if (this.$parent.$parent.$read.indexOf('Объекты') === -1)
+      if (this.$parent.$parent.read.indexOf('Объекты') === -1)
         this.$router.push({name: "Index"})
       this.$emit('set-auth')
       $.ajaxSetup({
