@@ -38,6 +38,10 @@
               <span class="profile__info-title">Должность</span>
               <span class="profile__info-content">{{ currentProfile.position }}</span>
             </li>
+            <li @click="changeGroupForm = true">
+              <span class="profile__info-title">Роль</span>
+              <span class="profile__info-content">{{ currentGroup.name }}</span>
+            </li>
             <li>
               <span class="profile__info-title">Номер соц. страхования</span>
               <span class="profile__info-content">{{ currentProfile.social_code_own }}</span>
@@ -341,6 +345,22 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="changeGroupForm" max-width="500">
+      <v-card>
+        <v-card-title>Поменять роль пользователя
+        </v-card-title>
+        <v-card-text>
+          <v-select v-model="currentGroup.id"
+                    :items="groups" item-text="name" item-value="id" outlined>
+          </v-select>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="changeGroupForm = false">Отмена</v-btn>
+          <v-btn color="primary" text @click="putUserGroup">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -406,11 +426,19 @@ export default {
         photo_path: null,
         auth_user_id: {
           email: "",
-          is_staff: ""
+          is_staff: "",
+          groups: {
+            id: 0,
+            name: ""
+          }
         }
       },
+      currentGroup: {
+        id: 0,
+        name: ""
+      },
+      groups: [],
       positions: ["Администратор", "Маляр", "Строитель"],
-      selects: ["Все", "Администратор", "Маляр", "Строитель"],
       full: false,
       formTitle: "Добавление работника",
       formBtnText: "Сохранить",
@@ -419,6 +447,7 @@ export default {
       confirmArchiveDialog: false,
       photoField: null,
       photoDialog: false,
+      changeGroupForm: false,
       menu: false,
       alertError: false,
       alertMsg: "",
@@ -479,6 +508,7 @@ export default {
               entrance: '',
               flat: '',
             }
+          this.loadGroups()
         },
         error: (response) => {
           if (response.status === 500) {
@@ -490,6 +520,31 @@ export default {
           }
           this.alertError = true
         }
+      })
+    },
+    loadGroups() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/groups",
+        type: "GET",
+        success: (response) => {
+          this.groups = response.data.groups
+          this.groups.forEach(group => {
+            if (this.currentProfile.auth_user_id.groups[0] === group.id) {
+              this.currentGroup.name = group.name
+              this.currentGroup.id = group.id
+            }
+          })
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
       })
     },
     editProfile() {
@@ -568,6 +623,9 @@ export default {
             this.currentProfile.photo_path = response.data.data.name
             this.loadData()
           });
+    },
+    putUserGroup() {
+
     },
     deleteUser() {
       $.ajax({

@@ -9,7 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'is_staff', 'last_login')
+        fields = '__all__'
+        # fields = ('id', 'username', 'email', 'password', 'is_staff', 'last_login')
 
     def create(self, validated_data):
         user = User(
