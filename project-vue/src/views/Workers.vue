@@ -522,9 +522,10 @@ export default {
   mounted() {
     console.log("init Workers")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+
+      this.$emit('set-auth')
       if (this.$parent.$parent.read.indexOf('Работники') === -1)
         this.$router.push({name: "Index"})
-      this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })

@@ -175,49 +175,46 @@ export default {
         this.page = "Профиль"
         break
       case "Workers":
-        console.log("работники - " + this.$funcs.read.indexOf('Работники'))
-        this.selectedItem = this.group.read.indexOf('Работники') + 1 + 2
+        this.selectedItem = this.$parent.$parent.read.indexOf('Работники') + 1 + 2
         this.page = "Работники"
         break
       case "Clients":
         // this.selectedItem = 4
-        this.selectedItem = this.$funcs.read.indexOf('Клиенты') + 1 + 2
+        this.selectedItem = this.$parent.$parent.read.indexOf('Клиенты') + 1 + 2
         this.page = "Клиенты"
         break
       case "Contacts":
         // this.selectedItem = 5
-        this.selectedItem = this.$funcs.read.indexOf('Контакты') + 1 + 2
+        this.selectedItem = this.$parent.$parent.read.indexOf('Контакты') + 1 + 2
         this.page = "Контакты"
         break
       case "Objects":
         // this.selectedItem = 6
-        this.selectedItem = this.$funcs.read.indexOf('Объекты') + 1 + 2
+        this.selectedItem = this.$parent.$parent.read.indexOf('Объекты') + 1 + 2
         this.page = "Объекты"
         break
       case "Accounting":
         // this.selectedItem = 7
-        this.selectedItem = this.$funcs.read.indexOf('Бухгалтерия') + 1 + 2
+        this.selectedItem = this.$parent.$parent.read.indexOf('Бухгалтерия') + 1 + 2
         this.page = "Бухгалтерия"
         break
       case "Settings":
-        this.selectedItem = this.$funcs.read.length + 3
+        this.selectedItem = this.$parent.$parent.read.length + 3
         // this.selectedItem = 8
         this.page = "Настройки"
         break
       case "Support":
-        this.selectedItem = this.$funcs.read.length + 4
+        this.selectedItem = this.$parent.$parent.read.length + 4
         this.page = "Поддержка"
         break
       case "Calendar":
         // this.selectedItem = 10
-        this.selectedItem = this.$funcs.read.length + 5
+        this.selectedItem = this.$parent.$parent.read.length + 5
         this.page = "Календарь"
         break
     }
     console.log(this.selectedItem)
     console.log(this.page)
-  },
-  mounted() {
   },
   data: () => ({
     user: {},

@@ -16,8 +16,8 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
-// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 // Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
@@ -43,8 +43,8 @@ export default {
     return {
       auth: false,
       admin: false,
-      read: [],
-      edit: [],
+      read: ['Работники', 'Клиенты', 'Контакты', 'Объекты', 'Бухгалтерия'],
+      edit: ['Работники', 'Клиенты', 'Контакты', 'Объекты', 'Бухгалтерия'],
     }
   },
   methods: {
@@ -82,7 +82,6 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
           this.admin = response.data.data.auth_user_id.is_staff
-          console.log(response.data.data.auth_user_id.is_staff)
         },
         error: (response) => {
           if (response.status === 500) {
