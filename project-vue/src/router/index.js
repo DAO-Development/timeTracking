@@ -15,6 +15,7 @@ import Contacts from "../views/Contacts";
 import ContactOpen from "../views/open/ContactOpen";
 import Groups from "../views/Groups";
 import Settings from "../views/Settings";
+import WorkerOpen from "../views/open/WorkerOpen";
 
 Vue.use(VueRouter)
 
@@ -53,6 +54,12 @@ const routes = [
         path: '/workers',
         name: 'Workers',
         component: Workers
+    },
+    {
+        path: '/workers/:id',
+        name: 'WorkerOpen',
+        component: WorkerOpen,
+        props: true
     },
     {
         path: '/documents/:type&:id',
