@@ -470,9 +470,9 @@ export default {
   },
   created() {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      this.$emit('set-auth')
       if (this.$parent.$parent.read.indexOf('Работники') === -1)
         this.$router.push({name: "Index"})
-      this.$emit('set-auth')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
@@ -625,7 +625,29 @@ export default {
           });
     },
     putUserGroup() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/user-groups",
+        type: "PUT",
+        data: {
+          auth_user_id: this.currentProfile.auth_user_id.id,
+          group_id: this.currentGroup.id
+        },
+        success: (response) => {
+          console.log(response.data.data)
+          this.currentGroup.name = response.data.data[0]
+          this.changeGroupForm = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
     },
     deleteUser() {
       $.ajax({

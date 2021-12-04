@@ -155,6 +155,14 @@ class UserDocumentsView(APIView):
         return Response(status=204)
 
 
+class UserGroupsView(APIView):
+    def put(self, request):
+        user = User.objects.get(pk=request.data['auth_user_id'])
+        user.groups.clear()
+        user.groups.add(request.data['group_id'])
+        return Response({"data": user.groups.all().values_list('name', flat=True)})
+
+
 class GroupView(APIView):
     """Группа пользователя"""
     permission_classes = [permissions.IsAuthenticated]
