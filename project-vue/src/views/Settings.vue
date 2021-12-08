@@ -12,6 +12,24 @@
             <v-list-item-title>Управление группами</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item v-if="$parent.$parent.admin"
+                     @click="$router.push({name: 'Positions',  params: {table: 'profile'}})">
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Специальности пользователей</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="$parent.$parent.admin"
+                     @click="$router.push({name: 'Positions',  params: {table: 'client'}})">
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Должности контактов</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </section>
   </div>

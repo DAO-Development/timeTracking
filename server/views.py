@@ -129,7 +129,7 @@ class PositionProfileView(APIView):
             return Response(status=400)
 
     def delete(self, request):
-        saved_position = get_object_or_404(PositionProfileSerializer.objects.all(), id=request.data["id"])
+        saved_position = get_object_or_404(PositionProfile.objects.all(), id=request.data["id"])
         saved_position.delete()
         return Response(status=204)
 

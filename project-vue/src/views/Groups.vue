@@ -27,20 +27,22 @@
       </v-list>
     </section>
     <v-dialog v-model="addGroupForm" max-width="500">
-      <v-card-title>
-        Введите название новой группы
-      </v-card-title>
-      <v-card-text>
-        <v-form ref="addForm">
-          <v-text-field placeholder="Название*" v-model="newGroup.name"
-                        outlined :rules="reqRules"></v-text-field>
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="secondary" text @click="addGroupForm=false">Отменить</v-btn>
-        <v-btn color="primary" text @click="addGroup">Сохранить</v-btn>
-      </v-card-actions>
+      <v-card>
+        <v-card-title>
+          Введите название новой группы
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="addForm">
+            <v-text-field placeholder="Название*" v-model="newGroup.name"
+                          outlined :rules="reqRules"></v-text-field>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="addGroupForm=false">Отменить</v-btn>
+          <v-btn color="primary" text @click="addGroup">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
     <v-dialog v-model="confirmDeleteGroup" max-width="500">
       <v-card>

@@ -16,6 +16,7 @@ import ContactOpen from "../views/open/ContactOpen";
 import Groups from "../views/Groups";
 import Settings from "../views/Settings";
 import WorkerOpen from "../views/open/WorkerOpen";
+import Positions from "../views/Positions";
 
 Vue.use(VueRouter)
 
@@ -102,14 +103,20 @@ const routes = [
         props: true
     },
     {
+        path: '/settings',
+        name: 'Settings',
+        component: Settings
+    },
+    {
         path: '/groups',
         name: 'Groups',
         component: Groups
     },
     {
-        path: '/settings',
-        name: 'Settings',
-        component: Settings
+        path: '/positions-:table',
+        name: 'Positions',
+        component: Positions,
+        props: true
     },
 ]
 
