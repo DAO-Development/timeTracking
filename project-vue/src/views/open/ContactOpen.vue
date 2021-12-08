@@ -30,7 +30,7 @@
             </li>
             <li>
               <span class="profile__info-title">Должность</span>
-              <span class="profile__info-content">{{ currentContact.position }}</span>
+              <span class="profile__info-content">{{ currentContact.position.name }}</span>
             </li>
             <li>
               <span class="profile__info-title">Фирма</span>
@@ -98,7 +98,7 @@
               <v-combobox placeholder="Фирма*" v-model="currentContact.client" :items="selectsClient"
                           item-text="name" :rules="reqRules" required outlined></v-combobox>
               <v-combobox placeholder="Должность*" v-model="currentContact.position" :items="selectsPosition"
-                          :rules="reqRules" required outlined></v-combobox>
+                          item-value="id" item-text="name" :rules="reqRules" required outlined></v-combobox>
             </v-row>
             <h4>Контакты</h4>
             <v-row>

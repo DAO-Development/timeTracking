@@ -117,7 +117,8 @@ class PositionProfileView(APIView):
 
     def get(self, request):
         positions = PositionProfile.objects.all().order_by('name')
-        return Response({"positions": positions})
+        serializer = PositionProfileSerializer(positions, many=True)
+        return Response({"positions": serializer.data})
 
     def post(self, request):
         serializer = PositionProfileSerializer(data=request.data)
@@ -578,7 +579,8 @@ class PositionClientView(APIView):
 
     def get(self, request):
         positions = PositionClient.objects.all().order_by('name')
-        return Response({"positions": positions})
+        serializer = PositionClientSerializer(positions, many=True)
+        return Response({"positions": serializer.data})
 
     def post(self, request):
         serializer = PositionClientSerializer(data=request.data)

@@ -15,20 +15,20 @@
           <v-text-field placeholder="ФИО" v-model="filter.name" outlined></v-text-field>
           <v-select v-model="filter.client" :items="['Все'].concat(selectsClient)" item-text="name" placeholder="Клиент"
                     outlined></v-select>
-          <v-select v-model="filter.position" :items="['Все'].concat(selectsPosition)" placeholder="Должность"
-                    outlined></v-select>
+          <v-select v-model="filter.position" :items="[{id: 0, name: 'Все'}].concat(selectsPosition)"
+                    item-text="name" item-value="name" placeholder="Должность" outlined></v-select>
         </div>
         <v-list three-line class="clients__list content-list">
           <template v-for="contact in contacts">
             <v-list-item :key="contact.id"
-                         v-if="contact.active === !archive && (contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position === filter.position || filter.position === 'Все')">
+                         v-if="contact.active === !archive && (contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position.name === filter.position || filter.position === 'Все')">
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="contact.photo_path" :src="$hostname+'media'+contact.photo_path"></v-img>
               </v-list-item-avatar>
               <v-list-item-content @click="$router.push({name: 'ContactOpen', params: {id: contact.id}})">
                 <v-list-item-title>{{ contact.lastname }} {{ contact.name }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  <span>{{ contact.client.name }}, {{ contact.position }}</span><br>
+                  <span>{{ contact.client.name }}, {{ contact.position.name }}</span><br>
                   <span>{{ contact.work_email }} {{ contact.work_phone }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
@@ -90,7 +90,7 @@
               <v-combobox placeholder="Фирма*" v-model="newContact.client" :items="selectsClient" item-text="name"
                           item-value="id" :rules="reqRules" required outlined></v-combobox>
               <v-combobox placeholder="Должность*" v-model="newContact.position" :items="selectsPosition"
-                          :rules="reqRules" required outlined></v-combobox>
+                          item-value="id" item-text="name" :rules="reqRules" required outlined></v-combobox>
             </v-row>
             <h4>Контакты</h4>
             <v-row>

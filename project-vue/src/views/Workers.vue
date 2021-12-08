@@ -17,13 +17,14 @@
             $deleteIcon
           </v-icon>
           <v-text-field placeholder="Фамилия Имя" v-model="filter.name" outlined></v-text-field>
-          <v-select v-model="filter.position" :items="selects" placeholder="Должность" outlined></v-select>
+          <v-select v-model="filter.position" :items="[{id: 0, name: 'Все'}].concat(positions)" item-text="name"
+                    item-value="name" placeholder="Должность" outlined></v-select>
           <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>
         </div>
         <v-list three-line class="workers__list content-list">
           <template v-for="profile in profiles">
             <v-list-item :key="profile.id"
-                         v-if="profile.active !== archive && profile.auth_user_id.email.includes(filter.email) && (profile.name + ' ' + profile.lastname).includes(filter.name)  && (profile.position===filter.position || filter.position === 'Все')">
+                         v-if="profile.active !== archive && profile.auth_user_id.email.includes(filter.email) && (profile.name + ' ' + profile.lastname).includes(filter.name)  && (profile.position.name===filter.position || filter.position === 'Все')">
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="profile.photo_path" :src="$hostname+'media'+profile.photo_path"></v-img>
               </v-list-item-avatar>
@@ -31,7 +32,7 @@
               <v-list-item-content @click="$router.push({name: 'WorkerOpen', params: {id: profile.id}})">
                 <v-list-item-title>{{ profile.lastname }} {{ profile.name }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  <span>{{ profile.position }}</span><br>
+                  <span>{{ profile.position.name }}</span><br>
                   <span>{{ profile.auth_user_id.email }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
@@ -340,8 +341,8 @@
               <v-checkbox label="Эстонский" v-model="newProfile.estonian"></v-checkbox>
             </v-row>
             <v-text-field placeholder="Другие языки" v-model="newProfile.other_language" outlined></v-text-field>
-            <v-combobox ref="positionCombobox" v-model="newProfile.position" :items="positions" placeholder="Должность*"
-                        outlined dense :rules="reqRules"></v-combobox>
+            <v-combobox ref="positionCombobox" v-model="newProfile.position" :items="positions" item-value="id"
+                        item-text="name" placeholder="Должность*" outlined dense :rules="reqRules"></v-combobox>
             <v-textarea placeholder="Что умеете делать?" v-model="newProfile.skills" outlined></v-textarea>
             <h4>Одежда</h4>
             <v-row>
@@ -427,8 +428,8 @@ export default {
       full: false,
       archive: false,
       profiles: {},
-      positions: ["Администратор", "Маляр", "Строитель"],
-      selects: ["Все", "Администратор", "Маляр", "Строитель"],
+      positions: [],
+      // selects: ["Все", "Администратор", "Маляр", "Строитель"],
       newProfile: {
         id: 0,
         lastname: "",
@@ -530,6 +531,7 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
+      this.loadPositions()
     } else {
       this.$router.push({name: "Index"})
     }
@@ -541,6 +543,25 @@ export default {
         type: "GET",
         success: (response) => {
           this.profiles = response.data.data
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadPositions() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/positions",
+        type: "GET",
+        success: (response) => {
+          this.positions = response.data.positions
         },
         error: (response) => {
           if (response.status === 500) {

@@ -26,7 +26,7 @@
           </li>
           <li>
             <span class="profile__info-title">Должность</span>
-            <span class="profile__info-content">{{ user.position }}</span>
+            <span class="profile__info-content">{{ user.position.name }}</span>
           </li>
           <li>
             <span class="profile__info-title">Номер соц. страхования</span>

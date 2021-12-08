@@ -36,7 +36,7 @@
             </li>
             <li>
               <span class="profile__info-title">Должность</span>
-              <span class="profile__info-content">{{ currentProfile.position }}</span>
+              <span class="profile__info-content">{{ currentProfile.position.name }}</span>
             </li>
             <li @click="changeGroupForm = true">
               <span class="profile__info-title">Роль</span>
@@ -282,8 +282,8 @@
             </v-row>
             <v-text-field placeholder="Другие языки" v-model="currentProfile.other_language" outlined></v-text-field>
             <v-combobox ref="positionCombobox" v-model="currentProfile.position" :items="positions"
-                        placeholder="Должность*"
-                        outlined dense :rules="reqRules"></v-combobox>
+                        item-value="id" item-text="name" placeholder="Должность*" outlined dense
+                        :rules="reqRules"></v-combobox>
             <v-textarea placeholder="Что умеете делать?" v-model="currentProfile.skills" outlined></v-textarea>
             <h4>Одежда</h4>
             <v-row>
@@ -438,7 +438,7 @@ export default {
         name: ""
       },
       groups: [],
-      positions: ["Администратор", "Маляр", "Строитель"],
+      positions: [],
       full: false,
       formTitle: "Добавление работника",
       formBtnText: "Сохранить",
@@ -477,6 +477,7 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
+      this.loadPositions()
     } else {
       this.$router.push({name: "Index"})
     }
@@ -509,6 +510,25 @@ export default {
               flat: '',
             }
           this.loadGroups()
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadPositions() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/positions",
+        type: "GET",
+        success: (response) => {
+          this.positions = response.data.positions
         },
         error: (response) => {
           if (response.status === 500) {
