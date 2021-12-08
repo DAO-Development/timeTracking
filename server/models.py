@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 
 
+class PositionProfile(models.Model):
+    name = models.CharField(verbose_name='Специальность', max_length=60)
+
+    class Meta:
+        db_table = "position_profile"
+        verbose_name = 'Специальность'
+        verbose_name_plural = 'Специальности для профилей'
+
+
 class UserProfile(models.Model):
     """Профиль пользователя"""
     auth_user_id = models.OneToOneField(User, models.CASCADE, verbose_name='Пользователь')
@@ -17,7 +26,9 @@ class UserProfile(models.Model):
     address_fin = models.JSONField(verbose_name='Адрес в Финляндии', null=True, blank=True)
     phone = models.CharField(verbose_name='Телефон', max_length=45, null=True, blank=True)
     phone_fin = models.CharField(verbose_name='Телефон в Финляндии', max_length=45, null=True, blank=True)
-    position = models.CharField(verbose_name='Специальность', max_length=60)
+    # position = models.CharField(verbose_name='Специальность', max_length=60)
+    position = models.ForeignKey('PositionProfile', models.RESTRICT, verbose_name='Специальность', null=True,
+                                 blank=True)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
     active = models.BooleanField(verbose_name='Работает')
     bank_account = models.CharField(verbose_name='Счет в банке', max_length=31, null=True, blank=True)
@@ -133,11 +144,21 @@ class Client(models.Model):
         verbose_name_plural = "Клиенты"
 
 
+class PositionClient(models.Model):
+    name = models.CharField(verbose_name='Специальность', max_length=60)
+
+    class Meta:
+        db_table = "position_client"
+        verbose_name = 'Должность'
+        verbose_name_plural = 'Должности для клиентов'
+
+
 class ClientEmployees(models.Model):
     """Штат фирмы клиента"""
     name = models.CharField(verbose_name='Имя', max_length=45)
     lastname = models.CharField(verbose_name='Фамилия', max_length=45)
-    position = models.CharField(verbose_name='Должность', max_length=60)
+    # position = models.CharField(verbose_name='Должность', max_length=60)
+    position = models.ForeignKey('PositionClient', models.RESTRICT, verbose_name='Должность', null=True, blank=True)
     phone = models.CharField(verbose_name='Телефон', max_length=45)
     work_phone = models.CharField(verbose_name='Рабочий телефон', max_length=45, null=True, blank=True)
     email = models.CharField(verbose_name='Email', max_length=100)

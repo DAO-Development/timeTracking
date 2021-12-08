@@ -16,8 +16,8 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
-Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 // Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
@@ -53,7 +53,7 @@ export default {
       this.auth = true
     },
     setAdmin() {
-      Vue.prototype.$admin = true
+      this.admin = true
     },
     loadFunctions() {
       $.ajax({
@@ -81,6 +81,7 @@ export default {
         type: "GET",
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
+          //todo исправить определение админа по группе
           this.admin = response.data.data.auth_user_id.is_staff
         },
         error: (response) => {

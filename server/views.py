@@ -111,6 +111,28 @@ class ProfilesView(APIView):
             return Response(status=400)
 
 
+class PositionProfileView(APIView):
+    """Получение всех существующих специальностей пользователей"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        positions = PositionProfile.objects.all().order_by('name')
+        return Response({"positions": positions})
+
+    def post(self, request):
+        serializer = PositionProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_position = get_object_or_404(PositionProfileSerializer.objects.all(), id=request.data["id"])
+        saved_position.delete()
+        return Response(status=204)
+
+
 class UserDocumentsView(APIView):
     """Документы пользователей"""
     permission_classes = [permissions.IsAuthenticated]
@@ -550,14 +572,26 @@ class ClientEmployeesView(APIView):
         return Response(status=204)
 
 
-class ClientEmployeesPositionView(APIView):
+class PositionClientView(APIView):
     """Получение всех существующих должностей в штатах фирм-клиентов"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        positions = ClientEmployees.objects.all().values_list('position', flat=True).distinct('position').order_by(
-            'position')
+        positions = PositionClient.objects.all().order_by('name')
         return Response({"positions": positions})
+
+    def post(self, request):
+        serializer = PositionClientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_position = get_object_or_404(PositionClient.objects.all(), id=request.data["id"])
+        saved_position.delete()
+        return Response(status=204)
 
 
 class NotesView(APIView):

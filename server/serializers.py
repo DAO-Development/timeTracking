@@ -32,10 +32,19 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PositionProfileSerializer(serializers.ModelSerializer):
+    """Сериализация специальностей пользователей"""
+
+    class Meta:
+        model = PositionProfile
+        fields = '__all__'
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """Сериализация профилей пользователей"""
 
     auth_user_id = UserSerializer()
+    position = PositionProfileSerializer()
 
     class Meta:
         model = UserProfile
@@ -128,10 +137,19 @@ class ClientPostSerializer(serializers.ModelSerializer):
             'electronic_number', 'account_email', 'create_date')
 
 
+class PositionClientSerializer(serializers.ModelSerializer):
+    """Сериализация должностей клиентов"""
+
+    class Meta:
+        model = PositionClient
+        fields = '__all__'
+
+
 class ClientEmployeesSerializer(serializers.ModelSerializer):
     """Сериализация сотрудников клиентов"""
 
     client = ClientSerializer()
+    position = PositionClientSerializer()
 
     class Meta:
         model = ClientEmployees
