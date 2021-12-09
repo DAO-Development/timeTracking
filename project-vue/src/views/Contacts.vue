@@ -28,7 +28,7 @@
               <v-list-item-content @click="$router.push({name: 'ContactOpen', params: {id: contact.id}})">
                 <v-list-item-title>{{ contact.lastname }} {{ contact.name }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  <span>{{ contact.client.name }}, {{ contact.position.name }}</span><br>
+                  <span>{{ contact.client.name }}, <span v-if="contact.position.name">{{ contact.position.name }}</span></span><br>
                   <span>{{ contact.work_email }} {{ contact.work_phone }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
