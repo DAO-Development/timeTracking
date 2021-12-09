@@ -36,7 +36,8 @@
             </li>
             <li>
               <span class="profile__info-title">Должность</span>
-              <span class="profile__info-content" v-if="currentProfile.position.name">{{ currentProfile.position.name }}</span>
+              <span class="profile__info-content"
+                    v-if="currentProfile.position.name  !== null">{{ currentProfile.position.name }}</span>
             </li>
             <li @click="changeGroupForm = true">
               <span class="profile__info-title">Роль</span>

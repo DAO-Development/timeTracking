@@ -30,7 +30,7 @@
             </li>
             <li>
               <span class="profile__info-title">Должность</span>
-              <span class="profile__info-content" v-if="currentContact.position.name">{{ currentContact.position.name }}</span>
+              <span class="profile__info-content" v-if="currentContact.position.name !== null">{{ currentContact.position.name }}</span>
             </li>
             <li>
               <span class="profile__info-title">Фирма</span>

@@ -31,7 +31,7 @@
               <v-list-item-content @click="$router.push({name: 'WorkerOpen', params: {id: profile.id}})">
                 <v-list-item-title>{{ profile.lastname }} {{ profile.name }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  <span v-if="profile.position.name">{{ profile.position.name }}</span><br>
+                  <span v-if="profile.position.name !== null">{{ profile.position.name }}</span><br>
                   <span>{{ profile.auth_user_id.email }}</span>
                 </v-list-item-subtitle>
               </v-list-item-content>
