@@ -290,6 +290,7 @@ export default {
     addContact() {
       if (this.$refs.addForm.validate()) {
         this.newContact.client = this.newContact.client.id
+        this.newContact.position = this.newContact.position.id
         $.ajax({
           url: this.$hostname + "time-tracking/clients-employees",
           type: "POST",

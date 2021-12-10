@@ -103,10 +103,10 @@ class ProfilesView(APIView):
             else:
                 return Response(status=400)
         saved_profile = get_object_or_404(UserProfile.objects.all(), id=request.data['id'])
-        serializer = UserProfileSerializer(saved_profile, data=request.data, partial=True)
+        serializer = UserProfilePostSerializer(saved_profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=201)
+            return Response({"data": serializer.data}, status=201)
         else:
             return Response(status=400)
 
@@ -560,7 +560,7 @@ class ClientEmployeesView(APIView):
                 for chunk in request.FILES['image'].chunks():
                     destination.write(chunk)
             data = {"photo_path": name}
-        serializer = ClientEmployeesSerializer(saved_employee, data=data, partial=True)
+        serializer = ClientEmployeesPostSerializer(saved_employee, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

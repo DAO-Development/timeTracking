@@ -4,7 +4,7 @@
       <div class="summary-box__title">
         <h3>Работники</h3>
         <div class="addition-btn" @click="$router.push({name: 'Workers'})">
-          <span>К списку клиентов</span>
+          <span>К списку работников</span>
           <back-icon/>
         </div>
       </div>
@@ -569,30 +569,33 @@ export default {
       })
     },
     editProfile() {
-      $.ajax({
-        url: this.$hostname + "time-tracking/profiles",
-        type: "PUT",
-        data: this.currentProfile,
-        success: () => {
-          console.log("Профиль изменен")
-          if (this.addForm) {
-            this.editUser()
-          } else {
-            this.confirmArchiveDialog = false
-            this.loadData()
-          }
-        },
-        error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
-          }
-          this.alertError = true
-        },
-      })
+      if (this.$refs.addForm.validate()) {
+        this.currentProfile.position = this.currentProfile.position.id
+        $.ajax({
+          url: this.$hostname + "time-tracking/profiles",
+          type: "PUT",
+          data: this.currentProfile,
+          success: () => {
+            console.log("Профиль изменен")
+            if (this.addForm) {
+              this.editUser()
+            } else {
+              this.confirmArchiveDialog = false
+              this.loadData()
+            }
+          },
+          error: (response) => {
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          },
+        })
+      }
     },
     editUser() {
       $.ajax({

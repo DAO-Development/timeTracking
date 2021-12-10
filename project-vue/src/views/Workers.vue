@@ -633,7 +633,7 @@ export default {
           finnish: this.newProfile.finnish,
           russian: this.newProfile.russian,
           other_language: this.newProfile.other_language,
-          position: this.newProfile.position,
+          position: this.newProfile.position.id,
           skills: this.newProfile.skills,
           boots: this.newProfile.boots,
           jacket: this.newProfile.jacket,

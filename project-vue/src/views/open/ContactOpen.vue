@@ -30,7 +30,8 @@
             </li>
             <li>
               <span class="profile__info-title">Должность</span>
-              <span class="profile__info-content" v-if="currentContact.position.name !== null">{{ currentContact.position.name }}</span>
+              <span class="profile__info-content"
+                    v-if="currentContact.position.name !== null">{{ currentContact.position.name }}</span>
             </li>
             <li>
               <span class="profile__info-title">Фирма</span>
@@ -305,12 +306,13 @@ export default {
     editContact() {
       if (this.$refs.addForm.validate()) {
         this.currentContact.client = this.currentContact.client.id
+        this.currentContact.position = this.currentContact.position.id
         $.ajax({
           url: this.$hostname + "time-tracking/clients-employees",
           type: "PUT",
           data: this.currentContact,
           success: () => {
-            this.closeForm()
+            this.addForm = false
             this.loadData()
           },
           error: (response) => {
