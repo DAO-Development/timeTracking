@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
+from django.db.models import CharField
 
 
 class PositionProfile(models.Model):
@@ -262,6 +263,142 @@ class Notes(models.Model):
         db_table = "notes"
         verbose_name = "Блокнот"
         verbose_name_plural = "Блокноты"
+
+
+class ChequeCategory(models.Model):
+    """Категории для чеков"""
+    name = models.CharField(verbose_name="Название", max_length=100)
+
+    class Meta:
+        db_table = "cheque_category"
+        verbose_name = "Категория чеков"
+        verbose_name_plural = "Категории чеков"
+
+
+class Term(models.Model):
+    """Сроки"""
+    days = models.IntegerField(verbose_name="Срок в днях")
+
+    class Meta:
+        db_table = "term"
+        verbose_name = "Срок"
+        verbose_name_plural = "Сроки"
+
+
+class Purchases(models.Model):
+    """Покупки"""
+    user_profile = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, verbose_name="Ответственный")
+    category = models.ForeignKey("ChequeCategory", on_delete=models.RESTRICT, verbose_name="Категория")
+    tax = models.IntegerField(verbose_name="НДС", null=True, blank=True)
+    payment_method = models.CharField(verbose_name="Способ оплаты", max_length=100)
+    number = models.CharField(verbose_name="Номер счета", max_length=100, null=True, blank=True)
+    date_receipt = models.DateField(verbose_name="Дата получения", null=True, blank=True)
+    date = models.DateField(verbose_name="Дата покупки")
+    place = models.CharField(verbose_name="Место покупки", max_length=150, null=True, blank=True)
+    # place = models.JSONField(verbose_name="Место покупки", max_length=150)
+    price = models.FloatField(verbose_name="Сумма покупки")
+    bundle = models.CharField(verbose_name="от 2х чеков", max_length=100, null=True, blank=True)
+    comment = models.TextField(verbose_name="Заметки", max_length=1000, null=True, blank=True)
+
+    class Meta:
+        db_table = "purchases"
+        verbose_name = "Покупка"
+        verbose_name_plural = "Покупки"
+
+
+class Sales(models.Model):
+    """Продажи"""
+    create_date = models.DateField(verbose_name="Дата покупки")
+    object_number = models.CharField(verbose_name='Номер объекта', max_length=60, null=True, blank=True)
+    object = models.ForeignKey("Objects", models.RESTRICT, verbose_name="Объект", null=True, blank=True)
+    comment = models.TextField(verbose_name="Заметки", max_length=1000, null=True, blank=True)
+    description = models.TextField(verbose_name="Пояснение к счету", max_length=1000, null=True, blank=True)
+    payment_terms = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок оплаты")
+    number_link = models.CharField(verbose_name="Номер ссылки", null=True, blank=True)
+
+    class Meta:
+        db_table = "sales"
+        verbose_name = "Продажа"
+        verbose_name_plural = "Продажи"
+
+
+class ChequeDocuments(models.Model):
+    """Фото/pdf чеков"""
+    path = models.CharField(verbose_name="Путь к файлу", max_length=250)
+    purchases = models.ForeignKey("Purchases", on_delete=models.CASCADE, verbose_name="Покупка", null=True, blank=True)
+
+    # sales = models.ForeignKey("Sales", on_delete=models.CASCADE, verbose_name="Покупка", null=True, blank=True)
+
+    class Meta:
+        db_table = "cheque_documents"
+        verbose_name = "Фото чеков"
+        verbose_name_plural = "Фото чеков"
+
+
+class DocumentsMode(models.Model):
+    name = models.CharField(verbose_name="Название", max_length=50)
+
+    class Meta:
+        db_table = "documents_mode"
+        verbose_name = "Тип документа"
+        verbose_name_plural = "Типы документов"
+
+
+class DocumentsAccounting(models.Model):
+    """Документы бухгалтерии: отчеты, выписки, документы на собственность"""
+    name = models.CharField(verbose_name="Название", max_length=100)
+    create_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    path = models.CharField(verbose_name="Путь к файлу", max_length=250)
+    mode = models.ForeignKey("DocumentsMode", on_delete=models.RESTRICT, verbose_name="Тип документа")
+
+    class Meta:
+        db_table = "documents_accounting"
+        verbose_name = "Бухгалтерский документ"
+        verbose_name_plural = "Бухгалтерские документы"
+
+
+class DocumentsClients(models.Model):
+    """Документы с клиентами: договора, документы"""
+    name = models.CharField(verbose_name="Название", max_length=100)
+    create_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    path = models.CharField(verbose_name="Путь к файлу", max_length=250)
+    client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")
+    mode = models.ForeignKey("DocumentsMode", on_delete=models.RESTRICT, verbose_name="Тип документа")
+
+    class Meta:
+        db_table = "documents_clients"
+        verbose_name = "Документ с клиентом"
+        verbose_name_plural = "Документы с клиентами"
+
+
+class WaybillGoal(models.Model):
+    """Цели поездок"""
+    name = models.CharField(verbose_name="Название", max_length=100)
+
+    class Meta:
+        db_table = "waybill_goal"
+        verbose_name = "Цель поездки"
+        verbose_name_plural = "Цели поездок"
+
+
+class Waybill(models.Model):
+    """Путевые листы"""
+    date = models.DateField(verbose_name="Дата поездки")
+    departure = models.CharField(verbose_name="Пункт отправления", max_length=150)
+    destination = models.CharField(verbose_name="Пункт назначенния", max_length=150)
+    kilometrage = models.IntegerField(verbose_name="Километраж")
+    user_profile = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, verbose_name="Профиль")
+    time_start = models.TimeField(verbose_name="Время начала поездки")
+    time_end = models.TimeField(verbose_name="Время конца поездки")
+    goal = models.ForeignKey("WaybillGoal", on_delete=models.RESTRICT, verbose_name="Цель поездки")
+    auto_mark = models.CharField(verbose_name="Марка автомобиля", max_length=100)
+    auto_type = models.CharField(verbose_name="Тип коробки", max_length=60)
+    auto_fuel = models.CharField(verbose_name="Тип топлива", max_length=60)
+
+    class Meta:
+        db_table = "waybill"
+        verbose_name = "Путевой лист"
+        verbose_name_plural = "Путевые листы"
 
 # class WidgetUser(models.Model):
 #     """Виджеты"""
