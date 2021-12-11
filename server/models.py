@@ -357,7 +357,7 @@ class DocumentsAccounting(models.Model):
         verbose_name_plural = "Бухгалтерские документы"
 
 
-class DocumentsClients(models.Model):
+class DocumentsClient(models.Model):
     """Документы с клиентами: договора, документы"""
     name = models.CharField(verbose_name="Название", max_length=100)
     create_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
@@ -366,7 +366,7 @@ class DocumentsClients(models.Model):
     mode = models.ForeignKey("DocumentsMode", on_delete=models.RESTRICT, verbose_name="Тип документа")
 
     class Meta:
-        db_table = "documents_clients"
+        db_table = "documents_client"
         verbose_name = "Документ с клиентом"
         verbose_name_plural = "Документы с клиентами"
 
@@ -400,12 +400,36 @@ class Waybill(models.Model):
         verbose_name = "Путевой лист"
         verbose_name_plural = "Путевые листы"
 
+
+class OfferPositions(models.Model):
+    """Позиции для предложений"""
+    name = models.CharField(verbose_name="Название", max_length=100)
+    price = models.FloatField(verbose_name="Стоимость")
+    tax = models.IntegerField(verbose_name="НДС", null=True, blank=True)
+
+    class Meta:
+        db_table = "offer_positions"
+        verbose_name = "Позиция предложения"
+        verbose_name_plural = "Позиции предложения"
+
+
+class Offer(models.Model):
+    """Предложения"""
+    active = models.BooleanField(verbose_name="Активно", default=True)
+    term = models.IntegerField(verbose_name="Срок предложения")
+    client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")
+
+    class Meta:
+        db_table = "offer"
+        verbose_name = "Предложение"
+        verbose_name_plural = "Предложения"
+
 # class WidgetUser(models.Model):
 #     """Виджеты"""
 #     name = models.CharField(verbose_name="Название виджета", max_length=120)
 #     user = models.ForeignKey("User", models.CASCADE, verbose_name='Пользователь')
 #
 #     class Meta:
-#         db_table = "time_report"
-#         verbose_name = "Часовой отчет"
-#         verbose_name_plural = "Часовые отчеты"
+#         db_table = "widget_user"
+#         verbose_name = "Виджет"
+#         verbose_name_plural = "Виджеты"
