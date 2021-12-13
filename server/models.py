@@ -295,7 +295,6 @@ class Purchases(models.Model):
     date_receipt = models.DateField(verbose_name="Дата получения", null=True, blank=True)
     date = models.DateField(verbose_name="Дата покупки")
     place = models.CharField(verbose_name="Место покупки", max_length=150, null=True, blank=True)
-    # place = models.JSONField(verbose_name="Место покупки", max_length=150)
     price = models.FloatField(verbose_name="Сумма покупки")
     bundle = models.CharField(verbose_name="от 2х чеков", max_length=100, null=True, blank=True)
     comment = models.TextField(verbose_name="Заметки", max_length=1000, null=True, blank=True)
@@ -384,8 +383,8 @@ class WaybillGoal(models.Model):
 class Waybill(models.Model):
     """Путевые листы"""
     date = models.DateField(verbose_name="Дата поездки")
-    departure = models.CharField(verbose_name="Пункт отправления", max_length=150)
-    destination = models.CharField(verbose_name="Пункт назначенния", max_length=150)
+    departure = models.CharField(verbose_name="Пункт отправления", max_length=250)
+    destination = models.CharField(verbose_name="Пункт назначенния", max_length=250)
     kilometrage = models.IntegerField(verbose_name="Километраж")
     user_profile = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, verbose_name="Профиль")
     time_start = models.TimeField(verbose_name="Время начала поездки")
@@ -404,8 +403,12 @@ class Waybill(models.Model):
 class OfferPositions(models.Model):
     """Позиции для предложений"""
     name = models.CharField(verbose_name="Название", max_length=100)
-    price = models.FloatField(verbose_name="Стоимость")
+    price = models.FloatField(verbose_name="Стоимость без налога")
     tax = models.IntegerField(verbose_name="НДС", null=True, blank=True)
+    discount = models.IntegerField(verbose_name="Скидка (%)", null=True, blank=True)
+    quantity = models.FloatField(verbose_name="Количество")
+    measurement = models.CharField(verbose_name="Единицы измерения", max_length=20, null=True, blank=True)
+    offer = models.ForeignKey("Offer", on_delete=models.CASCADE, verbose_name="Предложение")
 
     class Meta:
         db_table = "offer_positions"
