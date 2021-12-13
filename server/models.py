@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.db.models import CharField
 
 
 class PositionProfile(models.Model):
@@ -314,6 +313,7 @@ class Sales(models.Model):
     description = models.TextField(verbose_name="Пояснение к счету", max_length=1000, null=True, blank=True)
     payment_terms = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок оплаты")
     number_link = models.CharField(verbose_name="Номер ссылки", null=True, blank=True)
+    items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
 
     class Meta:
         db_table = "sales"
@@ -400,20 +400,19 @@ class Waybill(models.Model):
         verbose_name_plural = "Путевые листы"
 
 
-class OfferPositions(models.Model):
-    """Позиции для предложений"""
+class Items(models.Model):
+    """Товары и услуги"""
     name = models.CharField(verbose_name="Название", max_length=100)
     price = models.FloatField(verbose_name="Стоимость без налога")
     tax = models.IntegerField(verbose_name="НДС", null=True, blank=True)
     discount = models.IntegerField(verbose_name="Скидка (%)", null=True, blank=True)
-    quantity = models.FloatField(verbose_name="Количество")
+    quantity = models.FloatField(verbose_name="Количество", null=True, blank=True)
     measurement = models.CharField(verbose_name="Единицы измерения", max_length=20, null=True, blank=True)
-    offer = models.ForeignKey("Offer", on_delete=models.CASCADE, verbose_name="Предложение")
 
     class Meta:
-        db_table = "offer_positions"
-        verbose_name = "Позиция предложения"
-        verbose_name_plural = "Позиции предложения"
+        db_table = "Items"
+        verbose_name = "Товар/услуга"
+        verbose_name_plural = "Товары/услуги"
 
 
 class Offer(models.Model):
@@ -421,6 +420,7 @@ class Offer(models.Model):
     active = models.BooleanField(verbose_name="Активно", default=True)
     term = models.IntegerField(verbose_name="Срок предложения")
     client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")
+    items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
 
     class Meta:
         db_table = "offer"
