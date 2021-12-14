@@ -284,11 +284,21 @@ class Term(models.Model):
         verbose_name_plural = "Сроки"
 
 
+class Tax(models.Model):
+    """НДС"""
+    tax = models.IntegerField(verbose_name="Налог в %")
+
+    class Meta:
+        db_table = "tax"
+        verbose_name = "НДС"
+        verbose_name_plural = "НДС"
+
+
 class Purchases(models.Model):
     """Покупки"""
     user_profile = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, verbose_name="Ответственный")
     category = models.ForeignKey("ChequeCategory", on_delete=models.RESTRICT, verbose_name="Категория")
-    tax = models.IntegerField(verbose_name="НДС", null=True, blank=True)
+    tax = models.ForeignKey("Tax", on_delete=models.RESTRICT, verbose_name="НДС", null=True, blank=True)
     payment_method = models.CharField(verbose_name="Способ оплаты", max_length=100)
     number = models.CharField(verbose_name="Номер счета", max_length=100, null=True, blank=True)
     date_receipt = models.DateField(verbose_name="Дата получения", null=True, blank=True)
@@ -325,8 +335,7 @@ class ChequeDocuments(models.Model):
     """Фото/pdf чеков"""
     path = models.CharField(verbose_name="Путь к файлу", max_length=250)
     purchases = models.ForeignKey("Purchases", on_delete=models.CASCADE, verbose_name="Покупка", null=True, blank=True)
-
-    # sales = models.ForeignKey("Sales", on_delete=models.CASCADE, verbose_name="Покупка", null=True, blank=True)
+    sales = models.ForeignKey("Sales", on_delete=models.CASCADE, verbose_name="Покупка", null=True, blank=True)
 
     class Meta:
         db_table = "cheque_documents"
@@ -410,7 +419,7 @@ class Items(models.Model):
     measurement = models.CharField(verbose_name="Единицы измерения", max_length=20, null=True, blank=True)
 
     class Meta:
-        db_table = "Items"
+        db_table = "items"
         verbose_name = "Товар/услуга"
         verbose_name_plural = "Товары/услуги"
 
@@ -418,7 +427,7 @@ class Items(models.Model):
 class Offer(models.Model):
     """Предложения"""
     active = models.BooleanField(verbose_name="Активно", default=True)
-    term = models.IntegerField(verbose_name="Срок предложения")
+    term = models.ForeignKey("Term", on_delete=models.RESTRICT(), verbose_name="Срок предложения")
     client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
 

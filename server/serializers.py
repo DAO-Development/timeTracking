@@ -252,3 +252,126 @@ class NotesPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notes
         fields = ('color', 'text', 'user')
+
+
+class ChequeCategorySerializer(serializers.ModelSerializer):
+    """Сериализация категорий чеков"""
+
+    class Meta:
+        model = ChequeCategory
+        fields = '__all__'
+
+
+class TermSerializer(serializers.ModelSerializer):
+    """Сериализация сроков для счетов"""
+
+    class Meta:
+        model = Term
+        fields = '__all__'
+
+
+class ItemsSerializer(serializers.ModelSerializer):
+    """Сериализация товаров/услуг"""
+
+    class Meta:
+        model = Items
+        fields = '__all__'
+
+
+class TaxSerializer(serializers.ModelSerializer):
+    """Сериализация налога"""
+
+    class Meta:
+        model = Tax
+        fields = '__all__'
+
+
+class PurchasesSerializer(serializers.ModelSerializer):
+    """Сериализация покупок"""
+
+    user_profile = UserProfileSerializer()
+    category = ChequeCategorySerializer()
+    tax = TaxSerializer()
+
+    class Meta:
+        model = Purchases
+        fields = '__all__'
+
+
+class SalesSerializer(serializers.ModelSerializer):
+    """Сериализация продаж (счетов)"""
+
+    object = ObjectsSerializer()
+    payment_term = TermSerializer()
+    items = ItemsSerializer()
+
+    class Meta:
+        model = Sales
+        fields = '__all__'
+
+
+class ChequeDocumentsSerializer(serializers.ModelSerializer):
+    """Сериализация фото чеков"""
+    sales = SalesSerializer()
+    purchases = PurchasesSerializer()
+
+    class Meta:
+        model = ChequeDocuments
+        fields = '__all__'
+
+
+class DocumentsModeSerializer(serializers.ModelSerializer):
+    """Сериализация типов документов"""
+
+    class Meta:
+        model = DocumentsMode
+        fields = '__all__'
+
+
+class DocumentsAccountingSerializer(serializers.ModelSerializer):
+    """Сериализация документов бухгалтерии"""
+
+    class Meta:
+        model = DocumentsAccounting
+        fields = '__all__'
+
+
+class DocumentsClientSerializer(serializers.ModelSerializer):
+    """Сериализация документов с клиентами"""
+
+    client = ClientSerializer()
+
+    class Meta:
+        model = DocumentsClient
+        fields = '__all__'
+
+
+class WaybillGoalSerializer(serializers.ModelSerializer):
+    """Сериализация целей поездок"""
+
+    class Meta:
+        model = WaybillGoal
+        fields = '__all__'
+
+
+class WaybillSerializer(serializers.ModelSerializer):
+    """Сериализация путевых листов"""
+
+    user_profile = UserProfileSerializer()
+    goal = WaybillGoalSerializer()
+
+    class Meta:
+        model = Waybill
+        fields = '__all__'
+
+
+class OfferSerializer(serializers.ModelSerializer):
+    """Сериализация Предложений"""
+
+    term = TermSerializer()
+    client = ClientSerializer()
+    items = ItemsSerializer()
+
+    class Meta:
+        model = Offer
+        fields = '__all__'
