@@ -322,7 +322,7 @@ class Sales(models.Model):
     comment = models.TextField(verbose_name="Заметки", max_length=1000, null=True, blank=True)
     description = models.TextField(verbose_name="Пояснение к счету", max_length=1000, null=True, blank=True)
     payment_terms = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок оплаты")
-    number_link = models.CharField(verbose_name="Номер ссылки", null=True, blank=True)
+    number_link = models.CharField(verbose_name="Номер ссылки", max_length=100, null=True, blank=True)
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
 
     class Meta:
@@ -427,7 +427,7 @@ class Items(models.Model):
 class Offer(models.Model):
     """Предложения"""
     active = models.BooleanField(verbose_name="Активно", default=True)
-    term = models.ForeignKey("Term", on_delete=models.RESTRICT(), verbose_name="Срок предложения")
+    term = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок предложения")
     client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
 

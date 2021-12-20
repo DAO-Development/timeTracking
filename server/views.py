@@ -638,9 +638,315 @@ class NotesView(APIView):
         return Response(status=204)
 
 
-class ImagesView(APIView):
-    """Загрузка изображений из редактора"""
-    permission_classes = [permissions.AllowAny]
+class ChequeCategoryView(APIView):
+    """Все категории чеков"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        categories = ChequeCategory.objects.all().order_by('name')
+        serializer = ChequeCategorySerializer(categories, many=True)
+        return Response({"categories": serializer.data})
 
     def post(self, request):
-        return Response({"message": "upload"})
+        serializer = ChequeCategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_category = get_object_or_404(ChequeCategory.objects.all(), id=request.data["id"])
+        saved_category.delete()
+        return Response(status=204)
+
+
+class TermView(APIView):
+    """Сроки для счетов и предложений"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        terms = Term.objects.all().order_by('days')
+        serializer = TermSerializer(terms, many=True)
+        return Response({"terms": serializer.data})
+
+    def post(self, request):
+        serializer = TermSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_term = get_object_or_404(Term.objects.all(), id=request.data["id"])
+        saved_term.delete()
+        return Response(status=204)
+
+
+class TaxView(APIView):
+    """Налог для бухгалтерии"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        taxes = Tax.objects.all().order_by('tax')
+        serializer = TaxSerializer(taxes, many=True)
+        return Response({"taxes": serializer.data})
+
+    def post(self, request):
+        serializer = TaxSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_term = get_object_or_404(Tax.objects.all(), id=request.data["id"])
+        saved_term.delete()
+        return Response(status=204)
+
+
+class PurchasesView(APIView):
+    """Покупки"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        purchases = Purchases.objects.all()
+        serializer = PurchasesSerializer(purchases, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = PurchasesPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+        serializer = PurchasesPostSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class SalesView(APIView):
+    """Продажи"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        sales = Sales.objects.all()
+        serializer = SalesSerializer(sales, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = SalesPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(Sales.objects.all(), id=request.data["id"])
+        serializer = SalesPostSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(Sales.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class ChequeDocumentsView(APIView):
+    """Фото чеков"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        documents = ChequeDocuments.objects.all()
+        serializer = ChequeDocumentsSerializer(documents, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = ChequeDocumentsPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(ChequeDocuments.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class DocumentsAccountingView(APIView):
+    """Документы бухгалтерии"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, mode_id):
+        documents = DocumentsAccounting.objects.all().filter(mode=mode_id)
+        serializer = DocumentsAccountingSerializer(documents, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = DocumentsAccountingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(DocumentsAccounting.objects.all(), id=request.data["id"])
+        serializer = DocumentsAccountingSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(DocumentsAccounting.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class DocumentsClientView(APIView):
+    """Документы бухгалтерии с клиентами"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, mode_id):
+        documents = DocumentsClient.objects.all().filter(mode=mode_id)
+        serializer = DocumentsClientSerializer(documents, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = DocumentsClientPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
+        serializer = DocumentsClientPostSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class WaybillGoalView(APIView):
+    """Цели для путевых листов"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        goals = WaybillGoal.objects.all()
+        serializer = WaybillGoalSerializer(goals, many=True)
+        return Response({"goals": serializer.data})
+
+    def post(self, request):
+        serializer = WaybillGoalSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(WaybillGoal.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class WaybillView(APIView):
+    """Путевые листы"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        waybills = Waybill.objects.all()
+        serializer = WaybillSerializer(waybills, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = WaybillPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(Waybill.objects.all(), id=request.data["id"])
+        serializer = WaybillPostSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(Waybill.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class OfferView(APIView):
+    """Предложения"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        offers = Offer.objects.all()
+        serializer = OfferSerializer(offers, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = OfferPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
+        serializer = OfferPostSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+# class ImagesView(APIView):
+#     """Загрузка изображений из редактора"""
+#     permission_classes = [permissions.AllowAny]
+#
+#     def post(self, request):
+#         return Response({"message": "upload"})

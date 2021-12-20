@@ -298,6 +298,14 @@ class PurchasesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PurchasesPostSerializer(serializers.ModelSerializer):
+    """Сериализация покупок для POST-запросов"""
+
+    class Meta:
+        model = Purchases
+        fields = '__all__'
+
+
 class SalesSerializer(serializers.ModelSerializer):
     """Сериализация продаж (счетов)"""
 
@@ -310,10 +318,26 @@ class SalesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SalesPostSerializer(serializers.ModelSerializer):
+    """Сериализация продаж (счетов) для POST-запросов"""
+
+    class Meta:
+        model = Sales
+        fields = '__all__'
+
+
 class ChequeDocumentsSerializer(serializers.ModelSerializer):
     """Сериализация фото чеков"""
     sales = SalesSerializer()
     purchases = PurchasesSerializer()
+
+    class Meta:
+        model = ChequeDocuments
+        fields = '__all__'
+
+
+class ChequeDocumentsPostSerializer(serializers.ModelSerializer):
+    """Сериализация фото чеков для POST-запросов"""
 
     class Meta:
         model = ChequeDocuments
@@ -346,6 +370,14 @@ class DocumentsClientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DocumentsClientPostSerializer(serializers.ModelSerializer):
+    """Сериализация документов с клиентами для POST-запросов"""
+
+    class Meta:
+        model = DocumentsClient
+        fields = '__all__'
+
+
 class WaybillGoalSerializer(serializers.ModelSerializer):
     """Сериализация целей поездок"""
 
@@ -365,12 +397,28 @@ class WaybillSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class WaybillPostSerializer(serializers.ModelSerializer):
+    """Сериализация путевых листов для POST-запросов"""
+
+    class Meta:
+        model = Waybill
+        fields = '__all__'
+
+
 class OfferSerializer(serializers.ModelSerializer):
     """Сериализация Предложений"""
 
     term = TermSerializer()
     client = ClientSerializer()
     items = ItemsSerializer()
+
+    class Meta:
+        model = Offer
+        fields = '__all__'
+
+
+class OfferPostSerializer(serializers.ModelSerializer):
+    """Сериализация Предложений для POST-запросов"""
 
     class Meta:
         model = Offer

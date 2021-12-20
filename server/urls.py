@@ -30,5 +30,20 @@ urlpatterns = [
     path('clients-employees/positions', PositionClientView.as_view()),
     path('documents/worker', UserDocumentsView.as_view()),
     path('notes', NotesView.as_view()),
-    path('images/upload', ImagesView.as_view()),
+
+    path('cheque/categories', ChequeCategoryView.as_view()),
+    path('cheque/sales', SalesView.as_view()),
+    path('cheque/purchases', PurchasesView.as_view()),
+    path('cheque/documents', ChequeDocumentsView.as_view()),
+    path('accounting/terms', TermView.as_view()),
+    path('accounting/taxes', TaxView.as_view()),
+    path('accounting/documents', DocumentsAccountingView.as_view()),
+    path('accounting/documents/<int:mode_id>', DocumentsAccountingView.as_view()),
+    path('accounting/documents-client', DocumentsClientView.as_view()),
+    path('accounting/documents-client/<int:mode_id>', DocumentsClientView.as_view()),
+    path('waybill/goal', WaybillGoalView.as_view()),
+    path('waybill', WaybillView.as_view()),
+    path('offer', OfferView.as_view()),
+
+    # path('images/upload', ImagesView.as_view()),
 ]
