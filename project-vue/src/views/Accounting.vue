@@ -1,0 +1,196 @@
+<template>
+  <div class="accounting flex-content">
+    <Header/>
+    <section class="summary-box">
+      <h1>{{ title }}</h1>
+      <v-btn class="action-btn" color="primary" @click="addForm=true">Добавить документ</v-btn>
+      <div class="documents-all">
+        <v-data-table :headers="headers" :items="documents" item-key="id" @click:row="downloadFile">
+          <template v-slot:item.actions="{ item }">
+            <!--            <v-icon small class="mr-2" @click="openEditForm(item)">mdi-pencil</v-icon>-->
+            <v-icon small @click="currentDocument=item.id; confirmDeleteDialog=true">mdi-delete</v-icon>
+          </template>
+          <template v-slot:no-data>
+            Документы не загружены
+          </template>
+        </v-data-table>
+      </div>
+      <v-dialog v-model="addForm" max-width="500">
+        <v-card>
+          <v-card-title>
+            Новый документ
+          </v-card-title>
+          <v-card-text>
+            <v-form ref="form">
+              <v-text-field label="Название*" v-model="newDocument.name" outlined :rules="reqRules"></v-text-field>
+              <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
+                      offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newDocument.create_date" label="Дата создания"
+                                readonly v-bind="attrs" v-on="on"></v-text-field>
+                </template>
+                <v-date-picker v-model="newDocument.create_date" @input="menu = false"></v-date-picker>
+              </v-menu>
+              <v-file-input v-model="newDocument.path" show-size counter multiple label="Файлы"
+                            :rules="reqRules"></v-file-input>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="secondary" text @click="addForm=false">Отменить</v-btn>
+            <v-btn color="primary" text @click="addDocument">Сохранить</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="confirmDeleteDialog" max-width="500">
+        <v-card>
+          <v-card-title>
+            Удаление документа
+          </v-card-title>
+          <v-card-text>Вы действительно хотите удалить выбранный документ? Отменить это действие будет
+            невозможно
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>
+            <v-btn color="primary" text @click="deleteDocument">Подтвердить</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </section>
+  </div>
+</template>
+
+<script>
+import Header from "../components/Header";
+import $ from "jquery";
+
+export default {
+  name: "Accounting",
+  components: {Header},
+  props: {
+    type: String
+  },
+  data() {
+    return {
+      title: '',
+      url: '',
+      mode: 0,
+      documents: [],
+      newDocument: {
+        id: 0,
+        name: '',
+        create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        path: '',
+      },
+      currentDocument: 0,
+      headers: [
+        {text: 'Название', align: 'start', sortable: true, value: 'name',},
+        {text: 'Дата создания', value: 'create_date'},
+        {text: '', value: 'actions', sortable: false},
+      ],
+      menu: false,
+      addForm: false,
+      confirmDeleteDialog: false,
+      alertError: false,
+      alertMsg: "",
+      reqRules: [
+        v => !!v || 'Необходимо заполнить поле'
+      ],
+    }
+  },
+  created() {
+    console.log("init Accounting " + this.type)
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      this.$emit('set-auth')
+      $.ajaxSetup({
+        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+      })
+      switch (this.type) {
+        case 'reports':
+          this.title = "Бухгалтерские отчеты"
+          this.mode = 1
+          break
+        case 'extracts':
+          this.title = "Бухгалтерские выписки"
+          this.mode = 2
+          break
+        case 'documents':
+          this.title = "Бухгалтерские документы"
+          this.mode = 3
+          break
+      }
+      this.loadData()
+    } else {
+      this.$router.push({name: "Login"})
+    }
+  },
+  methods: {
+    loadData() {
+
+    },
+    addDocument() {
+      console.log(this.newDocument.path)
+      if (this.$refs.form.validate()) {
+        // const axios = require('axios')
+        // чтение файла в formData
+        let fd = new FormData();
+        // if (this.editFile) {
+        let i = 0
+        this.newDocument.path.forEach(doc => {
+          i++
+          fd.append('document' + i, doc.path)
+        })
+        // let document = this.currentDocument.path;
+        // if (document !== undefined) {
+        //   fd.append('document', document)
+        // } else {
+        //   console.log("ERROR")
+        //   return
+        // }
+        // } else
+        //   fd.append('path', this.currentDocument.path)
+        fd.append('id', this.currentDocument.id)
+        fd.append('create_date', this.currentDocument.create_date)
+        fd.append('name', this.currentDocument.name)
+        // axios({
+        //   method: 'put',
+        //   url: this.$hostname + "time-tracking/documents/" + this.type,
+        //   headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        //   data: fd
+        // })
+        //     .then(response => {
+        //       console.log(response.data.data)
+        //       this.addForm = false
+        //       this.loadData()
+        //     });
+      }
+    },
+    deleteDocument() {
+
+    },
+    downloadFile(item) {
+      const axios = require('axios')
+      axios({
+        url: this.$hostname + 'media' + item.path,
+        method: 'GET',
+        responseType: 'blob',
+      }).then((response) => {
+        var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        var fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', item.path);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      });
+    },
+  }
+
+}
+</script>
+
+<style scoped>
+
+</style>

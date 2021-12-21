@@ -812,8 +812,26 @@ class DocumentsAccountingView(APIView):
             return Response(status=400)
 
     def put(self, request):
-        saved = get_object_or_404(DocumentsAccounting.objects.all(), id=request.data["id"])
-        serializer = DocumentsAccountingSerializer(saved, data=request.data, partial=True)
+        name = ''
+        if len(request.FILES) >= 0:
+            for
+            name = '/documents/' + request.FILES['document'].name
+            with open('media' + name, 'wb+') as destination:
+                for chunk in request.FILES['document'].chunks():
+                    destination.write(chunk)
+        # else:
+        #     name = request.data['path']
+        return Response({"data": name})
+        data = {
+            "name": request.data['name'],
+            "create_date": request.data['create_date'],
+            "path": name,
+        }
+        if request.data["id"] == "0":
+            serializer = DocumentsAccountingSerializer(data=data)
+        else:
+            saved_object = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
+            serializer = UserDocumentsSerializer(saved_object, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

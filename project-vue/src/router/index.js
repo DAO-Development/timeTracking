@@ -17,6 +17,7 @@ import Groups from "../views/Groups";
 import Settings from "../views/Settings";
 import WorkerOpen from "../views/open/WorkerOpen";
 import Positions from "../views/Positions";
+import Accounting from "../views/Accounting";
 
 Vue.use(VueRouter)
 
@@ -116,6 +117,12 @@ const routes = [
         path: '/positions-:table',
         name: 'Positions',
         component: Positions,
+        props: true
+    },
+    {
+        path: '/accounting/:type',
+        name: 'Accounting',
+        component: Accounting,
         props: true
     },
 ]

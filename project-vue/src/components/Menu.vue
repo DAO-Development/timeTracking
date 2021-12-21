@@ -99,15 +99,57 @@
               <v-icon>$tile</v-icon>
             </v-list-item-icon>
           </v-list-item>
-          <v-list-item @click="goPage(7)" v-if="$parent.$parent.read.indexOf('Бухгалтерия') !== -1">
-            <v-list-item-icon>
-              <v-icon>mdi-cash</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Бухгалтерия</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-
+          <!--          <v-list-item @click="goPage(7)" v-if="$parent.$parent.read.indexOf('Бухгалтерия') !== -1">-->
+          <v-list-group v-if="$parent.$parent.read.indexOf('Бухгалтерия') !== -1">
+            <template v-slot:activator>
+              <v-list-item-icon>
+                <v-icon>mdi-cash</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Бухгалтерия</v-list-item-title>
+              </v-list-item-content>
+            </template>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Покупки</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Продажи</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item @click="$router.push({name: 'Accounting', params: {type: 'reports'}})">
+              <v-list-item-content>
+                <v-list-item-title>Отчеты</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item @click="$router.push({name: 'Accounting', params: {type: 'extracts'}})">
+              <v-list-item-content>
+                <v-list-item-title>Выписки</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item @click="$router.push({name: 'Accounting', params: {type: 'documents'}})">
+              <v-list-item-content>
+                <v-list-item-title>Документы</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Договора с клиентами</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Документы на собственность</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Путевые листы</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-group>
           <v-list-item @click="goPage(8)">
             <!--          <v-list-item @click="goPage(3+items.length)">-->
             <v-list-item-icon>
