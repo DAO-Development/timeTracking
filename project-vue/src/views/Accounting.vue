@@ -22,18 +22,23 @@
             Новый документ
           </v-card-title>
           <v-card-text>
-            <v-form ref="form">
+            <v-form ref="form" :model="newDocument">
               <v-text-field label="Название*" v-model="newDocument.name" outlined :rules="reqRules"
                             required></v-text-field>
               <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
                       offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="newDocument.create_date" label="Дата создания"
-                                readonly v-bind="attrs" v-on="on"></v-text-field>
+                  <v-text-field v-model="newDocument.create_date" label="Дата создания" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
                 </template>
                 <v-date-picker v-model="newDocument.create_date" @input="menu = false"></v-date-picker>
               </v-menu>
-              <v-file-input v-model="newDocument.path" show-size counter multiple label="Файлы"></v-file-input>
+              <v-combobox placeholder="Фирма*" v-model="newDocument.client" :items="clients" item-text="name"
+                          item-value="id" :rules="reqRules" required outlined></v-combobox>
+
+              <v-file-input v-model="newDocument.path" placeholder="Выберите документ*" accept="*"
+                            prepend-icon="" outlined multiple counter :rules="reqRules"></v-file-input>
+
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -78,11 +83,13 @@ export default {
       url: '',
       mode: 0,
       documents: [],
+      clients: [],
       newDocument: {
         id: 0,
         name: '',
         create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         path: '',
+        client: '',
       },
       currentDocument: 0,
       headers: [
@@ -96,7 +103,7 @@ export default {
       alertError: false,
       alertMsg: "",
       reqRules: [
-        v => !!v || 'Необходимо заполнить поле'
+        v => !!v || 'Необходимо заполнить поле',
       ],
     }
   },
@@ -110,15 +117,41 @@ export default {
       switch (this.type) {
         case 'reports':
           this.title = "Бухгалтерские отчеты"
+          this.url = "time-tracking/accounting/documents/"
           this.mode = 1
           break
         case 'extracts':
           this.title = "Бухгалтерские выписки"
+          this.url = "time-tracking/accounting/documents/"
           this.mode = 2
           break
         case 'documents':
           this.title = "Бухгалтерские документы"
+          this.url = "time-tracking/accounting/documents"
           this.mode = 3
+          break
+        case 'contracts':
+          this.headers = [
+            {text: 'Название', align: 'start', sortable: true, value: 'name',},
+            {text: 'Дата создания', value: 'create_date'},
+            {text: 'Клиент', value: 'client.name'},
+            {text: '', value: 'actions', sortable: false},
+          ]
+          this.title = "Договора с клиентами"
+          this.url = "time-tracking/accounting/documents-client"
+          this.mode = 4
+          this.loadClients()
+          break
+        case 'property':
+          this.headers = [
+            {text: 'Название', align: 'start', sortable: true, value: 'name',},
+            {text: 'Дата создания', value: 'create_date'},
+            {text: 'Клиент', value: 'client.name'},
+            {text: '', value: 'actions', sortable: false},
+          ]
+          this.title = "Документы на собственность"
+          this.mode = 5
+          this.loadClients()
           break
       }
       this.loadData()
@@ -129,7 +162,7 @@ export default {
   methods: {
     loadData() {
       $.ajax({
-        url: this.$hostname + "time-tracking/accounting/documents/" + this.mode,
+        url: this.$hostname + this.url + "/" + this.mode,
         type: "GET",
         success: (response) => {
           this.documents = response.data.data
@@ -144,6 +177,26 @@ export default {
           }
           this.alertError = true
         },
+      })
+    },
+    loadClients() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients",
+        type: "GET",
+        success: (response) => {
+          this.clients = response.data.data
+        },
+        error: (response) => {
+          console.log(response)
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
       })
     },
     addDocument() {
@@ -161,9 +214,11 @@ export default {
         fd.append('id', this.newDocument.id)
         fd.append('create_date', this.newDocument.create_date)
         fd.append('name', this.newDocument.name)
+        if (this.type === 'contracts' || this.type === 'property')
+          fd.append('client', this.newDocument.client.id)
         axios({
           method: 'put',
-          url: this.$hostname + "time-tracking/accounting/documents/" + this.mode,
+          url: this.$hostname + this.url + "/" + this.mode,
           headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
           data: fd
         })
@@ -175,6 +230,7 @@ export default {
                 name: '',
                 create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
                 path: '',
+                client: '',
               }
               this.loadData()
             });
@@ -182,7 +238,7 @@ export default {
     },
     deleteDocument() {
       $.ajax({
-        url: this.$hostname + "time-tracking/accounting/documents",
+        url: this.$hostname + this.url,
         type: "DELETE",
         data: {
           "id": this.currentDocument

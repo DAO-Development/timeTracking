@@ -857,17 +857,31 @@ class DocumentsClientView(APIView):
         serializer = DocumentsClientSerializer(documents, many=True)
         return Response({"data": serializer.data})
 
-    def post(self, request):
-        serializer = DocumentsClientPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+    def put(self, request, mode_id):
+        path = ''
+        if len(request.FILES) >= 0:
+            for i in range(1, len(request.FILES) + 1):
+                name = '/accounting/clients/' + request.FILES['document' + str(i)].name
+                with open('media' + name, 'wb+') as destination:
+                    for chunk in request.FILES['document' + str(i)].chunks():
+                        destination.write(chunk)
+                path += name
+                if i != len(request.FILES):
+                    path += ';'
         else:
-            return Response(status=400)
-
-    def put(self, request):
-        saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
-        serializer = DocumentsClientPostSerializer(saved, data=request.data, partial=True)
+            path = request.data['path']
+        data = {
+            "name": request.data['name'],
+            "create_date": request.data['create_date'],
+            "path": path,
+            "client": request.data['client'],
+            "mode": mode_id,
+        }
+        if request.data["id"] == "0":
+            serializer = DocumentsClientPostSerializer(data=data)
+        else:
+            saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
+            serializer = DocumentsClientPostSerializer(saved, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
@@ -876,12 +890,12 @@ class DocumentsClientView(APIView):
 
     def delete(self, request):
         saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
-        path = saved.path
-        path = path.split(";")
-        return Response({"data": path})
-        for item in path:
-            os.remove('/media' + item)
-            # os.path.join(os.path.abspath(os.path.dirname(__file__)), 'TestDir')
+        # path = saved.path
+        # path = path.split(";")
+        # return Response({"data": path})
+        # for item in path:
+        #     os.remove('/media' + item)
+        # os.path.join(os.path.abspath(os.path.dirname(__file__)), 'TestDir')
         saved.delete()
         return Response(status=204)
 
