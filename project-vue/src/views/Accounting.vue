@@ -33,7 +33,8 @@
                 </template>
                 <v-date-picker v-model="newDocument.create_date" @input="menu = false"></v-date-picker>
               </v-menu>
-              <v-combobox placeholder="Фирма*" v-model="newDocument.client" :items="clients" item-text="name"
+              <v-combobox v-if="type === 'contracts' || type === 'property'" placeholder="Фирма*"
+                          v-model="newDocument.client" :items="clients" item-text="name"
                           item-value="id" :rules="reqRules" required outlined></v-combobox>
 
               <v-file-input v-model="newDocument.path" placeholder="Выберите документ*" accept="*"
@@ -117,12 +118,12 @@ export default {
       switch (this.type) {
         case 'reports':
           this.title = "Бухгалтерские отчеты"
-          this.url = "time-tracking/accounting/documents/"
+          this.url = "time-tracking/accounting/documents"
           this.mode = 1
           break
         case 'extracts':
           this.title = "Бухгалтерские выписки"
-          this.url = "time-tracking/accounting/documents/"
+          this.url = "time-tracking/accounting/documents"
           this.mode = 2
           break
         case 'documents':
@@ -150,6 +151,7 @@ export default {
             {text: '', value: 'actions', sortable: false},
           ]
           this.title = "Документы на собственность"
+          this.url = "time-tracking/accounting/documents-client"
           this.mode = 5
           this.loadClients()
           break
