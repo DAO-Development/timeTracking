@@ -5,7 +5,8 @@
       <h1>{{ title }}</h1>
       <v-btn class="action-btn" color="primary" @click="addForm=true">Добавить документ</v-btn>
       <div class="documents-all">
-        <v-data-table :headers="headers" :items="documents" item-key="id" @click:row="downloadFile">
+        <!--        <v-data-table :headers="headers" :items="documents" item-key="id" @click:row="downloadFile">-->
+        <v-data-table :headers="headers" :items="documents" item-key="id">
           <template v-slot:item.actions="{ item }">
             <!--            <v-icon small class="mr-2" @click="openEditForm(item)">mdi-pencil</v-icon>-->
             <v-icon small @click="currentDocument=item.id; confirmDeleteDialog=true">mdi-delete</v-icon>
@@ -22,7 +23,8 @@
           </v-card-title>
           <v-card-text>
             <v-form ref="form">
-              <v-text-field label="Название*" v-model="newDocument.name" outlined :rules="reqRules"></v-text-field>
+              <v-text-field label="Название*" v-model="newDocument.name" outlined :rules="reqRules"
+                            required></v-text-field>
               <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
                       offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
@@ -31,8 +33,7 @@
                 </template>
                 <v-date-picker v-model="newDocument.create_date" @input="menu = false"></v-date-picker>
               </v-menu>
-              <v-file-input v-model="newDocument.path" show-size counter multiple label="Файлы"
-                            :rules="reqRules"></v-file-input>
+              <v-file-input v-model="newDocument.path" show-size counter multiple label="Файлы"></v-file-input>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -127,47 +128,81 @@ export default {
   },
   methods: {
     loadData() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/accounting/documents/" + this.mode,
+        type: "GET",
+        success: (response) => {
+          this.documents = response.data.data
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
     },
     addDocument() {
       console.log(this.newDocument.path)
       if (this.$refs.form.validate()) {
-        // const axios = require('axios')
+        const axios = require('axios')
         // чтение файла в formData
         let fd = new FormData();
-        // if (this.editFile) {
         let i = 0
         this.newDocument.path.forEach(doc => {
+          console.log(doc)
           i++
-          fd.append('document' + i, doc.path)
+          fd.append('document' + i, doc)
         })
-        // let document = this.currentDocument.path;
-        // if (document !== undefined) {
-        //   fd.append('document', document)
-        // } else {
-        //   console.log("ERROR")
-        //   return
-        // }
-        // } else
-        //   fd.append('path', this.currentDocument.path)
-        fd.append('id', this.currentDocument.id)
-        fd.append('create_date', this.currentDocument.create_date)
-        fd.append('name', this.currentDocument.name)
-        // axios({
-        //   method: 'put',
-        //   url: this.$hostname + "time-tracking/documents/" + this.type,
-        //   headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
-        //   data: fd
-        // })
-        //     .then(response => {
-        //       console.log(response.data.data)
-        //       this.addForm = false
-        //       this.loadData()
-        //     });
+        fd.append('id', this.newDocument.id)
+        fd.append('create_date', this.newDocument.create_date)
+        fd.append('name', this.newDocument.name)
+        axios({
+          method: 'put',
+          url: this.$hostname + "time-tracking/accounting/documents/" + this.mode,
+          headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+          data: fd
+        })
+            .then(response => {
+              console.log(response)
+              this.addForm = false
+              this.newDocument = {
+                id: 0,
+                name: '',
+                create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+                path: '',
+              }
+              this.loadData()
+            });
       }
     },
     deleteDocument() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/accounting/documents",
+        type: "DELETE",
+        data: {
+          "id": this.currentDocument
+        },
+        success: () => {
+          console.log("Документ удален")
+          this.confirmDeleteDialog = false
+          this.loadData()
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
     },
     downloadFile(item) {
       const axios = require('axios')
