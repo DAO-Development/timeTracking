@@ -18,6 +18,7 @@ import Settings from "../views/Settings";
 import WorkerOpen from "../views/open/WorkerOpen";
 import Positions from "../views/Positions";
 import Accounting from "../views/Accounting";
+import AccountingOpen from "../views/open/AccountingOpen";
 
 Vue.use(VueRouter)
 
@@ -123,6 +124,12 @@ const routes = [
         path: '/accounting/:type',
         name: 'Accounting',
         component: Accounting,
+        props: true
+    },
+    {
+        path: '/accounting/:type/:id',
+        name: 'AccountingOpen',
+        component: AccountingOpen,
         props: true
     },
 ]

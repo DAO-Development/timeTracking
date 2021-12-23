@@ -39,11 +39,15 @@ urlpatterns = [
     path('accounting/taxes', TaxView.as_view()),
     path('accounting/documents', DocumentsAccountingView.as_view()),
     path('accounting/documents/<int:mode_id>', DocumentsAccountingView.as_view()),
+    path('accounting/documents/<int:mode_id>/<int:id>', DocumentsAccountingView.as_view()),
     path('accounting/documents-client', DocumentsClientView.as_view()),
     path('accounting/documents-client/<int:mode_id>', DocumentsClientView.as_view()),
+    path('accounting/documents-client/<int:mode_id>/<int:id>', DocumentsClientView.as_view()),
     path('waybill/goal', WaybillGoalView.as_view()),
     path('waybill', WaybillView.as_view()),
     path('offer', OfferView.as_view()),
+
+    path('to-zip', ToZipView.as_view()),
 
     # path('images/upload', ImagesView.as_view()),
 ]

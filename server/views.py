@@ -1,4 +1,5 @@
 import os
+import zipfile
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -800,8 +801,10 @@ class DocumentsAccountingView(APIView):
     """Документы бухгалтерии"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, mode_id):
+    def get(self, request, mode_id, id=None):
         documents = DocumentsAccounting.objects.all().filter(mode=mode_id)
+        if id is not None:
+            documents = documents.filter(pk=id)
         serializer = DocumentsAccountingSerializer(documents, many=True)
         return Response({"data": serializer.data})
 
@@ -852,8 +855,10 @@ class DocumentsClientView(APIView):
     """Документы бухгалтерии с клиентами"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, mode_id):
+    def get(self, request, mode_id, id=None):
         documents = DocumentsClient.objects.all().filter(mode=mode_id)
+        if id is not None:
+            documents = documents.filter(pk=id)
         serializer = DocumentsClientSerializer(documents, many=True)
         return Response({"data": serializer.data})
 
@@ -985,6 +990,18 @@ class OfferView(APIView):
         saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
         saved.delete()
         return Response(status=204)
+
+
+class ToZipView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        newzip = zipfile.ZipFile('media/accounting/' + request.data['name'] + '.zip', 'w')
+        path = request.data['path'].split(';')
+        for item in path:
+            newzip.write('media' + item)
+        newzip.close()
+        return Response({"name": 'media/accounting/' + request.data['name'] + '.zip'})
 
 # class ImagesView(APIView):
 #     """Загрузка изображений из редактора"""

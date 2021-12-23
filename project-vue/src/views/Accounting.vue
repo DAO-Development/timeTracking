@@ -11,6 +11,11 @@
             <!--            <v-icon small class="mr-2" @click="openEditForm(item)">mdi-pencil</v-icon>-->
             <v-icon small @click="currentDocument=item.id; confirmDeleteDialog=true">mdi-delete</v-icon>
           </template>
+          <template v-slot:item.name="{ item }">
+            <span @click="$router.push({name: 'AccountingOpen', params: {type: type, id: item.id}})">
+              {{ item.name }}
+            </span>
+          </template>
           <template v-slot:no-data>
             Документы не загружены
           </template>
@@ -261,23 +266,6 @@ export default {
           this.alertError = true
         },
       })
-    },
-    downloadFile(item) {
-      const axios = require('axios')
-      axios({
-        url: this.$hostname + 'media' + item.path,
-        method: 'GET',
-        responseType: 'blob',
-      }).then((response) => {
-        var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-        var fileLink = document.createElement('a');
-
-        fileLink.href = fileURL;
-        fileLink.setAttribute('download', item.path);
-        document.body.appendChild(fileLink);
-
-        fileLink.click();
-      });
     },
   }
 
