@@ -121,6 +121,18 @@ const routes = [
         props: true
     },
     {
+        path: '/categories-:table',
+        name: 'Categories',
+        component: Positions,
+        props: true
+    },
+    {
+        path: '/goals-:table',
+        name: 'Goals',
+        component: Positions,
+        props: true
+    },
+    {
         path: '/accounting/:type',
         name: 'Accounting',
         component: Accounting,
