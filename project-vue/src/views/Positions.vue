@@ -8,7 +8,9 @@
         <template v-for="position in positions">
           <v-list-item :key="position.id">
             <v-list-item-content>
-              <v-list-item-title>{{ position.name }}</v-list-item-title>
+              <v-list-item-title v-if="table==='term'">{{ position.days }}</v-list-item-title>
+              <v-list-item-title v-else-if="table==='tax'">{{ position.tax }}</v-list-item-title>
+              <v-list-item-title v-else>{{ position.name }}</v-list-item-title>
             </v-list-item-content>
             <v-list-item-action
                 v-if="$parent.$parent.edit.indexOf('Работники') !== -1 || $parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
@@ -26,7 +28,9 @@
           </v-card-title>
           <v-card-text>
             <v-form ref="addForm">
-              <v-text-field placeholder="Название*" v-model="newPosition"
+              <v-text-field v-if="table === 'term' || table === 'tax'" label="Значение*" v-model="newPosition"
+                            outlined :rules="reqRules" type="number"></v-text-field>
+              <v-text-field v-else label="Название*" v-model="newPosition"
                             outlined :rules="reqRules"></v-text-field>
             </v-form>
           </v-card-text>
@@ -105,6 +109,14 @@ export default {
         case 'waybill':
           this.url = "time-tracking/waybill/goal"
           this.title = 'Цели для поездок'
+          break
+        case 'term':
+          this.url = "time-tracking/accounting/terms"
+          this.title = 'Сроки предложений и счетов'
+          break
+        case 'tax':
+          this.url = "time-tracking/accounting/taxes"
+          this.title = 'Налог на добавленную стоимость'
           break
       }
       this.loadData()

@@ -671,10 +671,10 @@ class TermView(APIView):
     def get(self, request):
         terms = Term.objects.all().order_by('days')
         serializer = TermSerializer(terms, many=True)
-        return Response({"terms": serializer.data})
+        return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = TermSerializer(data=request.data)
+        serializer = TermSerializer(data={"days": request.data['name']})
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
@@ -694,10 +694,10 @@ class TaxView(APIView):
     def get(self, request):
         taxes = Tax.objects.all().order_by('tax')
         serializer = TaxSerializer(taxes, many=True)
-        return Response({"taxes": serializer.data})
+        return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = TaxSerializer(data=request.data)
+        serializer = TaxSerializer(data={"tax": request.data['name']})
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)

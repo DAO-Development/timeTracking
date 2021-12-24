@@ -133,6 +133,12 @@ const routes = [
         props: true
     },
     {
+        path: '/:table',
+        name: 'IntegerField',
+        component: Positions,
+        props: true
+    },
+    {
         path: '/accounting/:type',
         name: 'Accounting',
         component: Accounting,

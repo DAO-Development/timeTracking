@@ -48,6 +48,24 @@
             <v-list-item-title>Цели поездок</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item v-if="$parent.$parent.admin"
+                     @click="$router.push({name: 'IntegerField',  params: {table: 'term'}})">
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Сроки</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="$parent.$parent.admin"
+                     @click="$router.push({name: 'IntegerField',  params: {table: 'tax'}})">
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Налог</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </section>
   </div>
