@@ -47,6 +47,11 @@ class ObjectCommentsAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_profile_id', 'objects_id')
 
 
+class DocumentsModeAdmin(admin.ModelAdmin):
+    """Типы документов"""
+    list_display = ('id', 'name')
+
+
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(UserDocuments, UserDocumentsAdmin)
 admin.site.register(Functions, FunctionsAdmin)
@@ -56,3 +61,4 @@ admin.site.register(ClientEmployees, ClientEmployeesAdmin)
 admin.site.register(Objects, ObjectsAdmin)
 admin.site.register(ObjectUser, ObjectUserAdmin)
 admin.site.register(ObjectComments, ObjectCommentsAdmin)
+admin.site.register(DocumentsMode, DocumentsModeAdmin)
