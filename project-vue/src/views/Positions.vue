@@ -10,7 +10,8 @@
             <v-list-item-content>
               <v-list-item-title>{{ position.name }}</v-list-item-title>
             </v-list-item-content>
-            <v-list-item-action v-if="$parent.$parent.edit.indexOf('Работники') !== -1">
+            <v-list-item-action
+                v-if="$parent.$parent.edit.indexOf('Работники') !== -1 || $parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
               <v-icon color="grey lighten-1" @click="currentPosition = position.id; confirmDeleteDialog = true">
                 $deleteIcon
               </v-icon>
@@ -21,7 +22,7 @@
       <v-dialog v-model="addForm" max-width="520">
         <v-card>
           <v-card-title>
-            Введите новую специальность/должность
+            Добавление
           </v-card-title>
           <v-card-text>
             <v-form ref="addForm">
@@ -39,9 +40,9 @@
       <v-dialog v-model="confirmDeleteDialog" max-width="500">
         <v-card>
           <v-card-title>
-            Удаление группы пользователей
+            Удаление
           </v-card-title>
-          <v-card-text>Вы действительно хотите удалить выбранную группу пользователей? Отменить это действие будет
+          <v-card-text>Вы действительно хотите удалить выбранный элемент? Отменить это действие будет
             невозможно
           </v-card-text>
           <v-card-actions>
@@ -88,12 +89,23 @@ export default {
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
-      if (this.table === 'profile') {
-        this.url = "time-tracking/profiles/positions"
-        this.title = 'Специальности профилей'
-      } else if (this.table === 'client') {
-        this.url = "time-tracking/clients-employees/positions"
-        this.title = 'Должности контактов'
+      switch (this.table) {
+        case 'profile':
+          this.url = "time-tracking/profiles/positions"
+          this.title = 'Специальности профилей'
+          break
+        case 'client':
+          this.url = "time-tracking/clients-employees/positions"
+          this.title = 'Должности контактов'
+          break
+        case 'cheque':
+          this.url = "time-tracking/cheque/categories"
+          this.title = 'Категории чеков'
+          break
+        case 'waybill':
+          this.url = "time-tracking/waybill/goal"
+          this.title = 'Цели для поездок'
+          break
       }
       this.loadData()
     } else {
@@ -106,7 +118,7 @@ export default {
         url: this.$hostname + this.url,
         type: "GET",
         success: (response) => {
-          this.positions = response.data.positions
+          this.positions = response.data.data
         },
         error: (response) => {
           console.log(response)

@@ -121,7 +121,7 @@ class PositionProfileView(APIView):
     def get(self, request):
         positions = PositionProfile.objects.all().order_by('name')
         serializer = PositionProfileSerializer(positions, many=True)
-        return Response({"positions": serializer.data})
+        return Response({"data": serializer.data})
 
     def post(self, request):
         serializer = PositionProfileSerializer(data=request.data)
@@ -583,7 +583,7 @@ class PositionClientView(APIView):
     def get(self, request):
         positions = PositionClient.objects.all().order_by('name')
         serializer = PositionClientSerializer(positions, many=True)
-        return Response({"positions": serializer.data})
+        return Response({"data": serializer.data})
 
     def post(self, request):
         serializer = PositionClientSerializer(data=request.data)
@@ -648,7 +648,7 @@ class ChequeCategoryView(APIView):
     def get(self, request):
         categories = ChequeCategory.objects.all().order_by('name')
         serializer = ChequeCategorySerializer(categories, many=True)
-        return Response({"categories": serializer.data})
+        return Response({"data": serializer.data})
 
     def post(self, request):
         serializer = ChequeCategorySerializer(data=request.data)
@@ -912,7 +912,7 @@ class WaybillGoalView(APIView):
     def get(self, request):
         goals = WaybillGoal.objects.all()
         serializer = WaybillGoalSerializer(goals, many=True)
-        return Response({"goals": serializer.data})
+        return Response({"data": serializer.data})
 
     def post(self, request):
         serializer = WaybillGoalSerializer(data=request.data)

@@ -5,7 +5,7 @@
       <div class="summary-box__title">
         <h1>{{ title }}</h1>
         <div class="addition-btn" @click="$router.push({name: 'Accounting', params: {type: type}})">
-          <span>К списку контактов</span>
+          <span>К списку документов</span>
           <back-icon/>
         </div>
       </div>

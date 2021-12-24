@@ -30,6 +30,24 @@
             <v-list-item-title>Должности контактов</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item v-if="$parent.$parent.admin"
+                     @click="$router.push({name: 'Positions',  params: {table: 'cheque'}})">
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Категории чеков</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="$parent.$parent.admin"
+                     @click="$router.push({name: 'Positions',  params: {table: 'waybill'}})">
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Цели поездок</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </section>
   </div>
