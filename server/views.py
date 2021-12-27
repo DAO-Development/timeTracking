@@ -932,8 +932,15 @@ class WaybillView(APIView):
     """Путевые листы"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        waybills = Waybill.objects.all()
+    def get(self, request, id=None):
+        if id is not None:
+            waybills = Waybill.objects.all().filter(pk=id)
+        else:
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+            waybills = Waybill.objects.all()
+            if 1 not in user.data['groups']:
+                waybills = waybills.filter(user_profile=user_profile)
         serializer = WaybillSerializer(waybills, many=True)
         return Response({"data": serializer.data})
 

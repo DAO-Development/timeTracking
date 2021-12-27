@@ -2,21 +2,59 @@
   <div class="waybill flex-content">
     <Header/>
     <section class="summary-box">
-      <h1>Путевые листы</h1>
-      <v-btn class="action-btn" color="primary" @click="addForm = true">Добавить</v-btn>
-      <v-data-table :headers="headers" :items="waybills" item-key="id">
-        <template v-slot:item.actions="{ item }">
-          <v-icon small @click="currentWaybill=item.id; confirmDeleteDialog=true">mdi-delete</v-icon>
-        </template>
-        <template v-slot:item.date="{ item }">
-            <span @click="$router.push({name: 'WaybillOpen', params: {id: item.id}})">
-              {{ item.date }}
-            </span>
-        </template>
-        <template v-slot:no-data>
-          Вы не заполнили ни одного путевого листа
-        </template>
-      </v-data-table>
+      <div class="summary-box__title">
+        <h1>Путевые листы</h1>
+        <div class="addition-btn" @click="$router.push({name: 'Waybill'})">
+          <span>К списку путевых листов</span>
+          <back-icon/>
+        </div>
+      </div>
+      <ul>
+        <li>
+          <span class="title">Дата</span>
+          <span class="content">{{ newWaybill.date }}</span>
+        </li>
+        <li>
+          <span class="title">Пункт отправления</span>
+          <span class="content">{{ newWaybill.departure }}</span>
+        </li>
+        <li>
+          <span class="title">Пункт назначения</span>
+          <span class="content">{{ newWaybill.destination }}</span>
+        </li>
+        <li>
+          <span class="title">Километраж</span>
+          <span class="content">{{ newWaybill.kilometrage }}</span>
+        </li>
+        <li>
+          <span class="title">Работник</span>
+          <span class="content">{{ newWaybill.user_profile.name }}
+            {{ newWaybill.user_profile.lastname }} ({{ newWaybill.user_profile.position.name }})</span>
+        </li>
+        <li>
+          <span class="title">Время</span>
+          <span class="content">{{ newWaybill.time_start }}-{{ newWaybill.time_end }}</span>
+        </li>
+        <li>
+          <span class="title">Цель поездки</span>
+          <span class="content">{{ newWaybill.goal.name }}</span>
+        </li>
+        <h3>Автомобиль</h3>
+        <li>
+          <span class="title">Марка</span>
+          <span class="content">{{ newWaybill.auto_mark }}</span>
+        </li>
+        <li>
+          <span class="title">Коробка</span>
+          <span class="content">{{ newWaybill.auto_type }}</span>
+        </li>
+        <li>
+          <span class="title">Топливо</span>
+          <span class="content">{{ newWaybill.auto_fuel }}</span>
+        </li>
+      </ul>
+      <v-btn class="action-btn" color="primary" @click="loadGoals; addForm = true">Редактировать</v-btn>
+      <v-btn class="action-btn" color="primary" @click="confirmDeleteDialog = true">Удалить</v-btn>
     </section>
     <v-dialog v-model="addForm">
       <v-card>
@@ -26,7 +64,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <h3>Добавление</h3>
+        <h3>Редактирование</h3>
         <v-card-text>
           <v-form ref="form" :model="newWaybill">
             <v-menu v-if="$parent.$parent.admin" v-model="menus.dateMenu" :close-on-content-click="false"
@@ -89,7 +127,7 @@
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn class="action-btn" color="primary" @click="addWaybill">Сохранить</v-btn>
+          <v-btn class="action-btn" color="primary" @click="putWaybill">Сохранить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -110,17 +148,21 @@
 </template>
 
 <script>
-import Header from "../components/Header";
+import Header from "../../components/Header";
 import $ from "jquery";
+import BackIcon from "../../components/icons/backIcon";
 
 export default {
-  name: "Waybill",
-  components: {Header},
+  name: "WaybillOpen",
+  components: {BackIcon, Header},
+  props: {
+    id: [String, Number]
+  },
   data() {
     return {
-      waybills: [],
       goals: [],
       newWaybill: {
+        id: 0,
         date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         departure: '',
         destination: '',
@@ -130,7 +172,12 @@ export default {
         goal: '',
         auto_mark: '',
         auto_type: '',
-        auto_fuel: ''
+        auto_fuel: '',
+        user_profile: {
+          name: '',
+          lastname: '',
+          position: {name: ''}
+        },
       },
       selectType: ['Автомат', 'Механика'],
       selectFuel: ['Дизель', 'Бензин', 'Электро'],
@@ -139,13 +186,6 @@ export default {
         timeStartMenu: false,
         timeEndMenu: false,
       },
-      headers: [
-        {text: 'Дата', value: 'date', align: 'start'},
-        {text: 'Пункт отправления', align: 'start', value: 'departure',},
-        {text: 'Пункт назначения', align: 'start', value: 'destination',},
-        {text: '', value: 'actions', sortable: false},
-      ],
-      currentWaybill: 0,
       addForm: false,
       confirmDeleteDialog: false,
       alertError: false,
@@ -173,10 +213,10 @@ export default {
   methods: {
     loadData() {
       $.ajax({
-        url: this.$hostname + "time-tracking/waybill",
+        url: this.$hostname + "time-tracking/waybill/" + this.id,
         type: "GET",
         success: (response) => {
-          this.waybills = response.data.data
+          this.newWaybill = response.data.data[0]
         },
         error: (response) => {
           if (response.status === 500) {
@@ -209,27 +249,15 @@ export default {
         }
       })
     },
-    addWaybill() {
+    putWaybill() {
       if (this.$refs.form.validate()) {
         $.ajax({
           url: this.$hostname + "time-tracking/waybill",
-          type: "POST",
+          type: "PUT",
           data: this.newWaybill,
           success: () => {
             this.loadData()
             this.addForm = false
-            this.newWaybill = {
-              date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-              departure: '',
-              destination: '',
-              kilometrage: '',
-              time_start: '',
-              time_end: '',
-              goal: '',
-              auto_mark: '',
-              auto_type: '',
-              auto_fuel: ''
-            }
           },
           error: (response) => {
             if (response.status === 500) {
@@ -249,11 +277,11 @@ export default {
         url: this.$hostname + "time-tracking/waybill",
         type: "DELETE",
         data: {
-          id: this.currentWaybill,
+          id: this.id,
         },
         success: () => {
-          this.loadData()
           this.confirmDeleteDialog = false
+          this.$router.push({name: 'Waybill'})
         },
         error: (response) => {
           if (response.status === 500) {

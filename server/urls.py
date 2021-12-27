@@ -45,6 +45,7 @@ urlpatterns = [
     path('accounting/documents-client/<int:mode_id>/<int:id>', DocumentsClientView.as_view()),
     path('waybill/goal', WaybillGoalView.as_view()),
     path('waybill', WaybillView.as_view()),
+    path('waybill/<int:id>', WaybillView.as_view()),
     path('offer', OfferView.as_view()),
 
     path('to-zip', ToZipView.as_view()),

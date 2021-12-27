@@ -20,6 +20,7 @@ import Positions from "../views/Positions";
 import Accounting from "../views/Accounting";
 import AccountingOpen from "../views/open/AccountingOpen";
 import Waybill from "../views/Waybill";
+import WaybillOpen from "../views/open/WaybillOpen";
 
 Vue.use(VueRouter)
 
@@ -120,12 +121,12 @@ const routes = [
         name: 'Waybill',
         component: Waybill
     },
-    // {
-    //     path: '/waybill/:id',
-    //     name: 'WaybillOpen',
-    //     component: Waybill,
-    //     props: true
-    // },
+    {
+        path: '/waybill/:id',
+        name: 'WaybillOpen',
+        component: WaybillOpen,
+        props: true
+    },
     {
         path: '/positions-:table',
         name: 'Positions',
