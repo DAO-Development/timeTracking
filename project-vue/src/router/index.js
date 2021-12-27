@@ -19,6 +19,7 @@ import WorkerOpen from "../views/open/WorkerOpen";
 import Positions from "../views/Positions";
 import Accounting from "../views/Accounting";
 import AccountingOpen from "../views/open/AccountingOpen";
+import Waybill from "../views/Waybill";
 
 Vue.use(VueRouter)
 
@@ -114,6 +115,17 @@ const routes = [
         name: 'Groups',
         component: Groups
     },
+    {
+        path: '/waybill',
+        name: 'Waybill',
+        component: Waybill
+    },
+    // {
+    //     path: '/waybill/:id',
+    //     name: 'WaybillOpen',
+    //     component: Waybill,
+    //     props: true
+    // },
     {
         path: '/positions-:table',
         name: 'Positions',

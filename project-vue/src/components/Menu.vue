@@ -145,7 +145,7 @@
               </v-list-item-content>
             </v-list-item>
             <v-list-item>
-              <v-list-item-content>
+              <v-list-item-content @click="$router.push({name: 'Waybill'})">
                 <v-list-item-title>Путевые листы</v-list-item-title>
               </v-list-item-content>
             </v-list-item>

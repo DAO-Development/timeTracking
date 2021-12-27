@@ -63,12 +63,14 @@
 
 <script>
 import $ from "jquery";
+import Header from "../components/Header";
 
 export default {
   name: "Positions",
   props: {
     table: String
   },
+  components: {Header},
   data() {
     return {
       title: '',

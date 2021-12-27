@@ -938,7 +938,21 @@ class WaybillView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = WaybillPostSerializer(data=request.data)
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+        serializer = WaybillPostSerializer(data={
+            'date': request.data['date'],
+            'departure': request.data['departure'],
+            'destination': request.data['destination'],
+            'kilometrage': request.data['kilometrage'],
+            'time_start': request.data['time_start'],
+            'time_end': request.data['time_end'],
+            'goal': request.data['goal'],
+            'auto_mark': request.data['auto_mark'],
+            'auto_type': request.data['auto_type'],
+            'auto_fuel': request.data['auto_fuel'],
+            'user_profile': user_profile
+        })
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
