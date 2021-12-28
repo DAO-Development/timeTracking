@@ -21,6 +21,8 @@ import Accounting from "../views/Accounting";
 import AccountingOpen from "../views/open/AccountingOpen";
 import Waybill from "../views/Waybill";
 import WaybillOpen from "../views/open/WaybillOpen";
+import Purchases from "../views/Purchases";
+import PurchaseOpen from "../views/open/PurchaseOpen";
 
 Vue.use(VueRouter)
 
@@ -128,6 +130,17 @@ const routes = [
         props: true
     },
     {
+        path: '/purchases',
+        name: 'Purchases',
+        component: Purchases
+    },
+    {
+        path: '/purchases/:id',
+        name: 'PurchaseOpen',
+        component: PurchaseOpen,
+        props: true
+    },
+    {
         path: '/positions-:table',
         name: 'Positions',
         component: Positions,
@@ -146,12 +159,6 @@ const routes = [
         props: true
     },
     {
-        path: '/:table',
-        name: 'IntegerField',
-        component: Positions,
-        props: true
-    },
-    {
         path: '/accounting/:type',
         name: 'Accounting',
         component: Accounting,
@@ -161,6 +168,12 @@ const routes = [
         path: '/accounting/:type/:id',
         name: 'AccountingOpen',
         component: AccountingOpen,
+        props: true
+    },
+    {
+        path: '/:table',
+        name: 'IntegerField',
+        component: Positions,
         props: true
     },
 ]

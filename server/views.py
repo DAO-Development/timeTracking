@@ -70,6 +70,16 @@ class UserView(APIView):
         return Response(status=204)
 
 
+class ActiveProfilesView(APIView):
+    """Получение списка работников, активные профили"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user_profile = UserProfile.objects.all().filter(active=True).order_by('lastname').order_by('name')
+        serializer = UserProfileSerializer(user_profile, many=True)
+        return Response({"data": serializer.data})
+
+
 class ProfilesView(APIView):
     """Получение списка работников, профили"""
     permission_classes = [permissions.IsAuthenticated]

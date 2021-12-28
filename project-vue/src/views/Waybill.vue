@@ -29,7 +29,7 @@
         <h3>Добавление</h3>
         <v-card-text>
           <v-form ref="form" :model="newWaybill">
-            <v-menu v-if="$parent.$parent.admin" v-model="menus.dateMenu" :close-on-content-click="false"
+            <v-menu ref="dateMenu" v-if="$parent.$parent.admin" v-model="menus.dateMenu" :close-on-content-click="false"
                     :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field v-model="newWaybill.date" label="Дата поездки" readonly v-bind="attrs"
@@ -89,6 +89,7 @@
           </v-form>
         </v-card-text>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="addWaybill">Сохранить</v-btn>
         </v-card-actions>
       </v-card>

@@ -8,6 +8,7 @@ urlpatterns = [
     path('user', UserView.as_view()),
     path('user-groups', UserGroupsView.as_view()),
     path('profiles', ProfilesView.as_view()),
+    path('profiles/active', ActiveProfilesView.as_view()),
     path('profiles/positions', PositionProfileView.as_view()),
     path('profiles/<int:id>', ProfilesView.as_view()),
     path('group', GroupView.as_view()),
