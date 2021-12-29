@@ -7,7 +7,25 @@
       <div class="purchases__content">
         <template v-for="cheque in purchases">
           <div class="purchases-single" :key="cheque.id">
-            {{ cheque }}
+            <v-img width="50" height="50" v-if="photos[cheque.id]" :src="$hostname+'media'+photos[cheque.id][0].path"></v-img>
+            <div class="purchases-single__btns">
+              <v-btn float color="primary">
+                <v-icon>mdi-format-list-bulleted-square</v-icon>
+              </v-btn>
+              <v-btn float color="primary">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn float color="primary">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </div>
+            <ul>
+              <li>Способ оплаты: {{ cheque.payment_method }}</li>
+              <li>Налог: {{ cheque.tax.tax }}</li>
+              <li>Дата покупки: {{ cheque.date }}</li>
+              <li>Место покупки: {{ cheque.place }}</li>
+              <li>Категория: {{ cheque.category.name }}</li>
+            </ul>
           </div>
         </template>
       </div>
@@ -23,49 +41,65 @@
         <h3>Добавление</h3>
         <v-card-text>
           <v-form ref="form" :model="newPurchase">
-            <v-autocomplete v-if="$parent.$parent.admin" v-model="newPurchase.user_profile"
+            <v-autocomplete v-if="$parent.$parent.admin" v-model="newPurchase.user_profile" outlined
                             label="Ответственный" :items="users" item-text="label" item-value="id"></v-autocomplete>
-            <v-menu v-model="menus.dateReceiptMenu" :close-on-content-click="false" :nudge-right="40"
-                    transition="scale-transition" offset-y min-width="auto">
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field v-model="newPurchase.date_receipt" label="Дата получения" readonly v-bind="attrs"
-                              v-on="on" outlined></v-text-field>
-              </template>
-              <v-date-picker v-model="newPurchase.date_receipt" @input="menus.dateReceiptMenu = false"></v-date-picker>
-            </v-menu>
-            <v-menu v-model="menus.dateMenu" :close-on-content-click="false" :nudge-right="40"
-                    transition="scale-transition" offset-y min-width="auto">
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field v-model="newPurchase.date" label="Дата покупки" readonly v-bind="attrs"
-                              v-on="on" outlined></v-text-field>
-              </template>
-              <v-date-picker v-model="newPurchase.date" @input="menus.dateMenu = false"></v-date-picker>
-            </v-menu>
-            <v-autocomplete v-model="newPurchase.category" :items="categories" item-text="name" item-value="id"
-                            label="Категория" :rules="reqRules" required outlined>
-              <template v-slot:no-data>
-                <v-list-item>
-                  <v-list-item-title>
-                    Категория не найдена
-                  </v-list-item-title>
-                </v-list-item>
-              </template>
-            </v-autocomplete>
-            <v-autocomplete v-model="newPurchase.tax" :items="taxes" item-text="tax" item-value="id"
-                            label="Налог" :rules="reqRules" required outlined>
-              <template v-slot:no-data>
-                <v-list-item>
-                  <v-list-item-title>
-                    Налог не найден
-                  </v-list-item-title>
-                </v-list-item>
-              </template>
-            </v-autocomplete>
+            <v-row>
+              <v-autocomplete v-model="newPurchase.category" :items="categories" item-text="name" item-value="id"
+                              label="Категория" :rules="reqRules" required outlined>
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-title>
+                      Категория не найдена
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+              <v-autocomplete v-model="newPurchase.tax" :items="taxes" item-text="tax" item-value="id"
+                              label="Налог" :rules="reqRules" required outlined>
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-title>
+                      Налог не найден
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </v-row>
+            <v-select v-model="newPurchase.payment_method" label="Способ оплаты"
+                      :items="['Банковская карта', 'Банковский перевод', 'Наличные']" outlined></v-select>
+            <v-text-field v-model="newPurchase.number" label="Номер счета" :rules="reqRules" required
+                          outlined></v-text-field>
+            <v-row>
+              <v-menu v-model="menus.dateReceiptMenu" :close-on-content-click="false" :nudge-right="40"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newPurchase.date_receipt" label="Дата получения" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="newPurchase.date_receipt"
+                               @input="menus.dateReceiptMenu = false"></v-date-picker>
+              </v-menu>
+              <v-menu v-model="menus.dateMenu" :close-on-content-click="false" :nudge-right="40"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newPurchase.date" label="Дата покупки" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="newPurchase.date" @input="menus.dateMenu = false"></v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-text-field v-model="newPurchase.place" label="Место покупки" :rules="reqRules" required
+                          outlined></v-text-field>
+            <v-text-field type="number" v-model="newPurchase.price" label="Сумма покупок" :rules="reqRules"
+                          required outlined></v-text-field>
+            <v-select v-model="newPurchase.bundle" label="Набор чеков" :items="['Один чек', '2 и более']"
+                      outlined></v-select>
+            <v-textarea v-model="newPurchase.comment" label="Заметки" outlined></v-textarea>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="action-btn" color="primary" @click="addWaybill">Сохранить</v-btn>
+          <v-btn class="action-btn" color="primary" @click="addPurchase">Сохранить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -99,6 +133,7 @@ export default {
       taxes: [],
       categories: [],
       users: [],
+      photos: [],
       newPurchase: {
         id: 0,
         user_profile: '',
@@ -151,6 +186,7 @@ export default {
         type: "GET",
         success: (response) => {
           this.purchases = response.data.data
+          this.photos = response.data.photos
         },
         error: (response) => {
           if (response.status === 500) {
@@ -225,7 +261,40 @@ export default {
       })
     },
     addPurchase() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/purchases",
+        type: "POST",
+        data: this.newPurchase,
+        success: () => {
+          this.loadData()
+          this.addForm = false
+          this.newPurchase = {
+            id: 0,
+            user_profile: '',
+            date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            date_receipt: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            category: '',
+            tax: '',
+            payment_method: '',
+            number: '',
+            place: '',
+            price: '',
+            bundle: '',
+            comment: '',
+            photo: '',
+          }
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
     },
     deletePurchase() {
 

@@ -334,8 +334,10 @@ class Sales(models.Model):
 class ChequeDocuments(models.Model):
     """Фото/pdf чеков"""
     path = models.CharField(verbose_name="Путь к файлу", max_length=250)
-    purchases = models.ForeignKey("Purchases", on_delete=models.CASCADE, verbose_name="Покупка", null=True, blank=True)
-    sales = models.ForeignKey("Sales", on_delete=models.CASCADE, verbose_name="Покупка", null=True, blank=True)
+    purchases = models.ForeignKey("Purchases", on_delete=models.CASCADE, related_name="photos", verbose_name="Покупка",
+                                  null=True, blank=True)
+    sales = models.ForeignKey("Sales", on_delete=models.CASCADE, related_name="photos", verbose_name="Покупка",
+                              null=True, blank=True)
 
     class Meta:
         db_table = "cheque_documents"

@@ -286,6 +286,14 @@ class TaxSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ChequeDocumentsSerializer(serializers.ModelSerializer):
+    """Сериализация фото чеков"""
+
+    class Meta:
+        model = ChequeDocuments
+        fields = '__all__'
+
+
 class PurchasesSerializer(serializers.ModelSerializer):
     """Сериализация покупок"""
 
@@ -323,24 +331,6 @@ class SalesPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sales
-        fields = '__all__'
-
-
-class ChequeDocumentsSerializer(serializers.ModelSerializer):
-    """Сериализация фото чеков"""
-    sales = SalesSerializer()
-    purchases = PurchasesSerializer()
-
-    class Meta:
-        model = ChequeDocuments
-        fields = '__all__'
-
-
-class ChequeDocumentsPostSerializer(serializers.ModelSerializer):
-    """Сериализация фото чеков для POST-запросов"""
-
-    class Meta:
-        model = ChequeDocuments
         fields = '__all__'
 
 

@@ -726,8 +726,13 @@ class PurchasesView(APIView):
 
     def get(self, request):
         purchases = Purchases.objects.all()
+        photos = {}
+        for item in purchases:
+            docs = ChequeDocuments.objects.filter(purchases=item.id)
+            docs_serializer = ChequeDocumentsSerializer(docs, many=True)
+            photos.update({item.id: docs_serializer.data})
         serializer = PurchasesSerializer(purchases, many=True)
-        return Response({"data": serializer.data})
+        return Response({"data": serializer.data, "photos": photos})
 
     def post(self, request):
         serializer = PurchasesPostSerializer(data=request.data)
