@@ -109,7 +109,7 @@
                 <v-list-item-title>Бухгалтерия</v-list-item-title>
               </v-list-item-content>
             </template>
-            <v-list-item>
+            <v-list-item @click="$router.push({name: 'Purchases'})">
               <v-list-item-content>
                 <v-list-item-title>Покупки</v-list-item-title>
               </v-list-item-content>
