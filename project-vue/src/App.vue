@@ -16,8 +16,8 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
-// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 // Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
