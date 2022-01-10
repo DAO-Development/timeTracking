@@ -95,7 +95,7 @@
                           required outlined></v-text-field>
             <v-select v-model="newPurchase.bundle" label="Набор чеков" :items="['Один чек', '2 и более']"
                       outlined></v-select>
-            <v-file-input v-if="formTitle === 'Добавление'" v-model="photos" multiple counter
+            <v-file-input v-if="formTitle === 'Добавление'" v-model="newPhotos" multiple counter
                           label="Фото или документы" outlined prepend-icon=""></v-file-input>
             <v-textarea v-model="newPurchase.comment" label="Заметки" outlined></v-textarea>
           </v-form>
@@ -152,6 +152,7 @@ export default {
         comment: '',
         photo: '',
       },
+      newPhotos: '',
       currentPurchase: 0,
       menus: {
         dateMenu: false,
@@ -304,7 +305,7 @@ export default {
       // чтение файла в formData
       let fd = new FormData();
       let i = 0
-      this.photo.forEach(doc => {
+      this.newPhotos.forEach(doc => {
         i++
         fd.append('document' + i, doc)
       })

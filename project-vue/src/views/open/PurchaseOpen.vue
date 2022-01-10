@@ -2,8 +2,24 @@
   <div class="purchases flex-content">
     <Header/>
     <section class="summary-box">
-      <h1>Покупки</h1>
+      <div class="summary-box__title">
+        <h1>Покупки</h1>
+        <div class="addition-btn" @click="$router.push({name: 'Purchases'})">
+          <span>К списку чеков</span>
+          <back-icon/>
+        </div>
+      </div>
       <div class="purchases__content">
+        <div v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1" class="open__actions">
+          <div class="addition-btn">
+            <edit-icon/>
+            Редактировать
+          </div>
+          <div class="addition-btn" @click="confirmDeletePhotoDialog = true">
+            <waste-icon/>
+            Удалить
+          </div>
+        </div>
         <div>Ответственный: {{ currentPurchase.user_profile.last_name }} {{ currentPurchase.user_profile.name }}</div>
         <div class="document_date">Дата получения: {{ currentPurchase.date_receipt }}</div>
         <div class="document_date">Дата покупки: {{ currentPurchase.date }}</div>
@@ -17,17 +33,22 @@
         <div>Заметки: {{ currentPurchase.comment }}</div>
 
         <strong>Документы:</strong>
-        <ul class="documents">
+        <v-list class="documents">
           <template v-for="item in photos">
-            <li @click="downloadFile(item.path)" :key="item.id">
-              <a>{{ item.path.substr(item.path.lastIndexOf("/") + 1) }}</a>
-            </li>
-            <v-img :key="item.id"
+            <v-list-item :key="item.id">
+              <a @click="downloadFile(item.path)">{{ item.path.substr(item.path.lastIndexOf("/") + 1) }}</a>
+              <v-list-item-action>
+                <v-icon color="grey lighten-1" @click="photoId = item.id; confirmDeletePhotoDialog = true">
+                  mdi-close
+                </v-icon>
+              </v-list-item-action>
+            </v-list-item>
+            <v-img :key="item.path"
                    v-if="item.path.substr(item.path.lastIndexOf('.') + 1).toLowerCase() === 'jpg' || item.path.substr(item.path.lastIndexOf('.') + 1).toLowerCase() === 'png'"
                    width="200" height="200" :src="$hostname+'media'+item.path"></v-img>
 
           </template>
-        </ul>
+        </v-list>
         <!--        <v-btn class="action-btn" color="primary" @click="downloadAll">Скачать все файлы</v-btn>-->
       </div>
     </section>
@@ -88,30 +109,47 @@
     <!--        </v-card-actions>-->
     <!--      </v-card>-->
     <!--    </v-dialog>-->
-    <!--    <v-dialog v-model="confirmDeleteDialog" max-width="500">-->
-    <!--      <v-card>-->
-    <!--        <v-card-title>-->
-    <!--          Удаление чеков-->
-    <!--        </v-card-title>-->
-    <!--        <v-card-text>Вы действительно хотите удалить выбранные чеки? Отменить это действие будет невозможно-->
-    <!--        </v-card-text>-->
-    <!--        <v-card-actions>-->
-    <!--          <v-spacer></v-spacer>-->
-    <!--          <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>-->
-    <!--          <v-btn color="primary" text @click="deletePurchase">Подтвердить</v-btn>-->
-    <!--        </v-card-actions>-->
-    <!--      </v-card>-->
-    <!--    </v-dialog>-->
+    <v-dialog v-model="confirmDeleteDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Удаление чеков
+        </v-card-title>
+        <v-card-text>Вы действительно хотите удалить выбранные чеки? Отменить это действие будет невозможно
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>
+          <v-btn color="primary" text @click="deletePurchase">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="confirmDeletePhotoDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Удаление докуметов
+        </v-card-title>
+        <v-card-text>Вы действительно хотите удалить выбранный документ? Отменить это действие будет невозможно
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmDeletePhotoDialog = false">Отменить</v-btn>
+          <v-btn color="primary" text @click="deleteChequeDocument">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import Header from "../../components/Header";
 import $ from "jquery";
+import BackIcon from "../../components/icons/backIcon";
+import EditIcon from "../../components/icons/editIcon";
+import WasteIcon from "../../components/icons/wasteIcon";
 
 export default {
   name: "PurchaseOpen",
-  components: {Header},
+  components: {WasteIcon, EditIcon, BackIcon, Header},
   props: {
     id: [String, Number],
   },
@@ -136,12 +174,14 @@ export default {
         comment: '',
         photo: '',
       },
+      photoId: 0,
       menus: {
         dateMenu: false,
         dateReceiptMenu: false,
       },
       addForm: false,
       confirmDeleteDialog: false,
+      confirmDeletePhotoDialog: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
@@ -152,7 +192,6 @@ export default {
       ],
     }
   },
-
   created() {
     console.log("init Purchases open")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
@@ -266,6 +305,52 @@ export default {
         fileLink.click();
       });
     },
+    deletePurchase() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/purchases",
+        type: "DELETE",
+        data: {
+          id: this.id
+        },
+        success: () => {
+          this.loadData()
+          this.confirmDeleteDialog = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    deleteChequeDocument() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/documents",
+        type: "DELETE",
+        data: {
+          id: this.photoId
+        },
+        success: () => {
+          this.loadData()
+          this.confirmDeletePhotoDialog = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    }
   }
 }
 </script>
