@@ -724,8 +724,10 @@ class PurchasesView(APIView):
     """Покупки"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, id=None):
         purchases = Purchases.objects.all()
+        if id is not None:
+            purchases = purchases.filter(id=id)
         photos = {}
         for item in purchases:
             docs = ChequeDocuments.objects.filter(purchases=item.id)
@@ -738,7 +740,7 @@ class PurchasesView(APIView):
         serializer = PurchasesPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=201)
+            return Response({"id": serializer.data['id']}, status=201)
         else:
             return Response(status=400)
 
@@ -799,12 +801,23 @@ class ChequeDocumentsView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = ChequeDocumentsPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
-        else:
-            return Response(status=400)
+        if len(request.FILES) >= 0:
+            for i in range(1, len(request.FILES) + 1):
+                name = '/cheque/' + request.FILES['document' + str(i)].name
+                with open('media' + name, 'wb+') as destination:
+                    for chunk in request.FILES['document' + str(i)].chunks():
+                        destination.write(chunk)
+                data = {
+                    "path": name,
+                    "sales": request.data['sales'],
+                    "purchases": request.data['purchases'],
+                }
+                serializer = ChequeDocumentsSerializer(data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    return Response(status=400)
+        return Response(status=201)
 
     def delete(self, request):
         saved = get_object_or_404(ChequeDocuments.objects.all(), id=request.data["id"])

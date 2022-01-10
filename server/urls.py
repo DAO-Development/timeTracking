@@ -35,6 +35,7 @@ urlpatterns = [
     path('cheque/categories', ChequeCategoryView.as_view()),
     path('cheque/sales', SalesView.as_view()),
     path('cheque/purchases', PurchasesView.as_view()),
+    path('cheque/purchases/<int:id>', PurchasesView.as_view()),
     path('cheque/documents', ChequeDocumentsView.as_view()),
     path('accounting/terms', TermView.as_view()),
     path('accounting/taxes', TaxView.as_view()),

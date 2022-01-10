@@ -3,17 +3,17 @@
     <Header/>
     <section class="summary-box">
       <h1>Покупки</h1>
-      <v-btn class="action-btn" color="primary" @click="addForm = true">Добавить</v-btn>
+      <v-btn class="action-btn" color="primary" @click="formTitle='Добавление'; addForm = true">Добавить</v-btn>
       <div class="purchases__content">
         <template v-for="cheque in purchases">
           <div class="purchases-single" :key="cheque.id">
             <v-img width="50" height="50" v-if="photos[cheque.id].length !== 0"
                    :src="$hostname+'media'+photos[cheque.id][0].path"></v-img>
             <div class="purchases-single__btns">
-              <v-btn float color="primary">
+              <v-btn float color="primary" @click="$router.push({name: 'PurchaseOpen', params: {id: cheque.id}})">
                 <v-icon>mdi-format-list-bulleted-square</v-icon>
               </v-btn>
-              <v-btn float color="primary" @click="newPurchase=cheque; addForm=true">
+              <v-btn float color="primary" @click="formTitle='Редактирование'; newPurchase=cheque; addForm=true">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
               <v-btn float color="primary" @click="currentPurchase = cheque.id; confirmDeleteDialog = true">
@@ -39,7 +39,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <h3>Добавление</h3>
+        <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-form ref="form" :model="newPurchase">
             <v-autocomplete v-if="$parent.$parent.admin" v-model="newPurchase.user_profile" outlined
@@ -91,10 +91,12 @@
             </v-row>
             <v-text-field v-model="newPurchase.place" label="Место покупки" :rules="reqRules" required
                           outlined></v-text-field>
-            <v-text-field type="number" v-model="newPurchase.price" label="Сумма покупок" :rules="reqRules"
+            <v-text-field type="number" v-model="newPurchase.price" label="Сумма покупок" :rules="numRules"
                           required outlined></v-text-field>
             <v-select v-model="newPurchase.bundle" label="Набор чеков" :items="['Один чек', '2 и более']"
                       outlined></v-select>
+            <v-file-input v-if="formTitle === 'Добавление'" v-model="photos" multiple counter
+                          label="Фото или документы" outlined prepend-icon=""></v-file-input>
             <v-textarea v-model="newPurchase.comment" label="Заметки" outlined></v-textarea>
           </v-form>
         </v-card-text>
@@ -155,12 +157,16 @@ export default {
         dateMenu: false,
         dateReceiptMenu: false,
       },
+      formTitle: 'Добавление',
       addForm: false,
       confirmDeleteDialog: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
         v => !!v || 'Необходимо заполнить поле'
+      ],
+      numRules: [
+        v => v >= 0 || 'Необходимо заполнить поле'
       ],
     }
   },
@@ -263,32 +269,17 @@ export default {
       })
     },
     addPurchase() {
-      if (this.$refs.form.validate())
+      if (this.$refs.form.validate()) {
         if (this.newPurchase.id !== 0)
           this.putPurchase()
-        else
+        else {
           $.ajax({
             url: this.$hostname + "time-tracking/cheque/purchases",
             type: "POST",
             data: this.newPurchase,
-            success: () => {
-              this.loadData()
-              this.addForm = false
-              this.newPurchase = {
-                id: 0,
-                user_profile: '',
-                date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-                date_receipt: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-                category: '',
-                tax: '',
-                payment_method: '',
-                number: '',
-                place: '',
-                price: '',
-                bundle: '',
-                comment: '',
-                photo: '',
-              }
+            success: (request) => {
+              console.log("добавление покупки")
+              this.addChequeDocuments(request.data.id)
             },
             error: (response) => {
               if (response.status === 500) {
@@ -301,10 +292,49 @@ export default {
               this.alertError = true
             }
           })
-      else {
+        }
+      } else {
         this.alertMsg = "Заполните все необходимые поля"
         this.alertError = true
       }
+    },
+    addChequeDocuments(id) {
+      console.log("добавление фото")
+      const axios = require('axios')
+      // чтение файла в formData
+      let fd = new FormData();
+      let i = 0
+      this.photo.forEach(doc => {
+        i++
+        fd.append('document' + i, doc)
+      })
+      fd.append('sales', '')
+      fd.append('purchases', id)
+      axios({
+        method: 'post',
+        url: this.$hostname + "time-tracking/cheque/documents",
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
+      })
+          .then(() => {
+            this.loadData()
+            this.addForm = false
+            this.newPurchase = {
+              id: 0,
+              user_profile: '',
+              date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+              date_receipt: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+              category: '',
+              tax: '',
+              payment_method: '',
+              number: '',
+              place: '',
+              price: '',
+              bundle: '',
+              comment: '',
+              photo: '',
+            }
+          });
     },
     putPurchase() {
       if (this.$refs.form.validate())
@@ -375,5 +405,9 @@ export default {
 </script>
 
 <style scoped>
-
+.purchases__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 20px;
+}
 </style>
