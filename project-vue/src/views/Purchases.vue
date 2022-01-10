@@ -7,15 +7,16 @@
       <div class="purchases__content">
         <template v-for="cheque in purchases">
           <div class="purchases-single" :key="cheque.id">
-            <v-img width="50" height="50" v-if="photos[cheque.id]" :src="$hostname+'media'+photos[cheque.id][0].path"></v-img>
+            <v-img width="50" height="50" v-if="photos[cheque.id].length !== 0"
+                   :src="$hostname+'media'+photos[cheque.id][0].path"></v-img>
             <div class="purchases-single__btns">
               <v-btn float color="primary">
                 <v-icon>mdi-format-list-bulleted-square</v-icon>
               </v-btn>
-              <v-btn float color="primary">
+              <v-btn float color="primary" @click="newPurchase=cheque; addForm=true">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn float color="primary">
+              <v-btn float color="primary" @click="currentPurchase = cheque.id; confirmDeleteDialog = true">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </div>
@@ -149,6 +150,7 @@ export default {
         comment: '',
         photo: '',
       },
+      currentPurchase: 0,
       menus: {
         dateMenu: false,
         dateReceiptMenu: false,
@@ -261,28 +263,100 @@ export default {
       })
     },
     addPurchase() {
+      if (this.$refs.form.validate())
+        if (this.newPurchase.id !== 0)
+          this.putPurchase()
+        else
+          $.ajax({
+            url: this.$hostname + "time-tracking/cheque/purchases",
+            type: "POST",
+            data: this.newPurchase,
+            success: () => {
+              this.loadData()
+              this.addForm = false
+              this.newPurchase = {
+                id: 0,
+                user_profile: '',
+                date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+                date_receipt: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+                category: '',
+                tax: '',
+                payment_method: '',
+                number: '',
+                place: '',
+                price: '',
+                bundle: '',
+                comment: '',
+                photo: '',
+              }
+            },
+            error: (response) => {
+              if (response.status === 500) {
+                this.alertMsg = "Ошибка соединения с сервером"
+              } else if (response.status === 401) {
+                this.$refresh()
+              } else {
+                this.alertMsg = "Непредвиденная ошибка"
+              }
+              this.alertError = true
+            }
+          })
+      else {
+        this.alertMsg = "Заполните все необходимые поля"
+        this.alertError = true
+      }
+    },
+    putPurchase() {
+      if (this.$refs.form.validate())
+        $.ajax({
+          url: this.$hostname + "time-tracking/cheque/purchases",
+          type: "PUT",
+          data: this.newPurchase,
+          success: () => {
+            this.loadData()
+            this.addForm = false
+            this.newPurchase = {
+              id: 0,
+              user_profile: '',
+              date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+              date_receipt: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+              category: '',
+              tax: '',
+              payment_method: '',
+              number: '',
+              place: '',
+              price: '',
+              bundle: '',
+              comment: '',
+              photo: '',
+            }
+          },
+          error: (response) => {
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          }
+        })
+      else {
+        this.alertMsg = "Заполните все необходимые поля"
+        this.alertError = true
+      }
+    },
+    deletePurchase() {
       $.ajax({
         url: this.$hostname + "time-tracking/cheque/purchases",
-        type: "POST",
-        data: this.newPurchase,
+        type: "DELETE",
+        data: {
+          id: this.currentPurchase
+        },
         success: () => {
           this.loadData()
-          this.addForm = false
-          this.newPurchase = {
-            id: 0,
-            user_profile: '',
-            date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-            date_receipt: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-            category: '',
-            tax: '',
-            payment_method: '',
-            number: '',
-            place: '',
-            price: '',
-            bundle: '',
-            comment: '',
-            photo: '',
-          }
+          this.confirmDeleteDialog = false
         },
         error: (response) => {
           if (response.status === 500) {
@@ -295,9 +369,6 @@ export default {
           this.alertError = true
         }
       })
-    },
-    deletePurchase() {
-
     },
   }
 }
