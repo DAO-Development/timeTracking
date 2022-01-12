@@ -11,7 +11,7 @@
       </div>
       <div class="purchases__content">
         <div v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1" class="open__actions">
-          <div class="addition-btn">
+          <div class="addition-btn" @click="addForm=true">
             <edit-icon/>
             Редактировать
           </div>
@@ -20,7 +20,7 @@
             Удалить
           </div>
         </div>
-        <div>Ответственный: {{ currentPurchase.user_profile.last_name }} {{ currentPurchase.user_profile.name }}</div>
+        <div>Ответственный: {{ currentPurchase.user_profile.lastname }} {{ currentPurchase.user_profile.name }}</div>
         <div class="document_date">Дата получения: {{ currentPurchase.date_receipt }}</div>
         <div class="document_date">Дата покупки: {{ currentPurchase.date }}</div>
         <div>Категория: {{ currentPurchase.category.name }}</div>
@@ -57,63 +57,79 @@
         <!--        <v-btn class="action-btn" color="primary" @click="downloadAll">Скачать все файлы</v-btn>-->
       </div>
     </section>
-    <!--    <v-dialog v-model="addForm">-->
-    <!--      <v-card>-->
-    <!--        <v-toolbar flat>-->
-    <!--          <v-spacer></v-spacer>-->
-    <!--          <v-btn icon @click="addForm = false">-->
-    <!--            <v-icon>mdi-close</v-icon>-->
-    <!--          </v-btn>-->
-    <!--        </v-toolbar>-->
-    <!--        <h3>Добавление</h3>-->
-    <!--        <v-card-text>-->
-    <!--          <v-form ref="form" :model="newPurchase">-->
-    <!--            <v-autocomplete v-if="$parent.$parent.admin" v-model="newPurchase.user_profile"-->
-    <!--                            label="Ответственный" :items="users" item-text="label" item-value="id"></v-autocomplete>-->
-    <!--            <v-menu v-model="menus.dateReceiptMenu" :close-on-content-click="false" :nudge-right="40"-->
-    <!--                    transition="scale-transition" offset-y min-width="auto">-->
-    <!--              <template v-slot:activator="{ on, attrs }">-->
-    <!--                <v-text-field v-model="newPurchase.date_receipt" label="Дата покупки" readonly v-bind="attrs"-->
-    <!--                              v-on="on" outlined></v-text-field>-->
-    <!--              </template>-->
-    <!--              <v-date-picker v-model="newPurchase.date_receipt" @input="menus.dateReceiptMenu = false"></v-date-picker>-->
-    <!--            </v-menu>-->
-    <!--            <v-menu v-model="menus.dateMenu" :close-on-content-click="false" :nudge-right="40"-->
-    <!--                    transition="scale-transition" offset-y min-width="auto">-->
-    <!--              <template v-slot:activator="{ on, attrs }">-->
-    <!--                <v-text-field v-model="newPurchase.date" label="Дата покупки" readonly v-bind="attrs"-->
-    <!--                              v-on="on" outlined></v-text-field>-->
-    <!--              </template>-->
-    <!--              <v-date-picker v-model="newPurchase.date" @input="menus.dateMenu = false"></v-date-picker>-->
-    <!--            </v-menu>-->
-    <!--            <v-autocomplete v-model="newPurchase.category" :items="categories" item-text="name" item-value="id"-->
-    <!--                            label="Категория" :rules="reqRules" required outlined>-->
-    <!--              <template v-slot:no-data>-->
-    <!--                <v-list-item>-->
-    <!--                  <v-list-item-title>-->
-    <!--                    Категория не найдена-->
-    <!--                  </v-list-item-title>-->
-    <!--                </v-list-item>-->
-    <!--              </template>-->
-    <!--            </v-autocomplete>-->
-    <!--            <v-autocomplete v-model="newPurchase.tax" :items="taxes" item-text="tax" item-value="id"-->
-    <!--                            label="Налог" :rules="reqRules" required outlined>-->
-    <!--              <template v-slot:no-data>-->
-    <!--                <v-list-item>-->
-    <!--                  <v-list-item-title>-->
-    <!--                    Налог не найден-->
-    <!--                  </v-list-item-title>-->
-    <!--                </v-list-item>-->
-    <!--              </template>-->
-    <!--            </v-autocomplete>-->
-    <!--          </v-form>-->
-    <!--        </v-card-text>-->
-    <!--        <v-card-actions>-->
-    <!--          <v-spacer></v-spacer>-->
-    <!--          <v-btn class="action-btn" color="primary" @click="addWaybill">Сохранить</v-btn>-->
-    <!--        </v-card-actions>-->
-    <!--      </v-card>-->
-    <!--    </v-dialog>-->
+    <v-dialog v-model="addForm">
+      <v-card>
+        <v-toolbar flat>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="addForm = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <h3>Редактирование</h3>
+        <v-card-text>
+          <v-form ref="form" :model="currentPurchase">
+            <v-autocomplete v-if="$parent.$parent.admin" v-model="currentPurchase.user_profile" outlined
+                            label="Ответственный" :items="users" item-text="label" item-value="id"></v-autocomplete>
+            <v-row>
+              <v-autocomplete v-model="currentPurchase.category" :items="categories" item-text="name" item-value="id"
+                              label="Категория" :rules="reqRules" required outlined>
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-title>
+                      Категория не найдена
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+              <v-autocomplete v-model="currentPurchase.tax" :items="taxes" item-text="tax" item-value="id"
+                              label="Налог" :rules="reqRules" required outlined>
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-title>
+                      Налог не найден
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </v-row>
+            <v-select v-model="currentPurchase.payment_method" label="Способ оплаты"
+                      :items="['Банковская карта', 'Банковский перевод', 'Наличные']" outlined></v-select>
+            <v-text-field v-model="currentPurchase.number" label="Номер счета" :rules="reqRules" required
+                          outlined></v-text-field>
+            <v-row>
+              <v-menu v-model="menus.dateReceiptMenu" :close-on-content-click="false" :nudge-right="40"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="currentPurchase.date_receipt" label="Дата получения" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="currentPurchase.date_receipt"
+                               @input="menus.dateReceiptMenu = false"></v-date-picker>
+              </v-menu>
+              <v-menu v-model="menus.dateMenu" :close-on-content-click="false" :nudge-right="40"
+                      transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="currentPurchase.date" label="Дата покупки" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="currentPurchase.date" @input="menus.dateMenu = false"></v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-text-field v-model="currentPurchase.place" label="Место покупки" :rules="reqRules" required
+                          outlined></v-text-field>
+            <v-text-field type="number" v-model="currentPurchase.price" label="Сумма покупок" :rules="numRules"
+                          required outlined></v-text-field>
+            <v-select v-model="currentPurchase.bundle" label="Набор чеков" :items="['Один чек', '2 и более']"
+                      outlined></v-select>
+            <v-textarea v-model="currentPurchase.comment" label="Заметки" outlined></v-textarea>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="action-btn" color="primary" @click="putPurchase">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="confirmDeleteDialog" max-width="500">
       <v-card>
         <v-card-title>
@@ -225,6 +241,9 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
+      this.loadCategories()
+      this.loadTax()
+      this.loadActiveUsers()
     } else {
       this.$router.push({name: "Index"})
     }
@@ -351,6 +370,32 @@ export default {
             this.newPhotos = ''
           });
     },
+    putPurchase() {
+      if (this.$refs.form.validate())
+        $.ajax({
+          url: this.$hostname + "time-tracking/cheque/purchases",
+          type: "PUT",
+          data: this.currentPurchase,
+          success: () => {
+            this.loadData()
+            this.addForm = false
+          },
+          error: (response) => {
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          }
+        })
+      else {
+        this.alertMsg = "Заполните все необходимые поля"
+        this.alertError = true
+      }
+    },
     deletePurchase() {
       $.ajax({
         url: this.$hostname + "time-tracking/cheque/purchases",
@@ -359,8 +404,8 @@ export default {
           id: this.id
         },
         success: () => {
-          this.loadData()
           this.confirmDeleteDialog = false
+          this.$router.push({name: 'Purchases'})
         },
         error: (response) => {
           if (response.status === 500) {
