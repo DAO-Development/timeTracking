@@ -32,7 +32,12 @@
         <div>Количество чеков: {{ currentPurchase.bundle }}</div>
         <div>Заметки: {{ currentPurchase.comment }}</div>
 
-        <strong>Документы:</strong>
+        <div class="unit-title">
+          <h3>Документы:</h3>
+          <v-btn color="primary" fab x-small @click="addPhotoDialog = true">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </div>
         <v-list class="documents">
           <template v-for="item in photos">
             <v-list-item :key="item.id">
@@ -137,6 +142,22 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="addPhotoDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Добавить документ
+        </v-card-title>
+        <v-card-text>
+          <v-file-input v-model="newPhotos" placeholder="Документы" accept="*" multiple counter
+                        prepend-icon="" outlined></v-file-input>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="addPhotoDialog = false; newPhotos = ''">Сохранить</v-btn>
+          <v-btn color="primary" text @click="addChequeDocuments">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -179,7 +200,9 @@ export default {
         dateMenu: false,
         dateReceiptMenu: false,
       },
+      newPhotos: '',
       addForm: false,
+      addPhotoDialog: false,
       confirmDeleteDialog: false,
       confirmDeletePhotoDialog: false,
       alertError: false,
@@ -304,6 +327,29 @@ export default {
 
         fileLink.click();
       });
+    },
+    addChequeDocuments() {
+      const axios = require('axios')
+      // чтение файла в formData
+      let fd = new FormData();
+      let i = 0
+      this.newPhotos.forEach(doc => {
+        i++
+        fd.append('document' + i, doc)
+      })
+      fd.append('sales', '')
+      fd.append('purchases', this.currentPurchase.id)
+      axios({
+        method: 'post',
+        url: this.$hostname + "time-tracking/cheque/documents",
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
+      })
+          .then(() => {
+            this.loadData()
+            this.addPhotoDialog = false
+            this.newPhotos = ''
+          });
     },
     deletePurchase() {
       $.ajax({

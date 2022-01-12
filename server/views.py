@@ -730,7 +730,7 @@ class PurchasesView(APIView):
             purchases = purchases.filter(id=id)
         photos = {}
         for item in purchases:
-            docs = ChequeDocuments.objects.filter(purchases=item.id)
+            docs = ChequeDocuments.objects.filter(purchases=item.id).order_by('id')
             docs_serializer = ChequeDocumentsSerializer(docs, many=True)
             photos.update({item.id: docs_serializer.data})
         serializer = PurchasesSerializer(purchases, many=True)
