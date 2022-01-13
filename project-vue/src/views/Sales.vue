@@ -78,12 +78,10 @@
               </v-autocomplete>
             </v-row>
             <v-text-field v-model=" newSale.object_number
-                    " label="Номер объекта" :rules="reqRules" required
-                          outlined></v-text-field>
+                    " label="Номер объекта" required outlined></v-text-field>
             <v-select v-model="newSale.payment_terms" label="Срок оплаты" :items="terms" item-value="id"
                       item-text="days" outlined></v-select>
-            <v-text-field v-model="newSale.number_link" label="Номер ссылки" :rules="reqRules" required
-                          outlined></v-text-field>
+            <v-text-field v-model="newSale.number_link" label="Номер ссылки" required outlined></v-text-field>
             <v-file-input v-if="formTitle === 'Добавление'" v-model="newPhotos" multiple counter
                           label="Фото или документы" outlined prepend-icon=""></v-file-input>
             <v-textarea v-model="newSale.description" label="Пояснение к счету" outlined></v-textarea>
