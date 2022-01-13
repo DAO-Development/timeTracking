@@ -164,7 +164,7 @@ export default {
     }
   },
   created() {
-    console.log("init Purchases")
+    console.log("init Sales")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
@@ -333,7 +333,27 @@ export default {
 
     },
     deleteSale() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/sales",
+        type: "DELETE",
+        data: {
+          id: this.currentSale
+        },
+        success: () => {
+          this.loadData()
+          this.confirmDeleteDialog = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
     }
   }
 }
