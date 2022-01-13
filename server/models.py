@@ -323,7 +323,7 @@ class Sales(models.Model):
     description = models.TextField(verbose_name="Пояснение к счету", max_length=1000, null=True, blank=True)
     payment_terms = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок оплаты")
     number_link = models.CharField(verbose_name="Номер ссылки", max_length=100, null=True, blank=True)
-    items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
+    items = models.ManyToManyField("Items", verbose_name="Товары/услуги", blank=True)
 
     class Meta:
         db_table = "sales"

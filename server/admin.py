@@ -52,6 +52,16 @@ class DocumentsModeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
 
+class SalesAdmin(admin.ModelAdmin):
+    """Продажи"""
+    list_display = ('id', 'create_date', 'object_id')
+
+
+class ItemsAdmin(admin.ModelAdmin):
+    """Товары"""
+    list_display = ('id', 'name')
+
+
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(UserDocuments, UserDocumentsAdmin)
 admin.site.register(Functions, FunctionsAdmin)
@@ -62,3 +72,5 @@ admin.site.register(Objects, ObjectsAdmin)
 admin.site.register(ObjectUser, ObjectUserAdmin)
 admin.site.register(ObjectComments, ObjectCommentsAdmin)
 admin.site.register(DocumentsMode, DocumentsModeAdmin)
+admin.site.register(Sales, SalesAdmin)
+admin.site.register(Items, ItemsAdmin)

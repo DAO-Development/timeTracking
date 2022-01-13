@@ -17,6 +17,7 @@ urlpatterns = [
     path('news', NewsView.as_view()),
     path('news/<int:id>', NewsView.as_view()),
     path('objects', ObjectsView.as_view()),
+    path('objects/<int:client_id>', ObjectsView.as_view()),
     path('objects/employees', ObjectUserView.as_view()),
     path('objects/employees/<int:objects_id>', ObjectUserView.as_view()),
     path('objects/comments', ObjectCommentsView.as_view()),
@@ -34,6 +35,7 @@ urlpatterns = [
 
     path('cheque/categories', ChequeCategoryView.as_view()),
     path('cheque/sales', SalesView.as_view()),
+    path('cheque/sales/<int:id>', SalesView.as_view()),
     path('cheque/purchases', PurchasesView.as_view()),
     path('cheque/purchases/<int:id>', PurchasesView.as_view()),
     path('cheque/documents', ChequeDocumentsView.as_view()),

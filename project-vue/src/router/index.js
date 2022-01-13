@@ -23,6 +23,8 @@ import Waybill from "../views/Waybill";
 import WaybillOpen from "../views/open/WaybillOpen";
 import Purchases from "../views/Purchases";
 import PurchaseOpen from "../views/open/PurchaseOpen";
+import Sales from "../views/Sales";
+import SalesOpen from "../views/open/SalesOpen";
 
 Vue.use(VueRouter)
 
@@ -138,6 +140,17 @@ const routes = [
         path: '/purchases/:id',
         name: 'PurchaseOpen',
         component: PurchaseOpen,
+        props: true
+    },
+    {
+        path: '/sales',
+        name: 'Sales',
+        component: Sales
+    },
+    {
+        path: '/sales/:id',
+        name: 'SalesOpen',
+        component: SalesOpen,
         props: true
     },
     {

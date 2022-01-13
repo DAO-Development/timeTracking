@@ -318,8 +318,7 @@ class SalesSerializer(serializers.ModelSerializer):
     """Сериализация продаж (счетов)"""
 
     object = ObjectsSerializer()
-    payment_term = TermSerializer()
-    items = ItemsSerializer()
+    payment_terms = TermSerializer()
 
     class Meta:
         model = Sales

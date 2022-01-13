@@ -149,8 +149,7 @@ export default {
         place: '',
         price: '',
         bundle: '',
-        comment: '',
-        photo: '',
+        comment: ''
       },
       newPhotos: '',
       currentPurchase: 0,

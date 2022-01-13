@@ -342,14 +342,16 @@ class ObjectsView(APIView):
     """Объекты"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, client_id=None):
         user = UserSerializer(request.user)
         objects = Objects.objects.all()
+        if client_id is not None:
+            objects = objects.filter(client_id=client_id)
         if not user.data["is_staff"]:
             user_profile = UserProfileSerializer(UserProfile.objects.get(auth_user_id=user.data["id"]))
             objects_user = ObjectUser.objects.filter(user_profile_id=user_profile.data["id"]).values_list('objects_id',
                                                                                                           flat=True)
-            objects = Objects.objects.filter(pk__in=objects_user)
+            objects = objects.filter(pk__in=objects_user)
         serializer = ObjectsSerializer(objects, many=True)
         return Response({"data": serializer.data})
 
@@ -763,16 +765,23 @@ class SalesView(APIView):
     """Продажи"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, id=None):
         sales = Sales.objects.all()
+        if id is not None:
+            sales = sales.filter(id=id)
+        photos = {}
+        for item in sales:
+            docs = ChequeDocuments.objects.filter(sales=item.id).order_by('id')
+            docs_serializer = ChequeDocumentsSerializer(docs, many=True)
+            photos.update({item.id: docs_serializer.data})
         serializer = SalesSerializer(sales, many=True)
-        return Response({"data": serializer.data})
+        return Response({"data": serializer.data, "photos": photos})
 
     def post(self, request):
         serializer = SalesPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=201)
+            return Response({"id": serializer.data['id']}, status=201)
         else:
             return Response(status=400)
 

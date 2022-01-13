@@ -169,7 +169,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="addPhotoDialog = false; newPhotos = ''">Сохранить</v-btn>
+          <v-btn color="primary" text @click="addPhotoDialog = false; newPhotos = ''">Отменить</v-btn>
           <v-btn color="primary" text @click="addChequeDocuments">Сохранить</v-btn>
         </v-card-actions>
       </v-card>

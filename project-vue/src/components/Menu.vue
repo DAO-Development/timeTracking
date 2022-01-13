@@ -114,7 +114,7 @@
                 <v-list-item-title>Покупки</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item>
+            <v-list-item @click="$router.push({name: 'Sales'})">
               <v-list-item-content>
                 <v-list-item-title>Продажи</v-list-item-title>
               </v-list-item-content>
