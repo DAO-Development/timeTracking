@@ -252,7 +252,7 @@ export default {
         url: this.$hostname + "time-tracking/clients-employees/positions",
         type: "GET",
         success: (response) => {
-          this.selectsPosition = response.data.positions
+          this.selectsPosition = response.data.data
         },
         error: (response) => {
           console.log(response)

@@ -299,8 +299,13 @@ export default {
       })
     },
     loadObjectsByCLient() {
+      let url = ''
+      if (this.currentSale.client.id)
+        url = this.$hostname + "time-tracking/objects/" + this.currentSale.client.id
+      else
+        url = this.$hostname + "time-tracking/objects/" + this.currentSale.client
       $.ajax({
-        url: this.$hostname + "time-tracking/objects/" + this.currentSale.client.id,
+        url: url,
         type: "GET",
         success: (response) => {
           this.objects = response.data.data

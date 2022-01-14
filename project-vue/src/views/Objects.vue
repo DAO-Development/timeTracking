@@ -660,12 +660,12 @@ export default {
       this.newObject.contact_id = null
       this.contacts = []
       $.ajax({
-        url: this.$hostname + "time-tracking/clients-employees/" + client_id,
+        url: this.$hostname + "time-tracking/clients/employees/" + client_id,
         type: "GET",
         success: (response) => {
           this.contacts = response.data.data
           this.contacts.forEach(contact => {
-            contact.label = contact.lastname + ' ' + contact.name + ', ' + contact.position
+            contact.label = contact.lastname + ' ' + contact.name + ', ' + contact.position.name
             console.log(contact.label)
           })
         },
