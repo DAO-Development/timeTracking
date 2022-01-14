@@ -3,7 +3,7 @@
     <Header/>
     <section class="summary-box">
       <h1>Продажи</h1>
-      <v-btn class="action-btn" color="primary" @click="formTitle='Добавление'; edit = false; addForm = true">
+      <v-btn class="action-btn" color="primary" @click="openAddForm">
         Добавить
       </v-btn>
       <div class="purchases__content">
@@ -128,10 +128,10 @@ export default {
       photos: [],
       newSale: {
         id: 0,
-        client: '',
+        client_id: '',
         create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         object_number: '',
-        object: {
+        object_id: {
           client_id: {
             name: ''
           }
@@ -185,6 +185,9 @@ export default {
         success: (response) => {
           this.sales = response.data.data
           this.photos = response.data.photos
+          this.sales.forEach(sale => {
+            sale.object_id.label = sale.object_id.city + ' ' + sale.object_id.street + ' ' + sale.object_id.house
+          })
           if (this.sales.length !== 0)
             this.newSale.id = this.sales[this.sales.length - 1].id + 1
           else
@@ -314,7 +317,7 @@ export default {
             this.addForm = false
             this.newSale = {
               id: 0,
-              client: {
+              client_id: {
                 name: ''
               },
               create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -352,6 +355,29 @@ export default {
           this.alertError = true
         }
       })
+    },
+    openAddForm() {
+      this.formTitle = 'Добавление'
+      this.edit = false
+      this.addForm = true
+      this.newSale = {
+        id: 0,
+        client_id: {
+          name: ''
+        },
+        create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        object_number: '',
+        object: '',
+        payment_terms: '',
+        number_link: '',
+        description: '',
+        comment: '',
+        items: [1],
+      }
+      if (this.sales.length !== 0)
+        this.newSale.id = this.sales[this.sales.length - 1].id + 1
+      else
+        this.newSale.id = 10000
     }
   }
 }

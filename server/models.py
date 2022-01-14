@@ -318,6 +318,7 @@ class Sales(models.Model):
     """Продажи"""
     create_date = models.DateField(verbose_name="Дата покупки")
     object_number = models.CharField(verbose_name='Номер объекта', max_length=60, null=True, blank=True)
+    client = models.ForeignKey("Client", models.RESTRICT, verbose_name="Клиент", null=True, blank=True)
     object = models.ForeignKey("Objects", models.RESTRICT, verbose_name="Объект", null=True, blank=True)
     comment = models.TextField(verbose_name="Заметки", max_length=1000, null=True, blank=True)
     description = models.TextField(verbose_name="Пояснение к счету", max_length=1000, null=True, blank=True)

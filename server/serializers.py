@@ -319,6 +319,7 @@ class SalesSerializer(serializers.ModelSerializer):
 
     object = ObjectsSerializer()
     payment_terms = TermSerializer()
+    client = ClientSerializer()
 
     class Meta:
         model = Sales

@@ -329,24 +329,6 @@ export default {
         }
       })
     },
-    downloadFile(item) {
-      console.log(this.$hostname + 'media' + item)
-      const axios = require('axios')
-      axios({
-        url: this.$hostname + 'media' + item,
-        method: 'GET',
-        responseType: 'blob',
-      }).then((response) => {
-        var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-        var fileLink = document.createElement('a');
-
-        fileLink.href = fileURL;
-        fileLink.setAttribute('download', item);
-        document.body.appendChild(fileLink);
-
-        fileLink.click();
-      });
-    },
     addChequeDocuments() {
       const axios = require('axios')
       // чтение файла в formData
@@ -441,7 +423,25 @@ export default {
           this.alertError = true
         }
       })
-    }
+    },
+    downloadFile(item) {
+      console.log(this.$hostname + 'media' + item)
+      const axios = require('axios')
+      axios({
+        url: this.$hostname + 'media' + item,
+        method: 'GET',
+        responseType: 'blob',
+      }).then((response) => {
+        var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        var fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', item);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      });
+    },
   }
 }
 </script>

@@ -20,17 +20,15 @@
             Удалить
           </div>
         </div>
-        <div>Ответственный: {{ currentPurchase.user_profile.lastname }} {{ currentPurchase.user_profile.name }}</div>
-        <div class="document_date">Дата получения: {{ currentPurchase.date_receipt }}</div>
-        <div class="document_date">Дата покупки: {{ currentPurchase.date }}</div>
-        <div>Категория: {{ currentPurchase.category.name }}</div>
-        <div>Налог: {{ currentPurchase.tax.tax }}</div>
-        <div>Способ оплаты: {{ currentPurchase.payment_method }}</div>
-        <div>Номер счета: {{ currentPurchase.number }}</div>
-        <div>Место покупки: {{ currentPurchase.place }}</div>
-        <div>Сумма покупки: {{ currentPurchase.price }}</div>
-        <div>Количество чеков: {{ currentPurchase.bundle }}</div>
-        <div>Заметки: {{ currentPurchase.comment }}</div>
+        <div>Номер счета: {{ currentSale.id }}</div>
+        <div class="document_date">Дата создания: {{ currentSale.create_date }}</div>
+        <div class="document_date">Клиент: {{ currentSale.client.name }}</div>
+        <div>Объект: {{ currentSale.object.city }} {{ currentSale.object.street }} {{ currentSale.object.house }}</div>
+        <div>Номер объекта: {{ currentSale.object_number }}</div>
+        <div>Срок оплаты: {{ currentSale.payment_terms.days }} дней</div>
+        <div>Номер ссылки: {{ currentSale.number_link }}</div>
+        <div>Пояснение: {{ currentSale.description }}</div>
+        <div>Заметки: {{ currentSale.comment }}</div>
 
         <div class="unit-title">
           <h3>Документы:</h3>
@@ -67,66 +65,53 @@
         </v-toolbar>
         <h3>Редактирование</h3>
         <v-card-text>
-          <v-form ref="form" :model="currentPurchase">
-            <v-autocomplete v-if="$parent.$parent.admin" v-model="currentPurchase.user_profile" outlined
-                            label="Ответственный" :items="users" item-text="label" item-value="id"></v-autocomplete>
+          <v-form ref="form" :model="currentSale">
+            <v-text-field v-model="currentSale.id" label="Номер квитанции" disabled></v-text-field>
+            <v-menu v-model="menus.dateMenu" :close-on-content-click="false" :nudge-right="40"
+                    transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field v-model="currentSale.create_date" label="Дата" readonly v-bind="attrs"
+                              v-on="on" outlined></v-text-field>
+              </template>
+              <v-date-picker v-model="currentSale.create_date" @input="menus.dateMenu = false"></v-date-picker>
+            </v-menu>
             <v-row>
-              <v-autocomplete v-model="currentPurchase.category" :items="categories" item-text="name" item-value="id"
-                              label="Категория" :rules="reqRules" required outlined>
+              <v-autocomplete v-model="currentSale.client" :items="clients" item-text="name" item-value="id"
+                              label="Клиент" :rules="reqRules" required outlined @change="loadObjectsByCLient">
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-title>
-                      Категория не найдена
+                      Клиенты не найдены
                     </v-list-item-title>
                   </v-list-item>
                 </template>
               </v-autocomplete>
-              <v-autocomplete v-model="currentPurchase.tax" :items="taxes" item-text="tax" item-value="id"
-                              label="Налог" :rules="reqRules" required outlined>
+              <v-autocomplete v-model="currentSale.object" :items="objects" item-text="label" item-value="id"
+                              label="Объект" :rules="reqRules" required outlined>
                 <template v-slot:no-data>
                   <v-list-item>
-                    <v-list-item-title>
-                      Налог не найден
+                    <v-list-item-title v-if="currentSale.client.name === ''">
+                      Выберите клиента
+                    </v-list-item-title>
+                    <v-list-item-title v-else>
+                      Объекты не найдены
                     </v-list-item-title>
                   </v-list-item>
                 </template>
               </v-autocomplete>
             </v-row>
-            <v-select v-model="currentPurchase.payment_method" label="Способ оплаты"
-                      :items="['Банковская карта', 'Банковский перевод', 'Наличные']" outlined></v-select>
-            <v-text-field v-model="currentPurchase.number" label="Номер счета" :rules="reqRules" required
-                          outlined></v-text-field>
-            <v-row>
-              <v-menu v-model="menus.dateReceiptMenu" :close-on-content-click="false" :nudge-right="40"
-                      transition="scale-transition" offset-y min-width="auto">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="currentPurchase.date_receipt" label="Дата получения" readonly v-bind="attrs"
-                                v-on="on" outlined></v-text-field>
-                </template>
-                <v-date-picker v-model="currentPurchase.date_receipt"
-                               @input="menus.dateReceiptMenu = false"></v-date-picker>
-              </v-menu>
-              <v-menu v-model="menus.dateMenu" :close-on-content-click="false" :nudge-right="40"
-                      transition="scale-transition" offset-y min-width="auto">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field v-model="currentPurchase.date" label="Дата покупки" readonly v-bind="attrs"
-                                v-on="on" outlined></v-text-field>
-                </template>
-                <v-date-picker v-model="currentPurchase.date" @input="menus.dateMenu = false"></v-date-picker>
-              </v-menu>
-            </v-row>
-            <v-text-field v-model="currentPurchase.place" label="Место покупки" :rules="reqRules" required
-                          outlined></v-text-field>
-            <v-text-field type="number" v-model="currentPurchase.price" label="Сумма покупок" :rules="numRules"
-                          required outlined></v-text-field>
-            <v-select v-model="currentPurchase.bundle" label="Набор чеков" :items="['Один чек', '2 и более']"
-                      outlined></v-select>
-            <v-textarea v-model="currentPurchase.comment" label="Заметки" outlined></v-textarea>
+            <v-text-field v-model=" currentSale.object_number
+                    " label="Номер объекта" required outlined></v-text-field>
+            <v-select v-model="currentSale.payment_terms" label="Срок оплаты" :items="terms" item-value="id"
+                      item-text="days" outlined></v-select>
+            <v-text-field v-model="currentSale.number_link" label="Номер ссылки" required outlined></v-text-field>
+            <v-textarea v-model="currentSale.description" label="Пояснение к счету" outlined></v-textarea>
+            <v-textarea v-model="currentSale.comment" label="Заметки" outlined></v-textarea>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="action-btn" color="primary" @click="putPurchase">Сохранить</v-btn>
+          <v-btn class="action-btn" color="primary" @click="putSale">Сохранить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -140,21 +125,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="secondary" text @click="confirmDeleteDialog = false">Отменить</v-btn>
-          <v-btn color="primary" text @click="deletePurchase">Подтвердить</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="confirmDeletePhotoDialog" max-width="500">
-      <v-card>
-        <v-card-title>
-          Удаление докуметов
-        </v-card-title>
-        <v-card-text>Вы действительно хотите удалить выбранный документ? Отменить это действие будет невозможно
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="secondary" text @click="confirmDeletePhotoDialog = false">Отменить</v-btn>
-          <v-btn color="primary" text @click="deleteChequeDocument">Подтвердить</v-btn>
+          <v-btn color="primary" text @click="deleteSale">Подтвердить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -174,6 +145,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="confirmDeletePhotoDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Удаление докуметов
+        </v-card-title>
+        <v-card-text>Вы действительно хотите удалить выбранный документ? Отменить это действие будет невозможно
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmDeletePhotoDialog = false">Отменить</v-btn>
+          <v-btn color="primary" text @click="deleteChequeDocument">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -181,28 +166,34 @@
 import BackIcon from "../../components/icons/backIcon";
 import Header from "../../components/Header";
 import $ from "jquery";
+import EditIcon from "../../components/icons/editIcon";
+import WasteIcon from "../../components/icons/wasteIcon";
 
 export default {
   name: "SalesOpen",
-  components: {Header, BackIcon},
+  components: {WasteIcon, EditIcon, Header, BackIcon},
   props: {
     id: [String, Number],
   },
   data() {
     return {
-      taxes: [],
-      categories: [],
-      users: [],
+      clients: [],
+      objects: [],
+      terms: [],
+      items: [],
       photos: [],
       currentSale: {
         id: 0,
-        client: '',
+        client: {
+          id: '',
+          name: '',
+        },
         create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         object_number: '',
         object: {
-          client_id: {
-            name: ''
-          }
+          city: '',
+          street: '',
+          house: '',
         },
         payment_terms: '',
         number_link: '',
@@ -248,15 +239,14 @@ export default {
   methods: {
     loadData() {
       $.ajax({
-        url: this.$hostname + "time-tracking/cheque/sales",
+        url: this.$hostname + "time-tracking/cheque/sales/" + this.id,
         type: "GET",
         success: (response) => {
-          this.sales = response.data.data
-          this.photos = response.data.photos
-          if (this.sales.length !== 0)
-            this.newSale.id = this.sales[this.sales.length - 1].id + 1
-          else
-            this.newSale.id = 10000
+          this.currentSale = response.data.data[0]
+          this.photos = response.data.photos[this.id]
+          this.currentSale.object.label = this.currentSale.object.city + ' ' + this.currentSale.object.street + ' ' + this.currentSale.object.house
+
+          this.loadObjectsByCLient()
         },
         error: (response) => {
           if (response.status === 500) {
@@ -310,7 +300,7 @@ export default {
     },
     loadObjectsByCLient() {
       $.ajax({
-        url: this.$hostname + "time-tracking/objects/" + this.newSale.client,
+        url: this.$hostname + "time-tracking/objects/" + this.currentSale.client.id,
         type: "GET",
         success: (response) => {
           this.objects = response.data.data
@@ -330,8 +320,32 @@ export default {
         },
       })
     },
-
-
+    putSale() {
+      if (this.$refs.form.validate())
+        $.ajax({
+          url: this.$hostname + "time-tracking/cheque/sales",
+          type: "PUT",
+          data: this.currentSale,
+          success: () => {
+            this.loadData()
+            this.addForm = false
+          },
+          error: (response) => {
+            if (response.status === 500) {
+              this.alertMsg = "Ошибка соединения с сервером"
+            } else if (response.status === 401) {
+              this.$refresh()
+            } else {
+              this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          }
+        })
+      else {
+        this.alertMsg = "Заполните все необходимые поля"
+        this.alertError = true
+      }
+    },
     deleteSale() {
       $.ajax({
         url: this.$hostname + "time-tracking/cheque/sales",
@@ -353,7 +367,71 @@ export default {
           this.alertError = true
         }
       })
-    }
+    },
+    addChequeDocuments() {
+      const axios = require('axios')
+      // чтение файла в formData
+      let fd = new FormData();
+      let i = 0
+      this.newPhotos.forEach(doc => {
+        i++
+        fd.append('document' + i, doc)
+      })
+      fd.append('sales', this.currentSale.id)
+      fd.append('purchases', '')
+      axios({
+        method: 'post',
+        url: this.$hostname + "time-tracking/cheque/documents",
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
+      })
+          .then(() => {
+            this.loadData()
+            this.addPhotoDialog = false
+            this.newPhotos = ''
+          });
+    },
+    deleteChequeDocument() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/documents",
+        type: "DELETE",
+        data: {
+          id: this.photoId
+        },
+        success: () => {
+          this.loadData()
+          this.confirmDeletePhotoDialog = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    downloadFile(item) {
+      console.log(this.$hostname + 'media' + item)
+      const axios = require('axios')
+      axios({
+        url: this.$hostname + 'media' + item,
+        method: 'GET',
+        responseType: 'blob',
+      }).then((response) => {
+        var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        var fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', item);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      });
+    },
   }
 }
 </script>
