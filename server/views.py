@@ -1,3 +1,4 @@
+import json
 import os
 import zipfile
 
@@ -770,17 +771,37 @@ class SalesView(APIView):
         if id is not None:
             sales = sales.filter(id=id)
         photos = {}
+        items = {}
         for item in sales:
+            serializer = SalesSerializer(item)
             docs = ChequeDocuments.objects.filter(sales=item.id).order_by('id')
             docs_serializer = ChequeDocumentsSerializer(docs, many=True)
             photos.update({item.id: docs_serializer.data})
+            things = Items.objects.filter(pk__in=serializer.data['items'])
+            things_serializer = ItemsSerializer(things, many=True)
+            items.update({item.id: things_serializer.data})
         serializer = SalesSerializer(sales, many=True)
-        return Response({"data": serializer.data, "photos": photos})
+        return Response({"data": serializer.data, "photos": photos, "items": items})
 
     def post(self, request):
-        serializer = SalesPostSerializer(data=request.data)
+        items = json.loads(request.data['items'])
+        serializer = SalesPostSerializer(data={
+            'id': request.data['id'],
+            'create_date': request.data['create_date'],
+            'object_number': request.data['object_number'],
+            'client': request.data['client'],
+            'object': request.data['object'],
+            'payment_terms': request.data['payment_terms'],
+            'number_link': request.data['number_link'],
+            'comment': request.data['comment'],
+            'description': request.data['description'],
+        })
         if serializer.is_valid():
             serializer.save()
+            sale = Sales.objects.get(pk=serializer.data['id'])
+            for item in items:
+                sale.items.create(name=item['name'], price=item['price'], tax=item['tax'], discount=item['discount'],
+                                  quantity=item['quantity'], measurement=item['measurement'])
             return Response({"id": serializer.data['id']}, status=201)
         else:
             return Response(status=400)

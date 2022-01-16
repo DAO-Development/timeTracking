@@ -15,8 +15,7 @@
               <v-btn float color="primary" @click="$router.push({name: 'SalesOpen', params: {id: cheque.id}})">
                 <v-icon>mdi-format-list-bulleted-square</v-icon>
               </v-btn>
-              <v-btn float color="primary"
-                     @click="formTitle='Редактирование'; edit = true; newSale=cheque; addForm=true">
+              <v-btn float color="primary" @click="openEditForm(cheque)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
               <v-btn float color="primary" @click="currentSale = cheque.id; confirmDeleteDialog = true">
@@ -24,7 +23,7 @@
               </v-btn>
             </div>
             <ul>
-              <li>Клиент: {{ cheque.object.client_id.name }}</li>
+              <li>Клиент: {{ cheque.client.name }}</li>
               <li>Объект: {{ cheque.object_number }}</li>
               <li>Дата создания: {{ cheque.create_date }}</li>
             </ul>
@@ -77,16 +76,82 @@
                 </template>
               </v-autocomplete>
             </v-row>
-            <v-text-field v-model=" newSale.object_number
-                    " label="Номер объекта" required outlined></v-text-field>
+            <v-text-field v-model="newSale.object_number" label="Номер объекта" outlined></v-text-field>
             <v-select v-model="newSale.payment_terms" label="Срок оплаты" :items="terms" item-value="id"
                       item-text="days" outlined></v-select>
-            <v-text-field v-model="newSale.number_link" label="Номер ссылки" required outlined></v-text-field>
+            <v-text-field v-model="newSale.number_link" label="Номер ссылки" outlined></v-text-field>
             <v-file-input v-if="formTitle === 'Добавление'" v-model="newPhotos" multiple counter
                           label="Фото или документы" outlined prepend-icon=""></v-file-input>
+            <v-row>
+              <v-col cols="11"><h3>Товары/услуги</h3></v-col>
+              <v-col cols="1">
+                <v-btn color="primary" fab x-small @click="addNewItem">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+
+            <template v-for="i in itemsQuantity">
+              <div :key="i">
+                <v-row>
+                  <v-col cols="1">
+                    <strong style="font-size: 20px">{{ i }}</strong>
+                  </v-col>
+                  <v-col cols="10">
+                    <v-text-field v-model="newItems[i-1].name" label="Название"
+                                  :rules="reqRules" outlined></v-text-field>
+                  </v-col>
+                  <v-col cols="1">
+                    <v-btn icon @click="itemsQuantity = itemsQuantity-1; newItems.splice(i-1, 1)">
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field type="number" v-model="newItems[i-1].price" label="Стоимость без налога"
+                                  :rules="reqRules" outlined></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="10">
+                    <v-text-field type="number" v-model="newItems[i-1].tax" label="Налог"
+                                  :rules="reqRules" outlined></v-text-field>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field type="number" v-text="(newItems[i-1].price * (1+newItems[i-1].tax/100)).toFixed(2)"
+                                  label="Стоимость с налогом" outlined disabled></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="10">
+                    <v-text-field v-model="newItems[i-1].discount" label="Скидка" outlined></v-text-field>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field type="number"
+                                  v-text="(newItems[i-1].price * (1+newItems[i-1].tax/100) * (1-newItems[i-1].discount/100)).toFixed(2)"
+                                  label="Стоимость со скидкой" outlined disabled></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6">
+                    <v-text-field type="number" v-model="newItems[i-1].quantity"
+                                  label="Количество" outlined :rules="reqRules"></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="newItems[i-1].measurement"
+                                  label="Единицы измерения" outlined :rules="reqRules"></v-text-field>
+                  </v-col>
+                </v-row>
+              </div>
+            </template>
+
             <v-textarea v-model="newSale.description" label="Пояснение к счету" outlined></v-textarea>
             <v-textarea v-model="newSale.comment" label="Заметки" outlined></v-textarea>
           </v-form>
+          <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
+            {{ alertMsg }}
+          </v-alert>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -128,21 +193,20 @@ export default {
       photos: [],
       newSale: {
         id: 0,
-        client_id: '',
+        client: {
+          name: ''
+        },
         create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         object_number: '',
-        object_id: {
-          client_id: {
-            name: ''
-          }
-        },
+        object: {},
         payment_terms: '',
         number_link: '',
         description: '',
         comment: '',
-        items: [1],
       },
-      newPhotos: '',
+      newPhotos: null,
+      itemsQuantity: 0,
+      newItems: [],
       currentSale: 0,
       menus: {
         dateMenu: false
@@ -185,11 +249,12 @@ export default {
         success: (response) => {
           this.sales = response.data.data
           this.photos = response.data.photos
+          this.items = response.data.items
           this.sales.forEach(sale => {
-            sale.object_id.label = sale.object_id.city + ' ' + sale.object_id.street + ' ' + sale.object_id.house
+            sale.object.label = sale.object.city + ' ' + sale.object.street + ' ' + sale.object.house
           })
           if (this.sales.length !== 0)
-            this.newSale.id = this.sales[this.sales.length - 1].id + 1
+            this.newSale.id = this.sales[0].id + 1
           else
             this.newSale.id = 10000
         },
@@ -270,6 +335,7 @@ export default {
         if (this.edit)
           this.putSale()
         else {
+          this.newSale.items = JSON.stringify(this.newItems)
           $.ajax({
             url: this.$hostname + "time-tracking/cheque/sales",
             type: "POST",
@@ -317,7 +383,7 @@ export default {
             this.addForm = false
             this.newSale = {
               id: 0,
-              client_id: {
+              client: {
                 name: ''
               },
               create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -356,13 +422,46 @@ export default {
         }
       })
     },
+    addItem() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/sales",
+        type: "POST",
+        data: this.newSale,
+        success: (request) => {
+          this.addChequeDocuments(request.data.id)
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    putItem() {
+
+    },
+    deleteSalesItem() {
+
+    },
+    addNewItem() {
+      this.itemsQuantity += 1
+      this.newItems.push({name: '', price: '', tax: '', discount: '', quantity: '', measurement: ''})
+    },
     openAddForm() {
       this.formTitle = 'Добавление'
       this.edit = false
       this.addForm = true
+      this.itemsQuantity = 0
+      this.newItems = []
+      this.newPhotos = null
       this.newSale = {
         id: 0,
-        client_id: {
+        client: {
           name: ''
         },
         create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -372,12 +471,20 @@ export default {
         number_link: '',
         description: '',
         comment: '',
-        items: [1],
       }
       if (this.sales.length !== 0)
-        this.newSale.id = this.sales[this.sales.length - 1].id + 1
+        this.newSale.id = this.sales[0].id + 1
       else
         this.newSale.id = 10000
+    },
+    openEditForm(item) {
+      this.formTitle = 'Редактирование'
+      this.edit = true
+      this.addForm = true
+      console.log(this.items)
+      this.itemsQuantity = this.items[item.id].length
+      this.items = this.items[item.id]
+      this.newSale = item
     }
   }
 }
