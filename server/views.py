@@ -811,6 +811,13 @@ class SalesView(APIView):
         serializer = SalesPostSerializer(saved, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            items = json.loads(request.data['items'])
+            sale = Sales.objects.get(pk=serializer.data['id'])
+            for item in items:
+                if 'id' not in item:
+                    sale.items.create(name=item['name'], price=item['price'], tax=item['tax'],
+                                      discount=item['discount'], quantity=item['quantity'],
+                                      measurement=item['measurement'])
             return Response(status=201)
         else:
             return Response(status=400)
@@ -1067,6 +1074,32 @@ class OfferView(APIView):
 
     def delete(self, request):
         saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class ItemsView(APIView):
+    def get(self, request):
+        items = Items.objects.all()
+        serializer = ItemsSerializer(items, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        return Response(status=201)
+
+    def put(self, request):
+        saved = get_object_or_404(Items.objects.all(), id=request.data["id"])
+        serializer = ItemsSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(Items.objects.all(), id=request.data["id"])
+        sale = Sales.objects.get(pk=request.data['sale_id'])
+        sale.items.remove(saved)
         saved.delete()
         return Response(status=204)
 

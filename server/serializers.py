@@ -401,7 +401,6 @@ class OfferSerializer(serializers.ModelSerializer):
 
     term = TermSerializer()
     client = ClientSerializer()
-    items = ItemsSerializer()
 
     class Meta:
         model = Offer

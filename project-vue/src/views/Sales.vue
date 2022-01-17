@@ -102,7 +102,7 @@
                                   :rules="reqRules" outlined></v-text-field>
                   </v-col>
                   <v-col cols="1">
-                    <v-btn icon @click="itemsQuantity = itemsQuantity-1; newItems.splice(i-1, 1)">
+                    <v-btn icon @click="deleteNewItem(i)">
                       <v-icon>mdi-close</v-icon>
                     </v-btn>
                   </v-col>
@@ -207,6 +207,7 @@ export default {
       newPhotos: null,
       itemsQuantity: 0,
       newItems: [],
+      deletedItems: [],
       currentSale: 0,
       menus: {
         dateMenu: false
@@ -309,8 +310,13 @@ export default {
       })
     },
     loadObjectsByCLient() {
+      let client;
+      if ((typeof this.newSale.client) === 'object')
+        client = this.newSale.client.id
+      else
+        client = this.newSale.client
       $.ajax({
-        url: this.$hostname + "time-tracking/objects/" + this.newSale.client,
+        url: this.$hostname + "time-tracking/objects/" + client,
         type: "GET",
         success: (response) => {
           this.objects = response.data.data
@@ -341,7 +347,12 @@ export default {
             type: "POST",
             data: this.newSale,
             success: (request) => {
-              this.addChequeDocuments(request.data.id)
+              if (this.newPhotos.length > 0) {
+                this.addChequeDocuments(request.data.id)
+              } else {
+                this.loadData()
+                this.addForm = false
+              }
             },
             error: (response) => {
               if (response.status === 500) {
@@ -381,23 +392,61 @@ export default {
           .then(() => {
             this.loadData()
             this.addForm = false
-            this.newSale = {
-              id: 0,
-              client: {
-                name: ''
-              },
-              create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-              object_number: '',
-              object: '',
-              payment_terms: '',
-              number_link: '',
-              description: '',
-              comment: ''
-            }
           });
     },
     putSale() {
-
+      this.newSale.items = JSON.stringify(this.newItems)
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/sales",
+        type: "PUT",
+        data: this.newSale,
+        success: () => {
+          this.putItems()
+          if (this.newPhotos !== null) {
+            this.addChequeDocuments(this.newSale.id)
+          } else {
+            this.loadData()
+            this.addForm = false
+          }
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    putItems() {
+      this.newItems.forEach(item => {
+        if (item.id !== undefined) {
+          $.ajax({
+            url: this.$hostname + "time-tracking/item",
+            type: "PUT",
+            data: item,
+            success: () => {
+              console.log('товар отредактирован')
+            },
+            error: (response) => {
+              if (response.status === 500) {
+                this.alertMsg = "Ошибка соединения с сервером"
+              } else if (response.status === 401) {
+                this.$refresh()
+              } else {
+                this.alertMsg = "Непредвиденная ошибка"
+              }
+              this.alertError = true
+            }
+          })
+        }
+      })
+      this.deletedItems.forEach(item => {
+        this.deleteItem(item)
+      })
     },
     deleteSale() {
       $.ajax({
@@ -422,13 +471,16 @@ export default {
         }
       })
     },
-    addItem() {
+    deleteItem(item) {
       $.ajax({
-        url: this.$hostname + "time-tracking/cheque/sales",
-        type: "POST",
-        data: this.newSale,
-        success: (request) => {
-          this.addChequeDocuments(request.data.id)
+        url: this.$hostname + "time-tracking/item",
+        type: "DELETE",
+        data: {
+          sale_id: this.newSale.id,
+          id: item.id
+        },
+        success: () => {
+          console.log('товар удален')
         },
         error: (response) => {
           if (response.status === 500) {
@@ -442,15 +494,17 @@ export default {
         }
       })
     },
-    putItem() {
-
-    },
-    deleteSalesItem() {
-
-    },
     addNewItem() {
       this.itemsQuantity += 1
       this.newItems.push({name: '', price: '', tax: '', discount: '', quantity: '', measurement: ''})
+    },
+    deleteNewItem(i) {
+      if (this.newItems[i - 1].id !== undefined) {
+        this.deletedItems.push(this.newItems[i - 1])
+        // this.deleteItem(this.newItems[i - 1])
+      }
+      this.itemsQuantity = this.itemsQuantity - 1
+      this.newItems.splice(i - 1, 1)
     },
     openAddForm() {
       this.formTitle = 'Добавление'
@@ -478,13 +532,13 @@ export default {
         this.newSale.id = 10000
     },
     openEditForm(item) {
+      this.newSale = item
+      this.loadObjectsByCLient()
+      this.itemsQuantity = this.items[item.id].length
+      this.newItems = this.items[item.id]
       this.formTitle = 'Редактирование'
       this.edit = true
       this.addForm = true
-      console.log(this.items)
-      this.itemsQuantity = this.items[item.id].length
-      this.items = this.items[item.id]
-      this.newSale = item
     }
   }
 }
