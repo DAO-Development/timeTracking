@@ -20,7 +20,7 @@
             Удалить
           </div>
         </div>
-        <div>Номер счета: {{ currentSale.id }}</div>
+        <div>Номер счета: {{ currentSale.id + 9999 }}</div>
         <div class="document_date">Дата создания: {{ currentSale.create_date }}</div>
         <div class="document_date">Клиент: {{ currentSale.client.name }}</div>
         <div>Объект: {{ currentSale.object.city }} {{ currentSale.object.street }} {{ currentSale.object.house }}</div>
@@ -52,6 +52,37 @@
 
           </template>
         </v-list>
+        <h3>Товары:</h3>
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+            <tr>
+              <th class="text-left">№</th>
+              <th class="text-left">Название</th>
+              <th class="text-left">Стоимость без налога</th>
+              <th class="text-left">Налог</th>
+              <th class="text-left">Стоимость</th>
+              <th class="text-left">Скидка</th>
+              <th class="text-left">Количество</th>
+              <th class="text-left">Единицы измерения</th>
+              <th class="text-left">Итого</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, i) in items" :key="item.name">
+              <td>{{ i + 1 }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.price }}</td>
+              <td>{{ item.tax }}</td>
+              <td>{{ item.price * (1 + item.tax / 100) }}</td>
+              <td>{{ item.discount }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.measurement }}</td>
+              <td>{{ item.price * (1 + item.tax / 100) * (1 - item.discount / 100) * item.quantity }}</td>
+            </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
         <!--        <v-btn class="action-btn" color="primary" @click="downloadAll">Скачать все файлы</v-btn>-->
       </div>
     </section>
@@ -105,6 +136,71 @@
             <v-select v-model="currentSale.payment_terms" label="Срок оплаты" :items="terms" item-value="id"
                       item-text="days" outlined></v-select>
             <v-text-field v-model="currentSale.number_link" label="Номер ссылки" required outlined></v-text-field>
+
+            <v-row>
+              <v-col cols="11"><h3>Товары/услуги</h3></v-col>
+              <v-col cols="1">
+                <v-btn color="primary" fab x-small @click="addNewItem">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+            <template v-for="i in itemsQuantity">
+              <div :key="i">
+                <v-row>
+                  <v-col cols="1">
+                    <strong style="font-size: 20px">{{ i }}</strong>
+                  </v-col>
+                  <v-col cols="10">
+                    <v-text-field v-model="newItems[i-1].name" label="Название"
+                                  :rules="reqRules" outlined></v-text-field>
+                  </v-col>
+                  <v-col cols="1">
+                    <v-btn icon @click="deleteNewItem(i)">
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field type="number" v-model="newItems[i-1].price" label="Стоимость без налога"
+                                  :rules="reqRules" outlined></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="10">
+                    <v-text-field type="number" v-model="newItems[i-1].tax" label="Налог"
+                                  :rules="reqRules" outlined></v-text-field>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field type="number" v-text="(newItems[i-1].price * (1+newItems[i-1].tax/100)).toFixed(2)"
+                                  label="Стоимость с налогом" outlined disabled></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="10">
+                    <v-text-field v-model="newItems[i-1].discount" label="Скидка" outlined></v-text-field>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field type="number"
+                                  v-text="(newItems[i-1].price * (1+newItems[i-1].tax/100) * (1-newItems[i-1].discount/100)).toFixed(2)"
+                                  label="Стоимость со скидкой" outlined disabled></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6">
+                    <v-text-field type="number" v-model="newItems[i-1].quantity"
+                                  label="Количество" outlined :rules="reqRules"></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="newItems[i-1].measurement"
+                                  label="Единицы измерения" outlined :rules="reqRules"></v-text-field>
+                  </v-col>
+                </v-row>
+              </div>
+            </template>
+
+
             <v-textarea v-model="currentSale.description" label="Пояснение к счету" outlined></v-textarea>
             <v-textarea v-model="currentSale.comment" label="Заметки" outlined></v-textarea>
           </v-form>
@@ -205,7 +301,10 @@ export default {
       menus: {
         dateMenu: false,
       },
-      newPhotos: '',
+      newPhotos: null,
+      newItems: [],
+      deletedItems: [],
+      itemsQuantity: 0,
       addForm: false,
       addPhotoDialog: false,
       confirmDeleteDialog: false,
@@ -244,6 +343,9 @@ export default {
         success: (response) => {
           this.currentSale = response.data.data[0]
           this.photos = response.data.photos[this.id]
+          this.items = response.data.items[this.id]
+          this.newItems = response.data.items[this.id]
+          this.itemsQuantity = response.data.items[this.id].length
           this.currentSale.object.label = this.currentSale.object.city + ' ' + this.currentSale.object.street + ' ' + this.currentSale.object.house
 
           this.loadObjectsByCLient()
@@ -325,31 +427,82 @@ export default {
         },
       })
     },
+    addChequeDocuments() {
+      const axios = require('axios')
+      // чтение файла в formData
+      let fd = new FormData();
+      let i = 0
+      this.newPhotos.forEach(doc => {
+        i++
+        fd.append('document' + i, doc)
+      })
+      fd.append('sales', this.currentSale.id)
+      fd.append('purchases', '')
+      axios({
+        method: 'post',
+        url: this.$hostname + "time-tracking/cheque/documents",
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
+      })
+          .then(() => {
+            this.loadData()
+            this.addPhotoDialog = false
+            this.newPhotos = ''
+          });
+    },
     putSale() {
-      if (this.$refs.form.validate())
-        $.ajax({
-          url: this.$hostname + "time-tracking/cheque/sales",
-          type: "PUT",
-          data: this.currentSale,
-          success: () => {
+      this.currentSale.items = JSON.stringify(this.newItems)
+      $.ajax({
+        url: this.$hostname + "time-tracking/cheque/sales",
+        type: "PUT",
+        data: this.currentSale,
+        success: () => {
+          this.putItems()
+          if (this.newPhotos !== null) {
+            this.addChequeDocuments(this.currentSale.id)
+          } else {
             this.loadData()
             this.addForm = false
-          },
-          error: (response) => {
-            if (response.status === 500) {
-              this.alertMsg = "Ошибка соединения с сервером"
-            } else if (response.status === 401) {
-              this.$refresh()
-            } else {
-              this.alertMsg = "Непредвиденная ошибка"
-            }
-            this.alertError = true
           }
-        })
-      else {
-        this.alertMsg = "Заполните все необходимые поля"
-        this.alertError = true
-      }
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    putItems() {
+      this.newItems.forEach(item => {
+        if (item.id !== undefined) {
+          $.ajax({
+            url: this.$hostname + "time-tracking/item",
+            type: "PUT",
+            data: item,
+            success: () => {
+              console.log('товар отредактирован')
+            },
+            error: (response) => {
+              if (response.status === 500) {
+                this.alertMsg = "Ошибка соединения с сервером"
+              } else if (response.status === 401) {
+                this.$refresh()
+              } else {
+                this.alertMsg = "Непредвиденная ошибка"
+              }
+              this.alertError = true
+            }
+          })
+        }
+      })
+      this.deletedItems.forEach(item => {
+        this.deleteItem(item)
+      })
     },
     deleteSale() {
       $.ajax({
@@ -373,28 +526,28 @@ export default {
         }
       })
     },
-    addChequeDocuments() {
-      const axios = require('axios')
-      // чтение файла в formData
-      let fd = new FormData();
-      let i = 0
-      this.newPhotos.forEach(doc => {
-        i++
-        fd.append('document' + i, doc)
+    deleteItem(item) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/item",
+        type: "DELETE",
+        data: {
+          sale_id: this.newSale.id,
+          id: item.id
+        },
+        success: () => {
+          console.log('товар удален')
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
       })
-      fd.append('sales', this.currentSale.id)
-      fd.append('purchases', '')
-      axios({
-        method: 'post',
-        url: this.$hostname + "time-tracking/cheque/documents",
-        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
-        data: fd
-      })
-          .then(() => {
-            this.loadData()
-            this.addPhotoDialog = false
-            this.newPhotos = ''
-          });
     },
     deleteChequeDocument() {
       $.ajax({
@@ -436,6 +589,17 @@ export default {
 
         fileLink.click();
       });
+    },
+    addNewItem() {
+      this.itemsQuantity += 1
+      this.newItems.push({name: '', price: '', tax: '', discount: '', quantity: '', measurement: ''})
+    },
+    deleteNewItem(i) {
+      if (this.newItems[i - 1].id !== undefined) {
+        this.deletedItems.push(this.newItems[i - 1])
+      }
+      this.itemsQuantity = this.itemsQuantity - 1
+      this.newItems.splice(i - 1, 1)
     },
   }
 }

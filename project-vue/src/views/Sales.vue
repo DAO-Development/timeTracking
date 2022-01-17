@@ -501,7 +501,6 @@ export default {
     deleteNewItem(i) {
       if (this.newItems[i - 1].id !== undefined) {
         this.deletedItems.push(this.newItems[i - 1])
-        // this.deleteItem(this.newItems[i - 1])
       }
       this.itemsQuantity = this.itemsQuantity - 1
       this.newItems.splice(i - 1, 1)
