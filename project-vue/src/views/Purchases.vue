@@ -4,7 +4,30 @@
     <section class="summary-box">
       <h1>Покупки</h1>
       <v-btn class="action-btn" color="primary" @click="formTitle='Добавление'; addForm = true">Добавить</v-btn>
+
+      <v-menu ref="filterMenu" v-model="menus.filterMenu" :close-on-content-click="false" transition="scale-transition"
+              offset-y min-width="auto">
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field v-model="filter.month" label="Месяц" prepend-icon="mdi-calendar" readonly
+                        v-bind="attrs" v-on="on" outlined></v-text-field>
+        </template>
+        <v-date-picker v-model="filter.month" type="month"
+                       :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                       min="1950-01-01" @change="$refs.filterMenu.save(filter.month); loadData()"></v-date-picker>
+      </v-menu>
+
       <div class="purchases__content">
+        <div>
+          <h3>Статистика</h3>
+          <div>Чеков {{ purchases.length }}</div>
+          <div>Категорий {{ statistic.count_categories }}</div>
+          <div>Сумма {{ statistic.sum }}</div>
+          <strong>По каегориям: </strong>
+          <template v-for="item in statistic.by_categories">
+            <div :key="item.category__name">{{ item.category__name }} - {{ item.price__sum }}</div>
+          </template>
+
+        </div>
         <template v-for="cheque in purchases">
           <div class="purchases-single" :key="cheque.id">
             <v-img width="50" height="50" v-if="photos[cheque.id].length !== 0"
@@ -137,6 +160,11 @@ export default {
       categories: [],
       users: [],
       photos: [],
+      statistic: {
+        count_categories: 0,
+        sum: 0,
+        by_categories: [],
+      },
       newPurchase: {
         id: 0,
         user_profile: '',
@@ -153,7 +181,11 @@ export default {
       },
       newPhotos: '',
       currentPurchase: 0,
+      filter: {
+        month: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 7)
+      },
       menus: {
+        filterMenu: false,
         dateMenu: false,
         dateReceiptMenu: false,
       },
@@ -193,9 +225,14 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/cheque/purchases",
         type: "GET",
+        data: {
+          year: this.filter.month.substr(0, 4),
+          month: this.filter.month.substr(5, 2)
+        },
         success: (response) => {
           this.purchases = response.data.data
           this.photos = response.data.photos
+          this.statistic = response.data.statistic
         },
         error: (response) => {
           if (response.status === 500) {

@@ -61,6 +61,7 @@ export default {
       this.admin = true
     },
     loadFunctions() {
+      console.log('loadFunctions')
       $.ajax({
         url: this.$hostname + "time-tracking/group",
         type: "GET",

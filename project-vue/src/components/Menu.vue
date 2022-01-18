@@ -139,13 +139,13 @@
                 <v-list-item-title>Договора с клиентами</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item>
-              <v-list-item-content @click="$router.push({name: 'Accounting', params: {type: 'property'}})">
+            <v-list-item @click="$router.push({name: 'Accounting', params: {type: 'property'}})">
+              <v-list-item-content>
                 <v-list-item-title>Документы на собственность</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item>
-              <v-list-item-content @click="$router.push({name: 'Waybill'})">
+            <v-list-item @click="$router.push({name: 'Waybill'})">
+              <v-list-item-content>
                 <v-list-item-title>Путевые листы</v-list-item-title>
               </v-list-item-content>
             </v-list-item>

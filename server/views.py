@@ -1,7 +1,7 @@
 import json
-import os
 import zipfile
 
+from django.db.models import Sum, Count
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -728,38 +728,56 @@ class PurchasesView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, id=None):
-        purchases = Purchases.objects.all()
+        purchases = Purchases.objects.order_by('date')
+        photos = {}
+        statistic = {}
         if id is not None:
             purchases = purchases.filter(id=id)
-        photos = {}
-        for item in purchases:
-            docs = ChequeDocuments.objects.filter(purchases=item.id).order_by('id')
-            docs_serializer = ChequeDocumentsSerializer(docs, many=True)
-            photos.update({item.id: docs_serializer.data})
+        elif 'year' in request.GET:
+            purchases = purchases.filter(date__year=request.GET['year'],
+                                         date__month=request.GET['month'])
+            statistic.update({'count_categories': Purchases.objects.filter(date__year=request.GET['year'],
+                                                                           date__month=request.GET['month']) \
+                             .values('category').distinct().count()})
+            statistic.update({'by_categories': Purchases.objects.filter(date__year=request.GET['year'],
+                                                                        date__month=request.GET['month']) \
+                             .values('category__name').annotate(Sum('price'))})
+            statistic.update({'sum': Purchases.objects.filter(date__year=request.GET['year'],
+                                                              date__month=request.GET['month'])
+                             .aggregate(Sum('price'))['price__sum']})
+            for item in purchases:
+                docs = ChequeDocuments.objects.filter(purchases=item.id).order_by('id')
+                docs_serializer = ChequeDocumentsSerializer(docs, many=True)
+                photos.update({item.id: docs_serializer.data})
         serializer = PurchasesSerializer(purchases, many=True)
-        return Response({"data": serializer.data, "photos": photos})
+        return Response({"data": serializer.data,
+                         "photos": photos,
+                         "statistic": statistic})
 
-    def post(self, request):
-        serializer = PurchasesPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"id": serializer.data['id']}, status=201)
-        else:
-            return Response(status=400)
 
-    def put(self, request):
-        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
-        serializer = PurchasesPostSerializer(saved, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
-        else:
-            return Response(status=400)
+def post(self, request):
+    serializer = PurchasesPostSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"id": serializer.data['id']}, status=201)
+    else:
+        return Response(status=400)
 
-    def delete(self, request):
-        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
-        saved.delete()
-        return Response(status=204)
+
+def put(self, request):
+    saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+    serializer = PurchasesPostSerializer(saved, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(status=201)
+    else:
+        return Response(status=400)
+
+
+def delete(self, request):
+    saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+    saved.delete()
+    return Response(status=204)
 
 
 class SalesView(APIView):
@@ -777,7 +795,7 @@ class SalesView(APIView):
             docs = ChequeDocuments.objects.filter(sales=item.id).order_by('id')
             docs_serializer = ChequeDocumentsSerializer(docs, many=True)
             photos.update({item.id: docs_serializer.data})
-            things = Items.objects.filter(pk__in=serializer.data['items'])
+            things = Items.objects.filter(pk__in=serializer.data['items']).order_by('id')
             things_serializer = ItemsSerializer(things, many=True)
             items.update({item.id: things_serializer.data})
         serializer = SalesSerializer(sales, many=True)

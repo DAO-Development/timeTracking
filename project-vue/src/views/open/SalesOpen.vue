@@ -68,22 +68,56 @@
               <th class="text-left">Итого</th>
             </tr>
             </thead>
+            <tfoot>
+            <tr>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left">Итого</th>
+              <th class="text-left">{{ sum.price.toFixed(2) }}</th>
+            </tr>
+            <tr>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left">Итого с налогом</th>
+              <th class="text-left">{{ sum.tax.toFixed(2) }}</th>
+            </tr>
+            <tr>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left"></th>
+              <th class="text-left">Итого со скидкой</th>
+              <th class="text-left">{{ sum.discount.toFixed(2) }}</th>
+            </tr>
+            </tfoot>
             <tbody>
             <tr v-for="(item, i) in items" :key="item.name">
               <td>{{ i + 1 }}</td>
               <td>{{ item.name }}</td>
               <td>{{ item.price }}</td>
               <td>{{ item.tax }}</td>
-              <td>{{ item.price * (1 + item.tax / 100) }}</td>
+              <td>{{ (item.price * (1 + item.tax / 100)).toFixed(2) }}</td>
               <td>{{ item.discount }}</td>
               <td>{{ item.quantity }}</td>
               <td>{{ item.measurement }}</td>
-              <td>{{ item.price * (1 + item.tax / 100) * (1 - item.discount / 100) * item.quantity }}</td>
+              <td>{{ (item.price * (1 + item.tax / 100) * (1 - item.discount / 100) * item.quantity).toFixed(2) }}</td>
             </tr>
             </tbody>
           </template>
         </v-simple-table>
-        <!--        <v-btn class="action-btn" color="primary" @click="downloadAll">Скачать все файлы</v-btn>-->
       </div>
     </section>
     <v-dialog v-model="addForm">
@@ -297,6 +331,11 @@ export default {
         comment: '',
         items: [1],
       },
+      sum: {
+        price: 0,
+        tax: 0,
+        discount: 0,
+      },
       photoId: 0,
       menus: {
         dateMenu: false,
@@ -348,7 +387,12 @@ export default {
           this.newItems = response.data.items[this.id]
           this.itemsQuantity = response.data.items[this.id].length
           this.currentSale.object.label = this.currentSale.object.city + ' ' + this.currentSale.object.street + ' ' + this.currentSale.object.house
-
+          this.sum = {price: 0, tax: 0, discount: 0}
+          this.items.forEach(item => {
+            this.sum.price += item.price * item.quantity
+            this.sum.tax += item.price * (1 + item.tax / 100) * item.quantity
+            this.sum.discount += item.price * (1 + item.tax / 100) * (1 - item.discount / 100) * item.quantity
+          })
           this.loadObjectsByCLient()
         },
         error: (response) => {
