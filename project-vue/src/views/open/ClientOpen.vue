@@ -378,6 +378,7 @@ export default {
       })
       this.loadData()
     } else {
+      this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },

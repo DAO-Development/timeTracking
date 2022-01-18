@@ -3,6 +3,7 @@
     <v-container class="flex-main">
       <Menu v-if="auth" class="flex-sidebar"/>
       <router-view v-on:set-auth="setAuth"
+                   v-on:set-not-auth="setNotAuth"
                    v-on:set-admin="setAdmin"
                    v-on:load-functions="loadFunctions"
                    :key="$route.path"/>
@@ -22,10 +23,11 @@ Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
 Vue.prototype.$refresh = function () {
   localStorage.clear()
   sessionStorage.clear()
-  this.$router.push({name: "Index"})
+  this.$emit('set-not-auth')
   $.ajaxSetup({
     headers: {"Authorization": ""}
   })
+  this.$router.push({name: "Index"})
 }
 
 export default {
@@ -51,6 +53,9 @@ export default {
     setAuth() {
       console.log("auth")
       this.auth = true
+    },
+    setNotAuth() {
+      this.auth = false
     },
     setAdmin() {
       this.admin = true

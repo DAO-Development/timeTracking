@@ -85,9 +85,9 @@ export default {
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
-      // this.loadData()
     } else {
-      this.$router.push({name: "Login"})
+      this.$emit('set-not-auth')
+      this.$router.push({name: "Index"})
     }
   },
 }

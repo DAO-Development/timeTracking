@@ -39,7 +39,8 @@
           </template>
         </v-list>
         <v-list class="content-list__btns">
-          <v-list-item v-if="!archive && $parent.$parent.edit.indexOf('Клиенты') !== -1" class="content-list__btns-add" @click="openAddForm">
+          <v-list-item v-if="!archive && $parent.$parent.edit.indexOf('Клиенты') !== -1" class="content-list__btns-add"
+                       @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -288,6 +289,7 @@ export default {
       })
       this.loadData()
     } else {
+      this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },

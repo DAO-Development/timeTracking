@@ -604,7 +604,8 @@ export default {
       this.loadData()
       this.loadClients()
     } else {
-      this.$router.push({name: "Login"})
+      this.$emit('set-not-auth')
+      this.$router.push({name: "Index"})
     }
   },
   methods: {

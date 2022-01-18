@@ -245,6 +245,7 @@ export default {
       this.loadTax()
       this.loadActiveUsers()
     } else {
+      this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },

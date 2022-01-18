@@ -168,6 +168,7 @@ export default {
       this.loadData()
       this.loadGoals()
     } else {
+      this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },

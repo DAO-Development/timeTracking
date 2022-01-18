@@ -480,6 +480,7 @@ export default {
       this.loadData()
       this.loadPositions()
     } else {
+      this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },

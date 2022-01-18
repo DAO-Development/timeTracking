@@ -239,6 +239,7 @@ export default {
       this.loadClients()
       this.loadTerms()
     } else {
+      this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },
