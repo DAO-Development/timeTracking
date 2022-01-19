@@ -754,30 +754,27 @@ class PurchasesView(APIView):
                          "photos": photos,
                          "statistic": statistic})
 
+    def post(self, request):
+        serializer = PurchasesPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"id": serializer.data['id']}, status=201)
+        else:
+            return Response(status=400)
 
-def post(self, request):
-    serializer = PurchasesPostSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"id": serializer.data['id']}, status=201)
-    else:
-        return Response(status=400)
+    def put(self, request):
+        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+        serializer = PurchasesPostSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
 
-
-def put(self, request):
-    saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
-    serializer = PurchasesPostSerializer(saved, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(status=201)
-    else:
-        return Response(status=400)
-
-
-def delete(self, request):
-    saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
-    saved.delete()
-    return Response(status=204)
+    def delete(self, request):
+        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
 
 
 class SalesView(APIView):

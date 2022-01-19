@@ -6,7 +6,26 @@
       <v-btn class="action-btn" color="primary" @click="openAddForm">
         Добавить
       </v-btn>
-      <div class="purchases__content">
+
+      <v-menu ref="filterMenu" v-model="menus.filterMenu" :close-on-content-click="false" transition="scale-transition"
+              offset-y min-width="auto">
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field v-model="filter.month" label="Месяц" prepend-icon="mdi-calendar" readonly
+                        v-bind="attrs" v-on="on" outlined></v-text-field>
+        </template>
+        <v-date-picker v-model="filter.month" type="month"
+                       :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                       min="1950-01-01" @change="$refs.filterMenu.save(filter.month); loadData()"></v-date-picker>
+      </v-menu>
+
+      <div class="sales__content">
+        <div>
+          <h3>Статистика</h3>
+          <div>Счетов за месяц: {{ sales.length }}</div>
+          <div>Клиентов: {{ statistic.count_clients }}</div>
+          <div>Сумма без налога {{ statistic.sum }}</div>
+          <div>Сумма с налогом {{ statistic.sum_tax }}</div>
+        </div>
         <template v-for="cheque in sales">
           <div class="purchases-single" :key="cheque.id">
             <v-img width="50" height="50" v-if="photos[cheque.id].length !== 0"
@@ -191,6 +210,11 @@ export default {
       terms: [],
       items: [],
       photos: [],
+      statistic: {
+        count_clients: 0,
+        sum: 0,
+        sum_tax: 0,
+      },
       newSale: {
         id: 0,
         client: {
@@ -209,7 +233,11 @@ export default {
       newItems: [],
       deletedItems: [],
       currentSale: 0,
+      filter: {
+        month: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 7)
+      },
       menus: {
+        filterMenu: false,
         dateMenu: false
       },
       edit: false,
@@ -248,10 +276,15 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/cheque/sales",
         type: "GET",
+        data: {
+          year: this.filter.month.substr(0, 4),
+          month: this.filter.month.substr(5, 2)
+        },
         success: (response) => {
           this.sales = response.data.data
           this.photos = response.data.photos
           this.items = response.data.items
+          this.statistic = response.data.statistic
           this.sales.forEach(sale => {
             sale.object.label = sale.object.city + ' ' + sale.object.street + ' ' + sale.object.house
           })

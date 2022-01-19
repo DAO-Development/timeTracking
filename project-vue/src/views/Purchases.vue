@@ -26,7 +26,6 @@
           <template v-for="item in statistic.by_categories">
             <div :key="item.category__name">{{ item.category__name }} - {{ item.price__sum }}</div>
           </template>
-
         </div>
         <template v-for="cheque in purchases">
           <div class="purchases-single" :key="cheque.id">
