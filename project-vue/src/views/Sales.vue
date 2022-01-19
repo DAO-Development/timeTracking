@@ -19,13 +19,13 @@
       </v-menu>
 
       <div class="sales__content">
-        <div>
-          <h3>Статистика</h3>
-          <div>Счетов за месяц: {{ sales.length }}</div>
-          <div>Клиентов: {{ statistic.count_clients }}</div>
-          <div>Сумма без налога {{ statistic.sum }}</div>
-          <div>Сумма с налогом {{ statistic.sum_tax }}</div>
-        </div>
+<!--        <div>-->
+<!--          <h3>Статистика</h3>-->
+<!--          <div>Счетов за месяц: {{ sales.length }}</div>-->
+<!--          <div>Клиентов: {{ statistic.count_clients }}</div>-->
+<!--          <div>Сумма без налога {{ statistic.sum }}</div>-->
+<!--          <div>Сумма с налогом {{ statistic.sum_tax }}</div>-->
+<!--        </div>-->
         <template v-for="cheque in sales">
           <div class="purchases-single" :key="cheque.id">
             <v-img width="50" height="50" v-if="photos[cheque.id].length !== 0"
@@ -578,5 +578,9 @@ export default {
 </script>
 
 <style scoped>
-
+.sales__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 20px;
+}
 </style>

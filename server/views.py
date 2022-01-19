@@ -1,7 +1,7 @@
 import json
 import zipfile
 
-from django.db.models import Sum, Count
+from django.db.models import Sum, F, ExpressionWrapper, FloatField
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -783,10 +783,25 @@ class SalesView(APIView):
 
     def get(self, request, id=None):
         sales = Sales.objects.all()
-        if id is not None:
-            sales = sales.filter(id=id)
         photos = {}
         items = {}
+        statistic = {}
+        if id is not None:
+            sales = sales.filter(id=id)
+        elif 'year' in request.GET:
+            sales = sales.filter(create_date__year=request.GET['year'],
+                                 create_date__month=request.GET['month'])
+            statistic.update({'count_clients': Sales.objects.filter(create_date__year=request.GET['year'],
+                                                                    create_date__month=request.GET['month']) \
+                             .values('client').distinct().count()})
+            statistic.update({'sum': Sales.objects.filter(create_date__year=request.GET['year'],
+                                                          create_date__month=request.GET['month']) \
+                             .aggregate(sum=Sum(F('items__price') * F('items__quantity')))['sum']})
+            statistic.update({'sum_tax': Sales.objects.filter(create_date__year=request.GET['year'],
+                                                              create_date__month=request.GET['month']) \
+                             .aggregate(
+                sum=ExpressionWrapper(Sum(F('items__price') * (100 + F('items__tax')) / 100 * F('items__quantity')),
+                                      output_field=FloatField()))['sum']})
         for item in sales:
             serializer = SalesSerializer(item)
             docs = ChequeDocuments.objects.filter(sales=item.id).order_by('id')
@@ -796,7 +811,10 @@ class SalesView(APIView):
             things_serializer = ItemsSerializer(things, many=True)
             items.update({item.id: things_serializer.data})
         serializer = SalesSerializer(sales, many=True)
-        return Response({"data": serializer.data, "photos": photos, "items": items})
+        return Response({"data": serializer.data,
+                         "photos": photos,
+                         "items": items,
+                         "statistic": statistic})
 
     def post(self, request):
         items = json.loads(request.data['items'])
