@@ -17,16 +17,16 @@
       </v-menu>
 
       <div class="purchases__content">
-<!--        <div>-->
-<!--          <h3>Статистика</h3>-->
-<!--          <div>Чеков {{ purchases.length }}</div>-->
-<!--          <div>Категорий {{ statistic.count_categories }}</div>-->
-<!--          <div>Сумма {{ statistic.sum }}</div>-->
-<!--          <strong>По каегориям: </strong>-->
-<!--          <template v-for="item in statistic.by_categories">-->
-<!--            <div :key="item.category__name">{{ item.category__name }} - {{ item.price__sum }}</div>-->
-<!--          </template>-->
-<!--        </div>-->
+        <div>
+          <h3>Статистика</h3>
+          <div>Чеков {{ purchases.length }}</div>
+          <div>Категорий {{ statistic.count_categories }}</div>
+          <div>Сумма {{ statistic.sum }}</div>
+          <strong>По каегориям: </strong>
+          <template v-for="item in statistic.by_categories">
+            <div :key="item.category__name">{{ item.category__name }} - {{ item.price__sum }}</div>
+          </template>
+        </div>
         <template v-for="cheque in purchases">
           <div class="purchases-single" :key="cheque.id">
             <v-img width="50" height="50" v-if="photos[cheque.id].length !== 0"
