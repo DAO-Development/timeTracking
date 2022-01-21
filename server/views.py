@@ -993,12 +993,6 @@ class DocumentsClientView(APIView):
 
     def delete(self, request):
         saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
-        # path = saved.path
-        # path = path.split(";")
-        # return Response({"data": path})
-        # for item in path:
-        #     os.remove('/media' + item)
-        # os.path.join(os.path.abspath(os.path.dirname(__file__)), 'TestDir')
         saved.delete()
         return Response(status=204)
 
@@ -1083,15 +1077,33 @@ class OfferView(APIView):
     """Предложения"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, id=None):
         offers = Offer.objects.all()
+        items = {}
+        if id is not None:
+            offers = offers.filter(id=id)
+        for item in offers:
+            serializer = OfferSerializer(item)
+            things = Items.objects.filter(pk__in=serializer.data['items']).order_by('id')
+            things_serializer = ItemsSerializer(things, many=True)
+            items.update({item.id: things_serializer.data})
         serializer = OfferSerializer(offers, many=True)
-        return Response({"data": serializer.data})
+        return Response({"data": serializer.data, "items": items})
 
     def post(self, request):
-        serializer = OfferPostSerializer(data=request.data)
+        items = json.loads(request.data['items'])
+        serializer = OfferPostSerializer(data={
+            'create_date': request.data["create_date"],
+            'active': request.data["active"],
+            'term': request.data["term"],
+            'client': request.data["client"],
+        })
         if serializer.is_valid():
             serializer.save()
+            offer = Offer.objects.get(pk=serializer.data['id'])
+            for item in items:
+                offer.items.create(name=item['name'], price=item['price'], tax=item['tax'], discount=item['discount'],
+                                   quantity=item['quantity'], measurement=item['measurement'])
             return Response(status=201)
         else:
             return Response(status=400)
@@ -1101,6 +1113,13 @@ class OfferView(APIView):
         serializer = OfferPostSerializer(saved, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            items = json.loads(request.data['items'])
+            offer = Offer.objects.get(pk=serializer.data['id'])
+            for item in items:
+                if 'id' not in item:
+                    offer.items.create(name=item['name'], price=item['price'], tax=item['tax'],
+                                       discount=item['discount'], quantity=item['quantity'],
+                                       measurement=item['measurement'])
             return Response(status=201)
         else:
             return Response(status=400)

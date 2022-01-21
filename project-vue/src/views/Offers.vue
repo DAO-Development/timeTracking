@@ -7,7 +7,22 @@
       <div class="offers__content">
         <template v-for="offer in offers">
           <div class="offers-single" :key="offer.id">
-            {{ offer }}
+            <div class="purchases-single__btns">
+              <v-btn float color="primary" @click="$router.push({name: 'OffersOpen', params: {id: offer.id}})">
+                <v-icon>mdi-format-list-bulleted-square</v-icon>
+              </v-btn>
+              <v-btn float color="primary" @click="openEditForm(offer)">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn float color="primary" @click="currentOffer = offer.id; confirmDeleteDialog = true">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </div>
+            <ul>
+              <li>Дата создания: {{ offer.create_date }}</li>
+              <li>Клиент: {{ offer.client.name }}</li>
+              <li>Срок: {{ offer.term.days }} дней</li>
+            </ul>
           </div>
         </template>
       </div>
@@ -24,7 +39,7 @@
         <v-card-text>
           <v-form ref="form" :model="newOffer">
             <v-row>
-              <v-autocomplete v-model="newOffer.client" :items="client" item-text="name" item-value="id"
+              <v-autocomplete v-model="newOffer.client" :items="clients" item-text="name" item-value="id"
                               label="Клиент" :rules="reqRules" required outlined>
                 <template v-slot:no-data>
                   <v-list-item>
@@ -46,6 +61,14 @@
               </v-autocomplete>
             </v-row>
 
+            <v-row>
+              <v-col cols="11"><h3>Товары/услуги</h3></v-col>
+              <v-col cols="1">
+                <v-btn color="primary" fab x-small @click="addNewItem">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
             <template v-for="i in itemsQuantity">
               <div :key="i">
                 <v-row>
@@ -172,6 +195,8 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
+      this.loadClients()
+      this.loadTerms()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
@@ -184,6 +209,7 @@ export default {
         type: "GET",
         success: (response) => {
           this.offers = response.data.data
+          this.items = response.data.items
         },
         error: (response) => {
           if (response.status === 500) {

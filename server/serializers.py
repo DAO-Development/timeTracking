@@ -412,4 +412,4 @@ class OfferPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Offer
-        fields = '__all__'
+        fields = ['id', 'create_date', 'active', 'client', 'term']
