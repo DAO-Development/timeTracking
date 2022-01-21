@@ -25,6 +25,8 @@ import Purchases from "../views/Purchases";
 import PurchaseOpen from "../views/open/PurchaseOpen";
 import Sales from "../views/Sales";
 import SalesOpen from "../views/open/SalesOpen";
+import Offers from "../views/Offers";
+import OffersOpen from "../views/open/OffersOpen";
 
 Vue.use(VueRouter)
 
@@ -154,6 +156,17 @@ const routes = [
         props: true
     },
     {
+        path: '/offers',
+        name: 'Offers',
+        component: Offers
+    },
+    {
+        path: '/offers/:id',
+        name: 'OffersOpen',
+        component: OffersOpen,
+        props: true
+    },
+    {
         path: '/positions-:table',
         name: 'Positions',
         component: Positions,
@@ -184,7 +197,7 @@ const routes = [
         props: true
     },
     {
-        path: '/:table',
+        path: '/add-:table',
         name: 'IntegerField',
         component: Positions,
         props: true

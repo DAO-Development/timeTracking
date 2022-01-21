@@ -1117,9 +1117,6 @@ class ItemsView(APIView):
         serializer = ItemsSerializer(items, many=True)
         return Response({"data": serializer.data})
 
-    def post(self, request):
-        return Response(status=201)
-
     def put(self, request):
         saved = get_object_or_404(Items.objects.all(), id=request.data["id"])
         serializer = ItemsSerializer(saved, data=request.data, partial=True)
@@ -1131,8 +1128,12 @@ class ItemsView(APIView):
 
     def delete(self, request):
         saved = get_object_or_404(Items.objects.all(), id=request.data["id"])
-        sale = Sales.objects.get(pk=request.data['sale_id'])
-        sale.items.remove(saved)
+        if 'sale_id' in request.data:
+            sale = Sales.objects.get(pk=request.data['sale_id'])
+            sale.items.remove(saved)
+        elif 'offer_id' in request.data:
+            offer = Offer.objects.get(pk=request.data['offer_id'])
+            offer.items.remove(saved)
         saved.delete()
         return Response(status=204)
 

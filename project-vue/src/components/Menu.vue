@@ -144,6 +144,11 @@
                 <v-list-item-title>Документы на собственность</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item @click="$router.push({name: 'Offers'})">
+              <v-list-item-content>
+                <v-list-item-title>Ценовые предложения</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item @click="$router.push({name: 'Waybill'})">
               <v-list-item-content>
                 <v-list-item-title>Путевые листы</v-list-item-title>

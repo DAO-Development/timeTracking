@@ -429,6 +429,7 @@ class Items(models.Model):
 
 class Offer(models.Model):
     """Предложения"""
+    create_date = models.DateField(verbose_name="Дата создания", auto_now_add=True, null=True, blank=True)
     active = models.BooleanField(verbose_name="Активно", default=True)
     term = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок предложения")
     client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")

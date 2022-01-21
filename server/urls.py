@@ -52,6 +52,7 @@ urlpatterns = [
     path('waybill/<int:id>', WaybillView.as_view()),
     path('item', ItemsView.as_view()),
     path('offer', OfferView.as_view()),
+    path('offer/<int:id>', OfferView.as_view()),
 
     path('to-zip', ToZipView.as_view()),
 
