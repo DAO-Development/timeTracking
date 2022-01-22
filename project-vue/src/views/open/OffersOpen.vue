@@ -23,7 +23,7 @@
         <div class="document_date">Дата создания: {{ currentOffer.create_date }}</div>
         <div class="document_date">Предложение <span v-if="!currentOffer.active">не</span> <span>действует</span></div>
         <div class="document_date">Клиент: {{ currentOffer.client.name }}</div>
-        <div>Срок: {{ currentOffer.term.days }}</div>
+        <div>Срок: {{ currentOffer.term.days }} дней</div>
 
         <h3>Товары:</h3>
         <v-simple-table>
@@ -249,6 +249,11 @@ export default {
       itemsQuantity: 0,
       newItems: [],
       deletedItems: [],
+      sum: {
+        price: 0,
+        tax: 0,
+        discount: 0,
+      },
       formTitle: 'Добавление',
       addForm: false,
       confirmDeleteDialog: false,
@@ -284,6 +289,14 @@ export default {
         success: (response) => {
           this.currentOffer = response.data.data[0]
           this.items = response.data.items[this.id]
+          this.newItems = response.data.items[this.id]
+          this.itemsQuantity = response.data.items[this.id].length
+          this.sum = {price: 0, tax: 0, discount: 0}
+          this.items.forEach(item => {
+            this.sum.price += item.price * item.quantity
+            this.sum.tax += item.price * (1 + item.tax / 100) * item.quantity
+            this.sum.discount += item.price * (1 + item.tax / 100) * (1 - item.discount / 100) * item.quantity
+          })
         },
         error: (response) => {
           if (response.status === 500) {
@@ -338,14 +351,15 @@ export default {
     },
     putOffer() {
       if (this.$refs.form.validate()) {
+        this.currentOffer.items = JSON.stringify(this.newItems)
         $.ajax({
           url: this.$hostname + "time-tracking/offer",
           type: "PUT",
           data: this.currentOffer,
           success: () => {
             this.putItems()
-            this.loadData()
             this.addForm = false
+            this.loadData()
           },
           error: (response) => {
             if (response.status === 500) {
