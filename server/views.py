@@ -9,6 +9,7 @@ from rest_framework.generics import get_object_or_404
 import datetime
 
 from server.serializers import *
+from server.test_pdf import print_profile_form
 
 
 class MainView(APIView):
@@ -123,6 +124,17 @@ class ProfilesView(APIView):
             return Response({"data": serializer.data}, status=201)
         else:
             return Response(status=400)
+
+
+class PrintProfile(APIView):
+    """Печать анкеты профиля"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, id=None):
+        user_profile = UserProfile.objects.get(pk=id)
+        serializer = UserProfileSerializer(user_profile)
+        path = print_profile_form(serializer.data)
+        return Response({"path": path}, status=200)
 
 
 class PositionProfileView(APIView):
