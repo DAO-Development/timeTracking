@@ -443,6 +443,24 @@ class Offer(models.Model):
         verbose_name = "Предложение"
         verbose_name_plural = "Предложения"
 
+
+class Calendar(models.Model):
+    """Календарь"""
+    profile = models.ForeignKey("UserProfile", verbose_name="Пользователь", on_delete=models.CASCADE, null=True,
+                                blank=True)
+    group = models.ForeignKey(Group, verbose_name="Группа", on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(verbose_name="Название", max_length=100)
+    start = models.DateTimeField(verbose_name="Дата начала")
+    end = models.DateTimeField(verbose_name="Дата и время конца", null=True, blank=True)
+    allDay = models.BooleanField(verbose_name="Весь день", default=False)
+    color = models.CharField(verbose_name="Цвет", max_length=7, null=True, blank=True)
+    description = models.TextField(verbose_name="Описание")
+
+    class Meta:
+        db_table = "calendar"
+        verbose_name = "Календарь"
+        verbose_name_plural = "Календарь"
+
 # class WidgetUser(models.Model):
 #     """Виджеты"""
 #     name = models.CharField(verbose_name="Название виджета", max_length=120)

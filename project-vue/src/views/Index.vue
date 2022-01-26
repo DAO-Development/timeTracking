@@ -285,7 +285,7 @@ export default {
                 text += 'Воскресенье'
                 break
             }
-            note.last_save = text + ' ' + date.toISOString().substring(0, 10) + ' ' + date.toISOString().substring(11, 16)
+            note.last_save = text + ' ' + date.toISOString().substring(0, 10) + ' ' + date.getHours() + ':' + date.getMinutes()
           })
         },
         error: (response) => {

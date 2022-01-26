@@ -413,3 +413,11 @@ class OfferPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = ['id', 'create_date', 'active', 'client', 'term']
+
+
+class CalendarSerializer(serializers.ModelSerializer):
+    """Сериализация событий календаря"""
+
+    class Meta:
+        model = Calendar
+        fields = '__all__'

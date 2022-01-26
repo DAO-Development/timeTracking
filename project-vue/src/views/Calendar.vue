@@ -40,7 +40,7 @@
               </v-toolbar>
             </v-sheet>
             <v-sheet height="600">
-              <v-calendar ref="calendar" v-model="focus" color="primary" :events="events" :event-color="getEventColor"
+              <v-calendar ref="calendar" v-model="focus" color="primary" :events="events"
                           :type="type"
                           @click:event="showEvent"
                           @click:more="viewDay"
@@ -82,6 +82,7 @@
 
 <script>
 import Header from "../components/Header";
+import $ from "jquery";
 
 export default {
   name: "Calendar",
@@ -103,7 +104,34 @@ export default {
   mounted() {
     this.$refs.calendar.checkChange()
   },
+  created() {
+    console.log("init Calendar")
+    if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      this.$emit('set-auth')
+      // if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
+      //   this.$router.push({name: "Index"})
+      $.ajaxSetup({
+        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+      })
+      this.loadData()
+    } else {
+      this.$emit('set-not-auth')
+      this.$router.push({name: "Index"})
+    }
+  },
   methods: {
+    loadData() {
+
+    },
+    addEvent() {
+
+    },
+    putEvent() {
+
+    },
+    deleteEvent() {
+
+    },
     viewDay({date}) {
       this.focus = date
       this.type = 'day'
@@ -153,13 +181,20 @@ export default {
       //     timed: false,
       //   })
       // }
-      // events.push({
-      //   name: 'День рождения мамы',
-      //   start: "2022-01-01 15:45",
-      //   end:"2022-01-01 16:45",
-      //   color: this.colors[this.rnd(0, this.colors.length - 1)],
-      //   timed: true,
-      // })
+      events.push({
+        name: 'Собрание',
+        start: "2022-01-12 15:45",
+        end: "2022-01-12 21:45",
+        color: this.colors[this.rnd(0, this.colors.length - 1)],
+        timed: true,
+      })
+      events.push({
+        name: 'День рождения мамы',
+        start: "2022-01-01 15:45",
+        end: "2022-01-01 16:45",
+        color: this.colors[this.rnd(0, this.colors.length - 1)],
+        timed: false,
+      })
 
       this.events = events
     },

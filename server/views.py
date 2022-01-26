@@ -1143,6 +1143,9 @@ class OfferView(APIView):
 
 
 class ItemsView(APIView):
+    """Товары и услуги"""
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request):
         items = Items.objects.all()
         serializer = ItemsSerializer(items, many=True)
@@ -1180,6 +1183,40 @@ class ToZipView(APIView):
         newzip.close()
         return Response({"name": 'media/accounting/' + request.data['name'] + '.zip'})
 
+
+class CalendarView(APIView):
+    """Календарь"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        events = Calendar.objects.all()
+        serializer = CalendarSerializer(events, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        user = UserSerializer(request.user)
+        # user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+        serializer = CalendarSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(Calendar.objects.all(), id=request.data["id"])
+        serializer = CalendarSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(Calendar.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+    
 # class ImagesView(APIView):
 #     """Загрузка изображений из редактора"""
 #     permission_classes = [permissions.AllowAny]
