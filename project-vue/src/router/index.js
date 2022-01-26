@@ -27,6 +27,7 @@ import Sales from "../views/Sales";
 import SalesOpen from "../views/open/SalesOpen";
 import Offers from "../views/Offers";
 import OffersOpen from "../views/open/OffersOpen";
+import Calendar from "../views/Calendar";
 
 Vue.use(VueRouter)
 
@@ -111,6 +112,11 @@ const routes = [
         name: 'ContactOpen',
         component: ContactOpen,
         props: true
+    },
+    {
+        path: '/calendar',
+        name: 'Calendar',
+        component: Calendar
     },
     {
         path: '/settings',

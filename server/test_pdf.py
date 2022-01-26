@@ -10,7 +10,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 def print_profile_form(profile):
     print(profile)
     my_canvas = canvas.Canvas("media/users/" + profile['auth_user_id']['email'] + ".pdf")
-    pdfmetrics.registerFont(TTFont('Arial-Bold', '../static/Arial Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('Arial-Bold', './static/fonts/Arial Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('Arial', './static/fonts/arialmt.ttf'))
     my_canvas.setLineWidth(.5)
     my_canvas.setFont('Arial-Bold', 12)
     my_canvas.drawString(285, 800, "Анкета данных")
@@ -64,13 +65,12 @@ def print_profile_form(profile):
     my_canvas.drawString(200, grid_rows[-5] + 4, profile['social_code_own'])
     my_canvas.drawString(200, grid_rows[-6] + 4, profile['social_code_fin'])
     my_canvas.drawString(200, grid_rows[-7] + 4,
-                         profile['address_own']['city'] + ' ' + profile['address_own']['street'] + ' ' +
-                         profile['address_own']['house'] if profile['address_own'] is not None else profile[
-                             'address_own'])
+                         profile['address_own']['country'] + '' + profile['address_own']['city'] + ' ' +
+                         profile['address_own']['street'] + ' ' + profile['address_own']['house']
+                         if profile['address_own'] is not None else '')
     my_canvas.drawString(200, grid_rows[-7] + 4,
                          profile['address_fin']['city'] + ' ' + profile['address_fin']['street'] + ' ' +
-                         profile['address_fin']['house'] if profile['address_fin'] is not None else profile[
-                             'address_own'])
+                         profile['address_fin']['house'] if profile['address_fin'] is not None else '')
     my_canvas.drawString(200, grid_rows[-9] + 4, profile['phone'])
     my_canvas.drawString(200, grid_rows[-10] + 4, profile['phone_fin'])
     my_canvas.drawString(200, grid_rows[-11] + 4, profile['auth_user_id']['email'])

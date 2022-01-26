@@ -155,6 +155,14 @@
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
+          <v-list-item @click="$router.push({name: 'Calendar'})">
+            <v-list-item-icon>
+              <v-icon>mdi-calendar</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Календарь</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           <v-list-item @click="goPage(8)">
             <!--          <v-list-item @click="goPage(3+items.length)">-->
             <v-list-item-icon>
