@@ -11,8 +11,12 @@
       </div>
       <ul>
         <li>
-          <span class="title">Дата</span>
-          <span class="content">{{ newWaybill.date }}</span>
+          <span class="title">Начало поездки</span>
+          <span class="content">{{ newWaybill.date_start }} {{ newWaybill.time_start }}</span>
+        </li>
+        <li>
+          <span class="title">Конец поездки</span>
+          <span class="content">{{ newWaybill.date_end }}-{{ newWaybill.time_end }}</span>
         </li>
         <li>
           <span class="title">Пункт отправления</span>
@@ -24,16 +28,12 @@
         </li>
         <li>
           <span class="title">Километраж</span>
-          <span class="content">{{ newWaybill.kilometrage }}</span>
+          <span class="content">{{ newWaybill.kilometrage_end - newWaybill.kilometrage_start }}</span>
         </li>
         <li>
           <span class="title">Работник</span>
           <span class="content">{{ newWaybill.user_profile.name }}
             {{ newWaybill.user_profile.lastname }} ({{ newWaybill.user_profile.position.name }})</span>
-        </li>
-        <li>
-          <span class="title">Время</span>
-          <span class="content">{{ newWaybill.time_start }}-{{ newWaybill.time_end }}</span>
         </li>
         <li>
           <span class="title">Цель поездки</span>
@@ -67,23 +67,47 @@
         <h3>Редактирование</h3>
         <v-card-text>
           <v-form ref="form" :model="newWaybill">
-            <v-menu v-if="$parent.$parent.admin" v-model="menus.dateMenu" :close-on-content-click="false"
-                    :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field v-model="newWaybill.date" label="Дата поездки" readonly v-bind="attrs"
-                              v-on="on" outlined></v-text-field>
-              </template>
-              <v-date-picker v-model="newWaybill.date" @input="menus.dateMenu = false"></v-date-picker>
-            </v-menu>
-            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date" label="Дата поездки" outlined
+            <v-row>
+              <v-menu ref="dateStartMenu" v-if="$parent.$parent.admin" v-model="menus.dateStartMenu"
+                      :close-on-content-click="false"
+                      :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newWaybill.date_start" label="Дата начала поездки" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="newWaybill.date_start" @input="menus.dateStartMenu = false"></v-date-picker>
+              </v-menu>
+              <v-menu ref="dateEndMenu" v-if="$parent.$parent.admin" v-model="menus.dateEndMenu"
+                      :close-on-content-click="false"
+                      :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newWaybill.date_end" label="Дата окончания поездки" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="newWaybill.date_end" @input="menus.dateEndMenu = false"></v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date_start" label="Дата начала поездки"
+                          outlined
+                          disabled></v-text-field>
+            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date_end" label="Дата окончания поездки"
+                          outlined
                           disabled></v-text-field>
             <v-text-field v-model="newWaybill.departure" label="Пункт отправления" outlined :rules="reqRules"
                           required></v-text-field>
             <v-text-field v-model="newWaybill.destination" label="Пункт назначения" outlined :rules="reqRules"
                           required></v-text-field>
+            <h3>Километраж</h3>
             <v-row>
-              <v-text-field type="number" v-model="newWaybill.kilometrage" label="Километраж" outlined :rules="reqRules"
+              <v-text-field type="number" v-model="newWaybill.kilometrage_start" label="Перед поездкой" outlined
+                            :rules="reqRules"
                             required></v-text-field>
+              <v-text-field type="number" v-model="newWaybill.kilometrage_end" label="После поездки" outlined
+                            :rules="reqRules"
+                            required></v-text-field>
+              <div>{{ newWaybill.kilometrage_end - newWaybill.kilometrage_start }}</div>
+            </v-row>
+            <v-row>
               <v-menu ref="menuStartTime" v-model="menus.timeStartMenu" :close-on-content-click="false"
                       :nudge-right="40" :return-value.sync="newWaybill.time_start" transition="scale-transition"
                       offset-y max-width="290px" min-width="290px">
@@ -163,10 +187,12 @@ export default {
       goals: [],
       newWaybill: {
         id: 0,
-        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        date_start: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        date_end: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         departure: '',
         destination: '',
-        kilometrage: '',
+        kilometrage_start: '',
+        kilometrage_end: '',
         time_start: '',
         time_end: '',
         goal: '',
@@ -182,7 +208,8 @@ export default {
       selectType: ['Автомат', 'Механика'],
       selectFuel: ['Дизель', 'Бензин', 'Электро'],
       menus: {
-        dateMenu: false,
+        dateStartMenu: false,
+        dateEndMenu: false,
         timeStartMenu: false,
         timeEndMenu: false,
       },

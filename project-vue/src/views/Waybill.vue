@@ -8,9 +8,9 @@
         <template v-slot:item.actions="{ item }">
           <v-icon small @click="currentWaybill=item.id; confirmDeleteDialog=true">mdi-delete</v-icon>
         </template>
-        <template v-slot:item.date="{ item }">
+        <template v-slot:item.date_start="{ item }">
             <span @click="$router.push({name: 'WaybillOpen', params: {id: item.id}})">
-              {{ item.date }}
+              {{ item.date_start }}
             </span>
         </template>
         <template v-slot:no-data>
@@ -29,23 +29,47 @@
         <h3>Добавление</h3>
         <v-card-text>
           <v-form ref="form" :model="newWaybill">
-            <v-menu ref="dateMenu" v-if="$parent.$parent.admin" v-model="menus.dateMenu" :close-on-content-click="false"
-                    :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field v-model="newWaybill.date" label="Дата поездки" readonly v-bind="attrs"
-                              v-on="on" outlined></v-text-field>
-              </template>
-              <v-date-picker v-model="newWaybill.date" @input="menus.dateMenu = false"></v-date-picker>
-            </v-menu>
-            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date" label="Дата поездки" outlined
+            <v-row>
+              <v-menu ref="dateStartMenu" v-if="$parent.$parent.admin" v-model="menus.dateStartMenu"
+                      :close-on-content-click="false"
+                      :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newWaybill.date_start" label="Дата начала поездки" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="newWaybill.date_start" @input="menus.dateStartMenu = false"></v-date-picker>
+              </v-menu>
+              <v-menu ref="dateEndMenu" v-if="$parent.$parent.admin" v-model="menus.dateEndMenu"
+                      :close-on-content-click="false"
+                      :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newWaybill.date_end" label="Дата окончания поездки" readonly v-bind="attrs"
+                                v-on="on" outlined></v-text-field>
+                </template>
+                <v-date-picker v-model="newWaybill.date_end" @input="menus.dateEndMenu = false"></v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date_start" label="Дата начала поездки"
+                          outlined
+                          disabled></v-text-field>
+            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date_end" label="Дата окончания поездки"
+                          outlined
                           disabled></v-text-field>
             <v-text-field v-model="newWaybill.departure" label="Пункт отправления" outlined :rules="reqRules"
                           required></v-text-field>
             <v-text-field v-model="newWaybill.destination" label="Пункт назначения" outlined :rules="reqRules"
                           required></v-text-field>
+            <h3>Километраж</h3>
             <v-row>
-              <v-text-field type="number" v-model="newWaybill.kilometrage" label="Километраж" outlined :rules="reqRules"
+              <v-text-field type="number" v-model="newWaybill.kilometrage_start" label="Перед поездкой" outlined
+                            :rules="reqRules"
                             required></v-text-field>
+              <v-text-field type="number" v-model="newWaybill.kilometrage_end" label="После поездки" outlined
+                            :rules="reqRules"
+                            required></v-text-field>
+              <div>{{ newWaybill.kilometrage_end - newWaybill.kilometrage_start }}</div>
+            </v-row>
+            <v-row>
               <v-menu ref="menuStartTime" v-model="menus.timeStartMenu" :close-on-content-click="false"
                       :nudge-right="40" :return-value.sync="newWaybill.time_start" transition="scale-transition"
                       offset-y max-width="290px" min-width="290px">
@@ -122,10 +146,13 @@ export default {
       waybills: [],
       goals: [],
       newWaybill: {
-        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        id: 0,
+        date_start: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        date_end: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         departure: '',
         destination: '',
-        kilometrage: '',
+        kilometrage_start: 0,
+        kilometrage_end: 0,
         time_start: '',
         time_end: '',
         goal: '',
@@ -136,12 +163,14 @@ export default {
       selectType: ['Автомат', 'Механика'],
       selectFuel: ['Дизель', 'Бензин', 'Электро'],
       menus: {
-        dateMenu: false,
+        dateStartMenu: false,
+        dateEndMenu: false,
         timeStartMenu: false,
         timeEndMenu: false,
       },
       headers: [
-        {text: 'Дата', value: 'date', align: 'start'},
+        {text: 'Дата начала', value: 'date_start', align: 'start'},
+        {text: 'Дата окончания', value: 'date_end', align: 'start'},
         {text: 'Пункт отправления', align: 'start', value: 'departure',},
         {text: 'Пункт назначения', align: 'start', value: 'destination',},
         {text: '', value: 'actions', sortable: false},

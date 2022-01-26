@@ -45,6 +45,7 @@
               <li>Клиент: {{ cheque.client.name }}</li>
               <li>Объект: {{ cheque.object_number }}</li>
               <li>Дата создания: {{ cheque.create_date }}</li>
+              <li>Статус: {{ cheque.status }}</li>
             </ul>
           </div>
         </template>
@@ -101,6 +102,8 @@
             <v-text-field v-model="newSale.number_link" label="Номер ссылки" outlined></v-text-field>
             <v-file-input v-if="formTitle === 'Добавление'" v-model="newPhotos" multiple counter
                           label="Фото или документы" outlined prepend-icon=""></v-file-input>
+            <v-select v-if="formTitle === 'Редактирование'" v-model="newSale.status" label="Статус"
+                      :items="['Выставлен', 'Оплачен']" outlined></v-select>
             <v-row>
               <v-col cols="11"><h3>Товары/услуги</h3></v-col>
               <v-col cols="1">
@@ -227,6 +230,7 @@ export default {
         number_link: '',
         description: '',
         comment: '',
+        status: 'Выставлен',
       },
       newPhotos: null,
       itemsQuantity: 0,

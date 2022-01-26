@@ -315,7 +315,7 @@ class Purchases(models.Model):
 
 
 class Sales(models.Model):
-    """Продажи"""
+    """Счета"""
     create_date = models.DateField(verbose_name="Дата покупки")
     object_number = models.CharField(verbose_name='Номер объекта', max_length=60, null=True, blank=True)
     client = models.ForeignKey("Client", models.RESTRICT, verbose_name="Клиент", null=True, blank=True)
@@ -324,6 +324,7 @@ class Sales(models.Model):
     description = models.TextField(verbose_name="Пояснение к счету", max_length=1000, null=True, blank=True)
     payment_terms = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок оплаты")
     number_link = models.CharField(verbose_name="Номер ссылки", max_length=100, null=True, blank=True)
+    status = models.CharField(verbose_name="Статус", max_length=30, default="Выставлен")
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги", blank=True)
 
     class Meta:
@@ -394,10 +395,12 @@ class WaybillGoal(models.Model):
 
 class Waybill(models.Model):
     """Путевые листы"""
-    date = models.DateField(verbose_name="Дата поездки")
+    date_start = models.DateField(verbose_name="Дата начала поездки", null=True)
+    date_end = models.DateField(verbose_name="Дата конца поездки", null=True)
     departure = models.CharField(verbose_name="Пункт отправления", max_length=250)
     destination = models.CharField(verbose_name="Пункт назначенния", max_length=250)
-    kilometrage = models.IntegerField(verbose_name="Километраж")
+    kilometrage_start = models.IntegerField(verbose_name="Километраж в начале поездки", null=True)
+    kilometrage_end = models.IntegerField(verbose_name="Километраж в конце поездки", null=True)
     user_profile = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, verbose_name="Профиль")
     time_start = models.TimeField(verbose_name="Время начала поездки")
     time_end = models.TimeField(verbose_name="Время конца поездки")

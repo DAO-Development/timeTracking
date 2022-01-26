@@ -332,7 +332,7 @@ class SalesPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sales
         fields = ['id', 'create_date', 'object_number', 'client', 'object', 'comment', 'description', 'payment_terms',
-                  'number_link']
+                  'number_link', 'status']
 
 
 class DocumentsModeSerializer(serializers.ModelSerializer):
