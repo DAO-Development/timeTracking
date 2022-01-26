@@ -153,13 +153,13 @@ export default {
       //     timed: false,
       //   })
       // }
-      events.push({
-        name: 'День рождения мамы',
-        start: "2022-01-01 15:45",
-        end:"2022-01-01 16:45",
-        color: this.colors[this.rnd(0, this.colors.length - 1)],
-        timed: true,
-      })
+      // events.push({
+      //   name: 'День рождения мамы',
+      //   start: "2022-01-01 15:45",
+      //   end:"2022-01-01 16:45",
+      //   color: this.colors[this.rnd(0, this.colors.length - 1)],
+      //   timed: true,
+      // })
 
       this.events = events
     },
