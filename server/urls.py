@@ -33,6 +33,7 @@ urlpatterns = [
     path('clients-employees/positions', PositionClientView.as_view()),
     path('documents/worker', UserDocumentsView.as_view()),
     path('notes', NotesView.as_view()),
+    path('calendar', CalendarView.as_view()),
 
     path('cheque/categories', ChequeCategoryView.as_view()),
     path('cheque/sales', SalesView.as_view()),

@@ -30,7 +30,7 @@
         <v-card-text>
           <v-form ref="form" :model="newWaybill">
             <v-row>
-              <v-menu ref="dateStartMenu" v-if="$parent.$parent.admin" v-model="menus.dateStartMenu"
+              <v-menu ref="dateStartMenu" v-if="$parent.$parent.admin || formTitle==='Добавление'" v-model="menus.dateStartMenu"
                       :close-on-content-click="false"
                       :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
@@ -39,7 +39,7 @@
                 </template>
                 <v-date-picker v-model="newWaybill.date_start" @input="menus.dateStartMenu = false"></v-date-picker>
               </v-menu>
-              <v-menu ref="dateEndMenu" v-if="$parent.$parent.admin" v-model="menus.dateEndMenu"
+              <v-menu ref="dateEndMenu" v-if="$parent.$parent.admin || formTitle==='Добавление'" v-model="menus.dateEndMenu"
                       :close-on-content-click="false"
                       :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
@@ -49,10 +49,10 @@
                 <v-date-picker v-model="newWaybill.date_end" @input="menus.dateEndMenu = false"></v-date-picker>
               </v-menu>
             </v-row>
-            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date_start" label="Дата начала поездки"
+            <v-text-field v-if="!$parent.$parent.admin && formTitle==='Редактирование'" v-model="newWaybill.date_start" label="Дата начала поездки"
                           outlined
                           disabled></v-text-field>
-            <v-text-field v-if="!$parent.$parent.admin" v-model="newWaybill.date_end" label="Дата окончания поездки"
+            <v-text-field v-if="!$parent.$parent.admin && formTitle==='Редактирование'" v-model="newWaybill.date_end" label="Дата окончания поездки"
                           outlined
                           disabled></v-text-field>
             <v-text-field v-model="newWaybill.departure" label="Пункт отправления" outlined :rules="reqRules"
