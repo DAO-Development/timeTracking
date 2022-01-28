@@ -468,6 +468,9 @@ export default {
       if (this.newEvent.end !== null) {
         this.newEvent.date_end = this.newEvent.end.substr(0, 10)
         this.newEvent.time_end = this.newEvent.end.substr(11, 5)
+      } else {
+        this.newEvent.date_end = ''
+        this.newEvent.time_end = ''
       }
       if (this.newEvent.group == null && this.newEvent.profile == null) {
         this.newEvent.all = true
