@@ -451,10 +451,10 @@ class Calendar(models.Model):
     group = models.ForeignKey(Group, verbose_name="Группа", on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(verbose_name="Название", max_length=100)
     start = models.DateTimeField(verbose_name="Дата и время начала")
-    end = models.DateTimeField(verbose_name="Дата и время конца", null=True, blank=True)
+    end = models.DateTimeField(verbose_name="Дата и время конца", null=True, blank=True, default=None)
     allDay = models.BooleanField(verbose_name="Весь день", default=False)
     color = models.CharField(verbose_name="Цвет", max_length=30, null=True, blank=True)
-    description = models.TextField(verbose_name="Описание")
+    description = models.TextField(verbose_name="Описание", null=True, blank=True)
 
     class Meta:
         db_table = "calendar"

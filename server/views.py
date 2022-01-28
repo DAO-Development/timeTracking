@@ -1,7 +1,7 @@
 import json
 import zipfile
 
-from django.db.models import Sum, F, ExpressionWrapper, FloatField
+from django.db.models import Sum, F, ExpressionWrapper, FloatField, Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -1189,14 +1189,34 @@ class CalendarView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"])
         events = Calendar.objects.all()
-        serializer = CalendarSerializer(events, many=True)
+        user_event = events.filter(
+            Q(profile=user_profile.serializable_value('id')) | Q(group__in=user.data['groups']) | Q(group=None) & (Q(
+                profile=None)))
+        serializer = CalendarSerializer(user_event, many=True)
         return Response({"data": serializer.data})
 
     def post(self, request):
-        user = UserSerializer(request.user)
-        # user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
-        serializer = CalendarSerializer(data=request.data)
+        data = {
+            "group": request.data["group"],
+            "profile": request.data["profile"],
+            "name": request.data["name"],
+            "start": request.data["start"],
+            "end": request.data["end"],
+            "allDay": request.data["allDay"],
+            "color": request.data["color"],
+            "description": request.data["description"]
+        }
+        if request.data["self"]:
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+            data["profile"] = user_profile
+            data["group"] = None
+        if request.data["end"] == '':
+            data["end"] = None
+        serializer = CalendarSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
@@ -1216,7 +1236,7 @@ class CalendarView(APIView):
         saved = get_object_or_404(Calendar.objects.all(), id=request.data["id"])
         saved.delete()
         return Response(status=204)
-    
+
 # class ImagesView(APIView):
 #     """Загрузка изображений из редактора"""
 #     permission_classes = [permissions.AllowAny]

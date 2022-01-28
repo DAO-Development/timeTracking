@@ -46,29 +46,25 @@
                           @click:event="showEvent"
                           @click:more="viewDay"
                           @click:date="viewDay"
-                          @change="updateRange"
               ></v-calendar>
               <v-menu v-model="selectedOpen" :close-on-content-click="false" :activator="selectedElement" offset-x>
                 <v-card color="grey lighten-4" min-width="350px" flat>
                   <v-toolbar :color="selectedEvent.color" dark>
-                    <v-btn icon>
-                      <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
                     <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <v-btn icon>
-                      <v-icon>mdi-heart</v-icon>
+                    <v-btn icon @click="openEditForm">
+                      <v-icon>mdi-pencil</v-icon>
                     </v-btn>
-                    <v-btn icon>
-                      <v-icon>mdi-dots-vertical</v-icon>
+                    <v-btn icon @click="confirmDeleteDialog=true">
+                      <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </v-toolbar>
                   <v-card-text>
-                    <span v-html="selectedEvent.details"></span>
+                    <span v-html="selectedEvent.description"></span>
                   </v-card-text>
                   <v-card-actions>
                     <v-btn text color="secondary" @click="selectedOpen = false">
-                      Cancel
+                      Закрыть
                     </v-btn>
                   </v-card-actions>
                 </v-card>
@@ -90,14 +86,21 @@
         <v-card-text>
           <v-form ref="form" :model="newEvent">
             <h3>Для кого событие</h3>
-            <v-checkbox v-if="$parent.$parent.admin" label="Для себя" v-model="newEvent.self"></v-checkbox>
+            <v-row>
+              <v-checkbox v-if="$parent.$parent.admin" label="Для себя" v-model="newEvent.self"
+                          :disabled="newEvent.group !== null || newEvent.profile !== null || newEvent.all"></v-checkbox>
+              <v-checkbox v-if="$parent.$parent.admin" label="Для всех" v-model="newEvent.all"
+                          :disabled="newEvent.group !== null || newEvent.profile !== null || newEvent.self"></v-checkbox>
+            </v-row>
             <v-row>
               <v-autocomplete v-if="$parent.$parent.admin" v-model="newEvent.group" label="Для группы"
                               :items="groups" item-text="name" item-value="id" :rules="userGroupRules"
-                              :disabled="newEvent.profile !== null || newEvent.self" clearable></v-autocomplete>
+                              :disabled="newEvent.profile !== null || newEvent.self|| newEvent.all"
+                              clearable></v-autocomplete>
               <v-autocomplete v-if="$parent.$parent.admin" v-model="newEvent.profile" label="Для пользователя"
                               :items="profiles" item-text="label" item-value="id" :rules="userGroupRules"
-                              :disabled="newEvent.group !== null  || newEvent.self" clearable></v-autocomplete>
+                              :disabled="newEvent.group !== null  || newEvent.self || newEvent.all"
+                              clearable></v-autocomplete>
             </v-row>
             <v-text-field v-model="newEvent.name" label="Название" :rules="reqRules"></v-text-field>
             <h3>Сроки</h3>
@@ -145,7 +148,7 @@
                                @click:minute="$refs.menuEndTime.save(newEvent.time_end)"></v-time-picker>
               </v-menu>
             </v-row>
-            <v-autocomplete :items="colors" label="Цвет" :rules="reqRules">
+            <v-autocomplete v-model="newEvent.color" :items="colors" label="Цвет" :rules="reqRules">
               <template v-slot:item="data">
                 <v-list-item-avatar>
                   <v-chip :color="data.item"/>
@@ -170,9 +173,9 @@
     <v-dialog v-model="confirmDeleteDialog" max-width="500">
       <v-card>
         <v-card-title>
-          Удаление чеков
+          Удаление события
         </v-card-title>
-        <v-card-text>Вы действительно хотите удалить выбранные чеки? Отменить это действие будет невозможно
+        <v-card-text>Вы действительно хотите удалить выбранное событие? Отменить это действие будет невозможно
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -205,10 +208,10 @@ export default {
     selectedElement: null,
     selectedOpen: false,
     colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-    // names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
     newEvent: {
       id: 0,
       self: false,
+      all: false,
       group: null,
       profile: null,
       name: '',
@@ -239,7 +242,7 @@ export default {
     userGroupRules() {
       const rules = []
       const rule =
-          v => !!v || !!this.newEvent.group || !!this.newEvent.profile || this.newEvent.self || 'Выберите для кого событие'
+          v => !!v || !!this.newEvent.group || !!this.newEvent.profile || this.newEvent.self || this.newEvent.all || 'Выберите для кого событие'
       rules.push(rule)
       return rules
     },
@@ -270,13 +273,16 @@ export default {
         url: this.$hostname + "time-tracking/calendar",
         type: "GET",
         success: (response) => {
-          // console.log(response)
           this.events = response.data.data
           this.events.forEach(event => {
-            let start = new Date(event.start)
-            let end = new Date(event.end)
-            event.start = start.getFullYear() + '-' + (start.getMonth() + 1) + '-' + start.getDate() + ' ' + start.getHours() + ':' + start.getMinutes()
-            event.end = end.getFullYear() + '-' + (end.getMonth() + 1) + '-' + end.getDate() + ' ' + end.getHours() + ':' + end.getMinutes()
+            if (event.allDay) {
+              event.start = event.start.substr(0, 10)
+              event.end = event.end.substr(0, 10)
+            } else {
+              event.start = event.start.substr(0, 10) + ' ' + event.start.substr(11, 5)
+              if (event.end !== null)
+                event.end = event.end.substr(0, 10) + ' ' + event.end.substr(11, 5)
+            }
             event.timed = !event.allDay
           })
         },
@@ -335,62 +341,136 @@ export default {
     },
     addEvent() {
       if (this.$refs.form.validate()) {
-        if (this.newEvent.self) {
+        if (this.newEvent.self || this.newEvent.all) {
           this.newEvent.group = null
           this.newEvent.profile = null
         }
-        $.ajax({
-          url: this.$hostname + "time-tracking/calendar",
-          type: "POST",
-          data: {
-            group: this.newEvent.group,
-            profile: this.newEvent.profile,
-            name: this.newEvent.name,
-            start: this.newEvent.date_start + ' ' + this.newEvent.time_start,
-            end: this.newEvent.date_end + ' ' + this.newEvent.time_end,
-            allDay: this.newEvent.allDay,
-            color: this.newEvent.color,
-            description: this.newEvent.description
-          },
-          success: () => {
-            this.loadData()
-            this.addForm = false
-            this.newEvent = {
-              id: 0,
-              self: false,
-              group: null,
-              profile: null,
-              name: '',
-              date_start: '',
-              time_start: '',
-              date_end: '',
-              time_end: '',
-              allDay: false,
-              color: '',
-              description: ''
+        if (this.newEvent.allDay) {
+          this.newEvent.start = this.newEvent.date_start + ' ' + '00:00'
+          if (this.newEvent.date_end !== '')
+            this.newEvent.end = this.newEvent.date_end + ' ' + '00:00'
+        } else {
+          this.newEvent.start = this.newEvent.date_start + ' ' + this.newEvent.time_start
+          if (this.newEvent.date_end !== '')
+            this.newEvent.end = this.newEvent.date_end + ' ' + this.newEvent.time_end
+        }
+        if (this.newEvent.id) {
+          this.putEvent()
+        } else {
+          $.ajax({
+            url: this.$hostname + "time-tracking/calendar",
+            type: "POST",
+            data: {
+              self: this.newEvent.self,
+              group: this.newEvent.group,
+              profile: this.newEvent.profile,
+              name: this.newEvent.name,
+              start: this.newEvent.start,
+              end: this.newEvent.end,
+              allDay: this.newEvent.allDay,
+              color: this.newEvent.color,
+              description: this.newEvent.description
+            },
+            success: () => {
+              this.loadData()
+              this.addForm = false
+              this.newEvent = {
+                self: false,
+                group: null,
+                profile: null,
+                name: '',
+                date_start: '',
+                time_start: '',
+                date_end: '',
+                time_end: '',
+                allDay: false,
+                color: '',
+                description: ''
+              }
+            },
+            error: (response) => {
+              if (response.status === 500) {
+                this.alertMsg = "Ошибка соединения с сервером"
+              } else if (response.status === 401) {
+                this.$refresh()
+              } else {
+                this.alertMsg = "Непредвиденная ошибка"
+              }
+              this.alertError = true
             }
-          },
-          error: (response) => {
-            if (response.status === 500) {
-              this.alertMsg = "Ошибка соединения с сервером"
-            } else if (response.status === 401) {
-              this.$refresh()
-            } else {
-              this.alertMsg = "Непредвиденная ошибка"
-            }
-            this.alertError = true
-          }
-        })
+          })
+        }
       } else {
         this.alertMsg = "Заполните все необходимые поля"
         this.alertError = true
       }
     },
     putEvent() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/calendar",
+        type: "PUT",
+        data: {
+          id: this.newEvent.id,
+          group: this.newEvent.group,
+          profile: this.newEvent.profile,
+          name: this.newEvent.name,
+          start: this.newEvent.start,
+          end: this.newEvent.end,
+          allDay: this.newEvent.allDay,
+          color: this.newEvent.color,
+          description: this.newEvent.description
+        },
+        success: () => {
+          this.loadData()
+          this.addForm = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
     },
     deleteEvent() {
-
+      $.ajax({
+        url: this.$hostname + "time-tracking/calendar",
+        type: "DELETE",
+        data: {
+          id: this.selectedEvent.id
+        },
+        success: () => {
+          this.loadData()
+          this.confirmDeleteDialog = false
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    openEditForm() {
+      this.newEvent = this.selectedEvent
+      this.newEvent.date_start = this.newEvent.start.substr(0, 10)
+      this.newEvent.time_start = this.newEvent.start.substr(11, 5)
+      if (this.newEvent.end !== null) {
+        this.newEvent.date_end = this.newEvent.end.substr(0, 10)
+        this.newEvent.time_end = this.newEvent.end.substr(11, 5)
+      }
+      if (this.newEvent.group == null && this.newEvent.profile == null) {
+        this.newEvent.all = true
+      }
+      this.addForm = true
     },
     viewDay({date}) {
       this.focus = date
@@ -417,49 +497,6 @@ export default {
       }
 
       nativeEvent.stopPropagation()
-    },
-    updateRange() {
-      const events = []
-      //{start, end}
-      // const min = new Date(`${start.date}T00:00:00`)
-      // const max = new Date(`${end.date}T23:59:59`)
-      // const days = (max.getTime() - min.getTime()) / 86400000
-      // const eventCount = this.rnd(days, days + 20)
-
-      // for (let i = 0; i < eventCount; i++) {
-      //   // const allDay = this.rnd(0, 3) === 0
-      //   const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-      //   const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-      //   // const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-      //   // const second = new Date(first.getTime() + secondTimestamp)
-      //
-      //   events.push({
-      //     name: this.names[this.rnd(0, this.names.length - 1)],
-      //     start: first,
-      //     end: first,
-      //     color: this.colors[this.rnd(0, this.colors.length - 1)],
-      //     timed: false,
-      //   })
-      // }
-      events.push({
-        name: 'Собрание',
-        start: "2022-01-12 15:45",
-        end: '',
-        color: this.colors[this.rnd(0, this.colors.length - 1)],
-        timed: true,
-      })
-      events.push({
-        name: 'День рождения мамы',
-        start: "2022-01-01",
-        end: "2022-01-01",
-        color: this.colors[this.rnd(0, this.colors.length - 1)],
-        timed: false,
-      })
-
-      this.events = events
-    },
-    rnd(a, b) {
-      return Math.floor((b - a + 1) * Math.random()) + a
     },
   },
 }
