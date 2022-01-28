@@ -345,6 +345,8 @@ export default {
           this.newEvent.group = null
           this.newEvent.profile = null
         }
+        this.newEvent.start = null
+        this.newEvent.end = null
         if (this.newEvent.allDay) {
           this.newEvent.start = this.newEvent.date_start + ' ' + '00:00'
           if (this.newEvent.date_end !== '')
