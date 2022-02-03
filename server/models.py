@@ -316,6 +316,7 @@ class Purchases(models.Model):
 
 class Sales(models.Model):
     """Счета"""
+    # todo Добавить поле "номер счета" - значение id+9999
     create_date = models.DateField(verbose_name="Дата покупки")
     object_number = models.CharField(verbose_name='Номер объекта', max_length=60, null=True, blank=True)
     client = models.ForeignKey("Client", models.RESTRICT, verbose_name="Клиент", null=True, blank=True)

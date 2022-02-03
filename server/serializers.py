@@ -421,3 +421,21 @@ class CalendarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Calendar
         fields = '__all__'
+
+
+class TimeReportSerializer(serializers.ModelSerializer):
+    """Сериализация часовых отчетов"""
+    user_profile_id = UserProfileSerializer()
+    object_id = ObjectsSerializer()
+
+    class Meta:
+        model = TimeReport
+        fields = '__all__'
+
+
+class TimeReportPostSerializer(serializers.ModelSerializer):
+    """Сериализация часовых отчетов для POST-запросов"""
+
+    class Meta:
+        model = TimeReport
+        fields = '__all__'

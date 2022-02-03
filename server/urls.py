@@ -12,6 +12,8 @@ urlpatterns = [
     path('profiles/positions', PositionProfileView.as_view()),
     path('profiles/<int:id>', ProfilesView.as_view()),
     path('print-profiles/<int:id>', PrintProfile.as_view()),
+    path('time-reports', TimeReportView.as_view()),
+    path('time-reports/<int:user_profile_id>', TimeReportView.as_view()),
     path('group', GroupView.as_view()),
     path('groups', GroupsView.as_view()),
     path('groups-functions', GroupFunctionsView.as_view()),

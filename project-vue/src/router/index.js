@@ -28,6 +28,7 @@ import SalesOpen from "../views/open/SalesOpen";
 import Offers from "../views/Offers";
 import OffersOpen from "../views/open/OffersOpen";
 import Calendar from "../views/Calendar";
+import Timing from "../views/Timing";
 
 Vue.use(VueRouter)
 
@@ -38,11 +39,6 @@ const routes = [
         component: Index
     },
     {
-        path: '/profile',
-        name: 'Profile',
-        component: Profile
-    },
-    {
         path: '/login',
         name: 'Login',
         component: Login
@@ -51,6 +47,16 @@ const routes = [
         path: '/recover',
         name: 'RecoverPassword',
         component: RecoverPassword
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: Profile
+    },
+    {
+        path: '/time-reports',
+        name: 'Timing',
+        component: Timing
     },
     {
         path: '/news',

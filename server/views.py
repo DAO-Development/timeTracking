@@ -647,7 +647,6 @@ class NotesView(APIView):
             return Response(status=400)
 
     def put(self, request):
-        # @todo исправить timezone
         saved_note = get_object_or_404(Notes.objects.all(), id=request.data["id"])
         serializer = NotesSerializer(saved_note, data={
             "text": request.data['text'],
@@ -1172,18 +1171,6 @@ class ItemsView(APIView):
         return Response(status=204)
 
 
-class ToZipView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        newzip = zipfile.ZipFile('media/accounting/' + request.data['name'] + '.zip', 'w')
-        path = request.data['path'].split(';')
-        for item in path:
-            newzip.write('media' + item)
-        newzip.close()
-        return Response({"name": 'media/accounting/' + request.data['name'] + '.zip'})
-
-
 class CalendarView(APIView):
     """Календарь"""
     permission_classes = [permissions.IsAuthenticated]
@@ -1236,6 +1223,58 @@ class CalendarView(APIView):
         saved = get_object_or_404(Calendar.objects.all(), id=request.data["id"])
         saved.delete()
         return Response(status=204)
+
+
+class TimeReportView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, user_profile_id=None):
+        reports = TimeReport.objects.all()
+        if user_profile_id is not None:
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+            reports = reports.filter(user_profile_id=user_profile)
+        serializer = TimeReportSerializer(data=reports, many=True)
+        return Response({"data": serializer.data}, status=200)
+
+    def post(self, request):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+        if request.data["user_profile_id"] is not None and request.data["user_profile_id"] != '':
+            user_profile = request.data["user_profile_id"]
+
+        serializer = TimeReportPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user_profile_id=user_profile)
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved = get_object_or_404(TimeReport.objects.all(), id=request.data["id"])
+        serializer = TimeReportPostSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved = get_object_or_404(TimeReport.objects.all(), id=request.data["id"])
+        saved.delete()
+        return Response(status=204)
+
+
+class ToZipView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        newzip = zipfile.ZipFile('media/accounting/' + request.data['name'] + '.zip', 'w')
+        path = request.data['path'].split(';')
+        for item in path:
+            newzip.write('media' + item)
+        newzip.close()
+        return Response({"name": 'media/accounting/' + request.data['name'] + '.zip'})
 
 # class ImagesView(APIView):
 #     """Загрузка изображений из редактора"""
