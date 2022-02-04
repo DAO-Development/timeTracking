@@ -38,7 +38,7 @@
               </v-toolbar>
             </v-sheet>
             <v-sheet height="600">
-              <v-calendar ref="calendar" v-model="focus" color="primary" :events="timings"
+              <v-calendar ref="calendar" v-model="focus" :color="colors" :events="timings"
                           :type="type"
                           @click:event="showEvent"
               ></v-calendar>
@@ -79,7 +79,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <h3>Добавление</h3>
+        <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-form ref="form" :model="newTiming">
             <v-row>
@@ -169,6 +169,9 @@ import $ from "jquery";
 export default {
   name: "Timing",
   components: {Header},
+  props: {
+    id: [String, Number, undefined]
+  },
   data() {
     return {
       timings: [],
@@ -184,6 +187,7 @@ export default {
         user_profile_id: null,
         comment: ''
       },
+      colors: '',
       focus: '',
       type: 'month',
       selectedEvent: {},
@@ -225,8 +229,22 @@ export default {
   methods: {
     allowedDates: val => val <= new Date().toISOString(),
     loadData() {
+      let url = "time-tracking/time-reports"
+      switch (this.id) {
+        case undefined:
+          this.colors = 'primary'
+          break
+        case 'all':
+          url += '/all'
+          this.colors = 'FFAA12'+15
+          break
+        default:
+          url += '/' + this.id
+          this.colors = 'primary'
+          break
+      }
       $.ajax({
-        url: this.$hostname + "time-tracking/time-reports",
+        url: this.$hostname + url,
         type: "GET",
         success: (response) => {
           this.timings = response.data.data
@@ -271,7 +289,7 @@ export default {
     },
     loadPositions() {
       $.ajax({
-        url: this.$hostname + "time-tracking/time-reports/positions",
+        url: this.$hostname + "time-tracking/time-reports-positions",
         type: "GET",
         success: (response) => {
           this.positions = response.data.positions

@@ -80,7 +80,7 @@
       <div class="objects-open" v-else>
         <div class="objects-open__info profile__info">
           <h3>Информация об объекте</h3>
-          <div class="news-open__actions open__actions">
+          <div class="news-open__actions open__actions" v-if="$parent.$parent.edit.indexOf('Объекты') !== -1">
             <div class="addition-btn" @click="openEditForm(currentObject)">
               <edit-icon/>
               Редактировать объект
@@ -187,7 +187,7 @@
                     <span>{{ worker.comment }}</span>
                   </v-list-item-subtitle>
                 </v-list-item-content>
-                <v-list-item-action>
+                <v-list-item-action v-if="$parent.$parent.edit.indexOf('Объекты') !== -1">
                   <v-icon color="grey lighten-1" @click="openEditWorkerForm(worker)">
                     $edit
                   </v-icon>
@@ -224,7 +224,7 @@
           <div class="objects-open__comments">
             <div class="objects-open__comments-single" v-for="com in comments.comments" :key="com.id">
               <h4> {{ com.user_profile_id.lastname }} {{ com.user_profile_id.name }}
-                ({{ com.user_profile_id.position }})</h4>
+                ({{ com.user_profile_id.position.name }})</h4>
               <div v-html="com.text"></div>
               <div class="open__actions">
                 <div class="addition-btn" @click="answer=com.text; newComment.object_comments_id=com.id">
@@ -238,7 +238,7 @@
               <v-divider></v-divider>
               <div class="objects-open__comments-answers" v-for="ans in comments.data[com.id]" :key="ans.id">
                 <h4> {{ ans.user_profile_id.lastname }} {{ ans.user_profile_id.name }}
-                  ({{ ans.user_profile_id.position }})</h4>
+                  ({{ ans.user_profile_id.position.name }})</h4>
                 <div v-html="ans.text"></div>
                 <div class="open__actions">
                   <div class="addition-btn" @click="deleteComment(ans.id)"

@@ -11,6 +11,9 @@
              @click="openFilters">Фильтры
         </div>
       </div>
+      <v-btn class="action-btn" color="primary" @click="$router.push({name: 'ProfileTiming', params: {id: 'all'}})">
+        Часовые отчеты работников
+      </v-btn>
       <div class="workers-all all" v-if="all">
         <div class="content-list__filters">
           <v-icon color="grey lighten-1" @click="closeFilters">
@@ -561,7 +564,7 @@ export default {
         url: this.$hostname + "time-tracking/profiles/positions",
         type: "GET",
         success: (response) => {
-          this.positions = response.data.positions
+          this.positions = response.data.data
         },
         error: (response) => {
           if (response.status === 500) {

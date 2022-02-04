@@ -1234,7 +1234,7 @@ class TimeReportView(APIView):
             user = UserSerializer(request.user)
             user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
             reports = reports.filter(user_profile_id=user_profile)
-        else:
+        elif user_profile_id != "all":
             reports = reports.filter(user_profile_id=user_profile_id)
         serializer = TimeReportSerializer(reports, many=True)
         return Response({"data": serializer.data}, status=200)

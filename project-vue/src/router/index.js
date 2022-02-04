@@ -59,6 +59,12 @@ const routes = [
         component: Timing
     },
     {
+        path: '/time-reports/:id',
+        name: 'ProfileTiming',
+        component: Timing,
+        props: true
+    },
+    {
         path: '/news',
         name: 'News',
         component: News
