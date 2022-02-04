@@ -90,7 +90,8 @@
                   <v-text-field v-model="newTiming.date" label="Дата" readonly v-bind="attrs"
                                 v-on="on" outlined :rules="reqRules"></v-text-field>
                 </template>
-                <v-date-picker v-model="newTiming.date" @input="menus.dateMenu = false"></v-date-picker>
+                <v-date-picker v-model="newTiming.date" @input="menus.dateMenu = false"
+                               :allowed-dates="allowedDates"></v-date-picker>
               </v-menu>
             </v-row>
             <v-autocomplete label="Выберите объект" v-model="newTiming.objects_id" :items="objects" item-text="label"
@@ -116,6 +117,7 @@
                                 v-on="on" outlined required></v-text-field>
                 </template>
                 <v-time-picker v-if="menus.timeEndMenu" v-model="newTiming.time_end" full-width format="24hr"
+                               :min="newTiming.time_start"
                                @click:minute="$refs.menuEndTime.save(newTiming.time_end)"></v-time-picker>
               </v-menu>
             </v-row>
@@ -221,6 +223,7 @@ export default {
     }
   },
   methods: {
+    allowedDates: val => val <= new Date().toISOString(),
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/time-reports",
