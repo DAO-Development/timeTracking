@@ -426,7 +426,7 @@ class CalendarSerializer(serializers.ModelSerializer):
 class TimeReportSerializer(serializers.ModelSerializer):
     """Сериализация часовых отчетов"""
     user_profile_id = UserProfileSerializer()
-    object_id = ObjectsSerializer()
+    objects_id = ObjectsSerializer()
 
     class Meta:
         model = TimeReport

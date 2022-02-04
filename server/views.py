@@ -1230,11 +1230,13 @@ class TimeReportView(APIView):
 
     def get(self, request, user_profile_id=None):
         reports = TimeReport.objects.all()
-        if user_profile_id is not None:
+        if user_profile_id is None:
             user = UserSerializer(request.user)
             user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
             reports = reports.filter(user_profile_id=user_profile)
-        serializer = TimeReportSerializer(data=reports, many=True)
+        else:
+            reports = reports.filter(user_profile_id=user_profile_id)
+        serializer = TimeReportSerializer(reports, many=True)
         return Response({"data": serializer.data}, status=200)
 
     def post(self, request):
@@ -1242,13 +1244,22 @@ class TimeReportView(APIView):
         user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
         if request.data["user_profile_id"] is not None and request.data["user_profile_id"] != '':
             user_profile = request.data["user_profile_id"]
-
-        serializer = TimeReportPostSerializer(data=request.data)
+        data = {
+            "date": request.data["date"],
+            "time_start": request.data["time_start"],
+            "time_end": request.data["time_end"],
+            "position": request.data["position"],
+            "objects_id": request.data["objects_id"],
+            "user_profile_id": user_profile,
+            "comment": request.data["comment"]
+        }
+        serializer = TimeReportPostSerializer(data=data)
+        # return Response({"data": data}, status=201)
         if serializer.is_valid():
-            serializer.save(user_profile_id=user_profile)
+            serializer.save()
             return Response(status=201)
         else:
-            return Response(status=400)
+            return Response({"data": data}, status=400)
 
     def put(self, request):
         saved = get_object_or_404(TimeReport.objects.all(), id=request.data["id"])
@@ -1263,6 +1274,15 @@ class TimeReportView(APIView):
         saved = get_object_or_404(TimeReport.objects.all(), id=request.data["id"])
         saved.delete()
         return Response(status=204)
+
+
+class TimeReportPositionsView(APIView):
+    """Профили работ из часовых отчетов"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        positions = TimeReport.objects.all().values_list("position", flat=True).distinct("position")
+        return Response({"positions": positions}, status=200)
 
 
 class ToZipView(APIView):
