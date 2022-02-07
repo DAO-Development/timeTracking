@@ -3,7 +3,9 @@
     <Header/>
     <section class="summary-box">
       <h1>Отчетность по проделанной работе</h1>
-      <v-btn class="action-btn" color="primary" @click="addForm = true; formTitle='Добавление'">Добавить</v-btn>
+      <v-btn class="action-btn" color="primary" v-if="id === undefined" @click="addForm = true; formTitle='Добавление'">
+        Добавить
+      </v-btn>
       <div class="calendar">
         <v-row class="fill-height">
           <v-col>
@@ -19,28 +21,30 @@
                   {{ $refs.calendar.title }}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <!--                <v-menu bottom right>-->
-                <!--                  <template v-slot:activator="{ on, attrs }">-->
-                <!--                    <v-btn outlined color="grey darken-2" v-bind="attrs" v-on="on">-->
-                <!--                      <span>{{ typeToLabel[type] }}</span>-->
-                <!--                      <v-icon right> mdi-menu-down</v-icon>-->
-                <!--                    </v-btn>-->
-                <!--                  </template>-->
-                <!--                  <v-list>-->
-                <!--                    <v-list-item @click="type = 'day'">-->
-                <!--                      <v-list-item-title> День</v-list-item-title>-->
-                <!--                    </v-list-item>-->
-                <!--                    <v-list-item @click="type = 'month'">-->
-                <!--                      <v-list-item-title>Месяц</v-list-item-title>-->
-                <!--                    </v-list-item>-->
-                <!--                  </v-list>-->
-                <!--                </v-menu>-->
+                <v-menu v-if="id === 'all'" bottom right>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn outlined color="grey darken-2" v-bind="attrs" v-on="on">
+                      <span>{{ typeToLabel[type] }}</span>
+                      <v-icon right> mdi-menu-down</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item @click="type = 'day'">
+                      <v-list-item-title> День</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="type = 'month'">
+                      <v-list-item-title>Месяц</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
               </v-toolbar>
             </v-sheet>
             <v-sheet height="600">
               <v-calendar ref="calendar" v-model="focus" :color="colors" :events="timings"
                           :type="type"
                           @click:event="showEvent"
+                          @click:more="viewDay"
+                          @click:date="viewDay"
               ></v-calendar>
               <v-menu v-model="selectedOpen" :close-on-content-click="false" :activator="selectedElement" offset-x>
                 <v-card color="grey lighten-4" min-width="350px" flat>
@@ -187,12 +191,16 @@ export default {
         user_profile_id: null,
         comment: ''
       },
-      colors: '',
+      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1', 'yellow', 'pink', 'lime'],
       focus: '',
       type: 'month',
       selectedEvent: {},
       selectedOpen: false,
       selectedElement: null,
+      typeToLabel: {
+        month: 'Месяц',
+        day: 'День',
+      },
       menus: {
         dateMenu: false,
         timeStartMenu: false,
@@ -236,7 +244,7 @@ export default {
           break
         case 'all':
           url += '/all'
-          this.colors = 'FFAA12'+15
+          this.colors = 'primary'
           break
         default:
           url += '/' + this.id
@@ -251,6 +259,9 @@ export default {
           this.timings.forEach(timing => {
             timing.start = timing.date + ' ' + timing.time_start
             timing.end = timing.date + ' ' + timing.time_end
+            if (this.id === 'all')
+              timing.name = timing.user_profile_id.lastname + ' ' + timing.user_profile_id.name + ' (' + timing.user_profile_id.position.name + ')'
+            // timing.color = this.colors[timing.user_profile_id % 10]
           })
         },
         error: (response) => {
@@ -407,6 +418,12 @@ export default {
         },
       })
     },
+    viewDay({date}) {
+      if (this.id === 'all') {
+        this.focus = date
+        this.type = 'day'
+      }
+    },
     showEvent({nativeEvent, event}) {
       const open = () => {
         this.selectedEvent = event
@@ -422,6 +439,9 @@ export default {
       }
 
       nativeEvent.stopPropagation()
+    },
+    getEventColor(event) {
+      return event.color
     },
   }
 }

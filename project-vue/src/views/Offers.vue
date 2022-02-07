@@ -11,10 +11,12 @@
               <v-btn float color="primary" @click="$router.push({name: 'OffersOpen', params: {id: offer.id}})">
                 <v-icon>mdi-format-list-bulleted-square</v-icon>
               </v-btn>
-              <v-btn float color="primary" @click="openEditForm(offer)">
+              <v-btn float color="primary" @click="openEditForm(offer)"
+                     v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn float color="primary" @click="currentOffer = offer.id; confirmDeleteDialog = true">
+              <v-btn float color="primary" @click="currentOffer = offer.id; confirmDeleteDialog = true"
+                     v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </div>

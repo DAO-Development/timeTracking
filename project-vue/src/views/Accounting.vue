@@ -9,7 +9,10 @@
         <v-data-table :headers="headers" :items="documents" item-key="id">
           <template v-slot:item.actions="{ item }">
             <!--            <v-icon small class="mr-2" @click="openEditForm(item)">mdi-pencil</v-icon>-->
-            <v-icon small @click="currentDocument=item.id; confirmDeleteDialog=true">mdi-delete</v-icon>
+            <v-icon small @click="currentDocument=item.id; confirmDeleteDialog=true"
+                    v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
+              mdi-delete
+            </v-icon>
           </template>
           <template v-slot:item.name="{ item }">
             <span @click="$router.push({name: 'AccountingOpen', params: {type: type, id: item.id}})">

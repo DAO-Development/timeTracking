@@ -53,8 +53,14 @@
           <span class="content">{{ newWaybill.auto_fuel }}</span>
         </li>
       </ul>
-      <v-btn class="action-btn" color="primary" @click="loadGoals; addForm = true">Редактировать</v-btn>
-      <v-btn class="action-btn" color="primary" @click="confirmDeleteDialog = true">Удалить</v-btn>
+      <v-btn class="action-btn" color="primary" @click="loadGoals; addForm = true"
+             v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
+        Редактировать
+      </v-btn>
+      <v-btn class="action-btn" color="primary" @click="confirmDeleteDialog = true"
+             v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
+        Удалить
+      </v-btn>
     </section>
     <v-dialog v-model="addForm">
       <v-card>

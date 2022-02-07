@@ -92,6 +92,12 @@ const routes = [
         props: true
     },
     {
+        path: '/documents/:type',
+        name: 'DocumentsOwn',
+        component: Documents,
+        props: true
+    },
+    {
         path: '/news/:id',
         name: 'NewOpen',
         component: NewOpen,

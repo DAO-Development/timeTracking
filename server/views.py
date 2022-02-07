@@ -164,10 +164,12 @@ class UserDocumentsView(APIView):
     """Документы пользователей"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, ):
-        profile = get_object_or_404(UserProfile.objects.all(), pk=request.GET['id'])
+    def get(self, request, id=None):
+        if id is None:
+            id = UserProfile.objects.get(auth_user_id=UserSerializer(request.user).data["id"]).id
+        profile = get_object_or_404(UserProfile.objects.all(), pk=id)
         profile_serializer = UserProfileSerializer(profile)
-        documents = UserDocuments.objects.all().filter(user_profile_id=request.GET['id'])
+        documents = UserDocuments.objects.all().filter(user_profile_id=id)
         serializer = UserDocumentsSerializer(documents, many=True)
         return Response({"profile": profile_serializer.data, "documents": serializer.data}, status=200)
 
@@ -1051,10 +1053,12 @@ class WaybillView(APIView):
         user = UserSerializer(request.user)
         user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
         serializer = WaybillPostSerializer(data={
-            'date': request.data['date'],
+            'date_start': request.data['date_start'],
+            'date_end': request.data['date_end'],
             'departure': request.data['departure'],
             'destination': request.data['destination'],
-            'kilometrage': request.data['kilometrage'],
+            'kilometrage_start': request.data['kilometrage_start'],
+            'kilometrage_end': request.data['kilometrage_end'],
             'time_start': request.data['time_start'],
             'time_end': request.data['time_end'],
             'goal': request.data['goal'],

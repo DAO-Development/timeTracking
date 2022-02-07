@@ -11,15 +11,23 @@
       <div class="documents-all all">
         <v-data-table :headers="headers" :items="documents" item-key="id" @click:row="downloadFile">
           <template v-slot:item.actions="{ item }">
-            <v-icon small class="mr-2" @click="openEditForm(item)">mdi-pencil</v-icon>
-            <v-icon small @click="openConfirmDeleteDialog(item)">mdi-delete</v-icon>
+            <v-icon small class="mr-2" @click="openEditForm(item)"
+                    v-if="id === undefined || $parent.$parent.edit.indexOf('Работники') !== -1">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="openConfirmDeleteDialog(item)"
+                    v-if="id === undefined || $parent.$parent.edit.indexOf('Работники') !== -1">
+              mdi-delete
+            </v-icon>
           </template>
           <template v-slot:no-data>
             Документы не загружены
           </template>
         </v-data-table>
         <v-list class="content-list__btns">
-          <v-list-item class="content-list__btns-add" @click="openAddForm">
+          <v-list-item class="content-list__btns-add"
+                       v-if="id === undefined || $parent.$parent.edit.indexOf('Работники') !== -1"
+                       @click="openAddForm">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -77,7 +85,7 @@ export default {
   components: {BackIcon},
   props: {
     type: String,
-    id: [String, Number],
+    id: [String, Number, undefined],
   },
   data() {
     return {
@@ -122,12 +130,14 @@ export default {
       console.log(this.currentDocument.path.type)
     },
     loadData() {
+      let url = ''
+      if (this.id !== undefined)
+        url = "time-tracking/documents/" + this.type + "/" + this.id
+      else
+        url = "time-tracking/documents/" + this.type
       $.ajax({
-        url: this.$hostname + "time-tracking/documents/" + this.type,
+        url: this.$hostname + url,
         type: "GET",
-        data: {
-          "id": this.id
-        },
         success: (response) => {
           this.documents = response.data.documents
           this.profile = response.data.profile

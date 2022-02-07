@@ -70,17 +70,29 @@
             <span v-if="full">Скрыть полную информацию</span>
             <span v-if="!full">Показать полную информацию</span>
           </div>
+          <div class="addition-btn"
+               @click="$router.push({name: 'DocumentsOwn', params: {type: 'worker'}})">
+            Документы
+          </div>
         </div>
         <div class="profile__info profile__info-full" v-if="full">
           <h3>Адреса</h3>
           <ul>
             <li>
               <span class="profile__info-title">Адрес в своей стране</span>
-              <span class="profile__info-content">{{ user.address_own }}</span>
+              <span class="profile__info-content"
+                    v-if="user.address_own.city !== '' && user.address_own.city !== undefined && user.address_own !== undefined">
+                {{ user.address_own.city }}, {{ user.address_own.street }}, д.{{ user.address_own.house }},
+                кв.{{ user.address_own.flat }}
+              </span>
             </li>
             <li>
               <span class="profile__info-title">Адрес в Финляндии</span>
-              <span class="profile__info-content">{{ user.address_fin }}</span>
+              <span class="profile__info-content"
+                    v-if="user.address_fin.city !== '' && user.address_fin.city !== undefined && user.address_fin !== undefined">
+                {{ user.address_fin.city }}, {{ user.address_fin.street }}, д.{{ user.address_fin.house }},
+                кв.{{ user.address_fin.flat }}
+              </span>
             </li>
           </ul>
           <h3>Одежда (размеры)</h3>

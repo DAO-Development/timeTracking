@@ -6,7 +6,10 @@
       <v-btn class="action-btn" color="primary" @click="addForm = true">Добавить</v-btn>
       <v-data-table :headers="headers" :items="waybills" item-key="id">
         <template v-slot:item.actions="{ item }">
-          <v-icon small @click="currentWaybill=item.id; confirmDeleteDialog=true">mdi-delete</v-icon>
+          <v-icon small @click="currentWaybill=item.id; confirmDeleteDialog=true"
+                  v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
+            mdi-delete
+          </v-icon>
         </template>
         <template v-slot:item.date_start="{ item }">
             <span @click="$router.push({name: 'WaybillOpen', params: {id: item.id}})">
@@ -26,11 +29,13 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <h3>Добавление</h3>
+        <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-form ref="form" :model="newWaybill">
             <v-row>
-              <v-menu ref="dateStartMenu" v-if="$parent.$parent.admin || formTitle==='Добавление'" v-model="menus.dateStartMenu"
+              <v-menu ref="dateStartMenu"
+                      v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1 || formTitle==='Добавление'"
+                      v-model="menus.dateStartMenu"
                       :close-on-content-click="false"
                       :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
@@ -39,7 +44,9 @@
                 </template>
                 <v-date-picker v-model="newWaybill.date_start" @input="menus.dateStartMenu = false"></v-date-picker>
               </v-menu>
-              <v-menu ref="dateEndMenu" v-if="$parent.$parent.admin || formTitle==='Добавление'" v-model="menus.dateEndMenu"
+              <v-menu ref="dateEndMenu"
+                      v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1 || formTitle==='Добавление'"
+                      v-model="menus.dateEndMenu"
                       :close-on-content-click="false"
                       :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
                 <template v-slot:activator="{ on, attrs }">
@@ -49,10 +56,12 @@
                 <v-date-picker v-model="newWaybill.date_end" @input="menus.dateEndMenu = false"></v-date-picker>
               </v-menu>
             </v-row>
-            <v-text-field v-if="!$parent.$parent.admin && formTitle==='Редактирование'" v-model="newWaybill.date_start" label="Дата начала поездки"
+            <v-text-field v-if="!$parent.$parent.admin && formTitle==='Редактирование'" v-model="newWaybill.date_start"
+                          label="Дата начала поездки"
                           outlined
                           disabled></v-text-field>
-            <v-text-field v-if="!$parent.$parent.admin && formTitle==='Редактирование'" v-model="newWaybill.date_end" label="Дата окончания поездки"
+            <v-text-field v-if="!$parent.$parent.admin && formTitle==='Редактирование'" v-model="newWaybill.date_end"
+                          label="Дата окончания поездки"
                           outlined
                           disabled></v-text-field>
             <v-text-field v-model="newWaybill.departure" label="Пункт отправления" outlined :rules="reqRules"
@@ -176,6 +185,7 @@ export default {
         {text: '', value: 'actions', sortable: false},
       ],
       currentWaybill: 0,
+      formTitle: 'Добавление',
       addForm: false,
       confirmDeleteDialog: false,
       alertError: false,

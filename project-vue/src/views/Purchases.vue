@@ -35,10 +35,12 @@
               <v-btn float color="primary" @click="$router.push({name: 'PurchaseOpen', params: {id: cheque.id}})">
                 <v-icon>mdi-format-list-bulleted-square</v-icon>
               </v-btn>
-              <v-btn float color="primary" @click="formTitle='Редактирование'; newPurchase=cheque; addForm=true">
+              <v-btn float color="primary" @click="formTitle='Редактирование'; newPurchase=cheque; addForm=true"
+                     v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn float color="primary" @click="currentPurchase = cheque.id; confirmDeleteDialog = true">
+              <v-btn float color="primary" @click="currentPurchase = cheque.id; confirmDeleteDialog = true"
+                     v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </div>

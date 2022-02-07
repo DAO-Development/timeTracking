@@ -13,7 +13,10 @@
           <v-img
               v-if="currentProfile.photo_path" :lazy-src="$hostname+'media'+currentProfile.photo_path"
               :src="$hostname+'media'+currentProfile.photo_path"></v-img>
-          <div class="profile__change-photo" @click="photoDialog = true">Сменить фото</div>
+          <div class="profile__change-photo" v-if="$parent.$parent.edit.indexOf('Работники') !== -1"
+               @click="photoDialog = true">
+            Сменить фото
+          </div>
           <v-btn class="action-btn" color="primary"
                  @click="$router.push({name: 'ProfileTiming', params: {id: currentProfile.id}})">Часовая отчетность
           </v-btn>
