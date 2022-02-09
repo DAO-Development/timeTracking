@@ -66,6 +66,7 @@ export default {
     console.log("init Accounting " + this.type)
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
+      this.$emit('load-functions')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })

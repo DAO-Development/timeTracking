@@ -69,6 +69,7 @@ export default {
         success: (response) => {
           this.read = response.data.read
           this.edit = response.data.edit
+          this.admin = response.data.admin
         },
         error: (response) => {
           if (response.status === 500) {
@@ -78,7 +79,8 @@ export default {
           } else {
             console.log("Непредвиденная ошибка")
           }
-        }
+        },
+        async: false,
       })
     },
     loadUser() {
@@ -88,7 +90,8 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
           //todo исправить определение админа по группе
-          this.admin = response.data.data.auth_user_id.is_staff
+          // this.admin = response.data.data.auth_user_id.is_staff
+          console.log(response.data)
         },
         error: (response) => {
           if (response.status === 500) {
@@ -100,6 +103,7 @@ export default {
           }
           this.alertError = true
         },
+        async: false,
       })
     }
   }

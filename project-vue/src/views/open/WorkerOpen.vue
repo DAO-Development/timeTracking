@@ -478,6 +478,7 @@ export default {
   created() {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
+      this.$emit('load-functions')
       if (this.$parent.$parent.read.indexOf('Работники') === -1)
         this.$router.push({name: "Index"})
       $.ajaxSetup({
@@ -536,7 +537,7 @@ export default {
         url: this.$hostname + "time-tracking/profiles/positions",
         type: "GET",
         success: (response) => {
-          this.positions = response.data.positions
+          this.positions = response.data.data
         },
         error: (response) => {
           if (response.status === 500) {

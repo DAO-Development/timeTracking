@@ -23,15 +23,16 @@ export default new Vuetify({
             light: {
                 primary: '#3D6FB6',
                 secondary: '#616161',
-                accent: '#673ab7',
-                alert: '#f44336',
-                error: '#f44336',
-                warning: '#ff9800',
-                info: '#3D6FB6',
-                success: '#3D6FB6',
                 text: {
                     primary: '#333333',
                     secondary: '#616161'
+                }
+            },
+            dark: {
+                primary: '#2A3C52',
+                secondary: '#344D69',
+                text: {
+                    primary: '#FFFFFF'
                 }
             },
         },

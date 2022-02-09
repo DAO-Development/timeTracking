@@ -60,7 +60,7 @@
                     </v-btn>
                   </v-toolbar>
                   <v-card-text>
-                    <span v-html="selectedEvent.description"></span>
+                    <div v-html="selectedEvent.description"></div>
                   </v-card-text>
                   <v-card-actions>
                     <v-btn text color="secondary" @click="selectedOpen = false">
@@ -254,6 +254,7 @@ export default {
     console.log("init Calendar")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
+      this.$emit('load-functions')
       // if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
       //   this.$router.push({name: "Index"})
       $.ajaxSetup({

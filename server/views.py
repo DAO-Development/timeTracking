@@ -221,6 +221,9 @@ class GroupView(APIView):
     def get(self, request):
         user = UserSerializer(request.user)
         group = Group.objects.get(user=user.data["id"])
+        admin = False
+        if (group.name == "Администраторы"):
+            admin = True
         functions = GroupFunctions.objects.filter(group_id=group.id)
         read = []
         edit = []
@@ -229,7 +232,7 @@ class GroupView(APIView):
                 read.append(Functions.objects.get(pk=func.functions_id.id).text)
             if func.edit:
                 edit.append(Functions.objects.get(id=func.functions_id.id).text)
-        return Response({"read": read, "edit": edit})
+        return Response({"read": read, "edit": edit, "admin": admin})
 
     def post(self, request):
         serializer = GroupSerializer(data=request.data)

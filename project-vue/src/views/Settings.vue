@@ -3,6 +3,8 @@
     <Header/>
     <section class="summary-box">
       <h1>Настройки</h1>
+      <v-select v-model="selected" label="Тема" :items="items" item-text="name" item-value="theme"
+                @change="toggleTheme"></v-select>
       <v-list>
         <v-list-item v-if="$parent.$parent.admin" @click="$router.push({name: 'Groups'})">
           <v-list-item-icon>
@@ -78,10 +80,22 @@ import $ from "jquery";
 export default {
   name: "Settings",
   components: {Header},
+  data() {
+    return {
+      selected: 'light',
+      items: [
+        {theme: 'light', name: 'Светлая'},
+        {theme: 'dark', name: 'Темная'},
+        {theme: '#EA80FC', name: 'Фиолетовый'},
+        {theme: '#8BC34A', name: 'Зеленый'},
+      ]
+    }
+  },
   created() {
     console.log("init Settings")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
+      this.$emit('load-functions')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
@@ -90,6 +104,26 @@ export default {
       this.$router.push({name: "Index"})
     }
   },
+  methods: {
+    toggleTheme() {
+      switch (this.selected) {
+        case "dark":
+          this.$vuetify.theme.light = false
+          this.$vuetify.theme.dark = true
+          break
+        case "light":
+          this.$vuetify.theme.dark = false
+          this.$vuetify.theme.light = true
+          break
+        default:
+          this.$vuetify.theme.dark = false
+          this.$vuetify.theme.light = true
+          this.$vuetify.theme.themes.light.primary = this.selected
+          break
+      }
+
+    }
+  }
 }
 </script>
 

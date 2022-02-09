@@ -154,6 +154,7 @@ export default {
     console.log("init Index")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.auth = true
+      this.$emit('load-functions')
     }
     this.loadData()
   },

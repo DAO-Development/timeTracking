@@ -62,6 +62,7 @@ export default {
           },
           success: (response) => {
             this.$emit('set-auth')
+            this.$emit('load-functions')
             if (this.checkbox)
               localStorage.setItem("auth_token", response.data.attributes.auth_token)
             else

@@ -216,6 +216,7 @@ export default {
       if (this.$parent.$parent.read.indexOf('Контакты') === -1)
         this.$router.push({name: "Index"})
       this.$emit('set-auth')
+      this.$emit('load-functions')
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
