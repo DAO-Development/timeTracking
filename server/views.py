@@ -1181,16 +1181,21 @@ class CalendarView(APIView):
 
     def get(self, request):
         user = UserSerializer(request.user)
-        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"])
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
         events = Calendar.objects.all()
+        edit_event = events.filter(author=user_profile)
         user_event = events.filter(
-            Q(profile=user_profile.serializable_value('id')) | Q(group__in=user.data['groups']) | Q(group=None) & (Q(
-                profile=None)))
+            Q(profile=user_profile) | Q(group__in=user.data['groups']) | (Q(group=None) & Q(
+                profile=None))).exclude(author=user_profile)
+        serializer_edit = CalendarSerializer(edit_event, many=True)
         serializer = CalendarSerializer(user_event, many=True)
-        return Response({"data": serializer.data})
+        return Response({"data": serializer.data, "edit": serializer_edit.data})
 
     def post(self, request):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
         data = {
+            "author": user_profile,
             "group": request.data["group"],
             "profile": request.data["profile"],
             "name": request.data["name"],
@@ -1201,8 +1206,6 @@ class CalendarView(APIView):
             "description": request.data["description"]
         }
         if request.data["self"]:
-            user = UserSerializer(request.user)
-            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
             data["profile"] = user_profile
             data["group"] = None
         if request.data["end"] == '':

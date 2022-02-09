@@ -447,6 +447,9 @@ class Offer(models.Model):
 
 class Calendar(models.Model):
     """Календарь"""
+    # todo сделать author not Null
+    author = models.ForeignKey("UserProfile", verbose_name="Автор", related_name='author', on_delete=models.CASCADE,
+                               null=True)
     profile = models.ForeignKey("UserProfile", verbose_name="Пользователь", on_delete=models.CASCADE, null=True,
                                 blank=True)
     group = models.ForeignKey(Group, verbose_name="Группа", on_delete=models.CASCADE, null=True, blank=True)

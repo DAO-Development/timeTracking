@@ -52,10 +52,10 @@
                   <v-toolbar :color="selectedEvent.color" dark>
                     <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <v-btn icon @click="openEditForm">
+                    <v-btn v-if="selectedEvent.edit" icon @click="openEditForm">
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
-                    <v-btn icon @click="confirmDeleteDialog=true">
+                    <v-btn v-if="selectedEvent.edit" icon @click="confirmDeleteDialog=true">
                       <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </v-toolbar>
@@ -273,7 +273,15 @@ export default {
         url: this.$hostname + "time-tracking/calendar",
         type: "GET",
         success: (response) => {
-          this.events = response.data.data
+          let edit = response.data.edit
+          edit.forEach(event => {
+            event.edit = true
+          })
+          let events = response.data.data
+          events.forEach(event => {
+            event.edit = false
+          })
+          this.events = edit.concat(events)
           this.events.forEach(event => {
             if (event.allDay) {
               event.start = event.start.substr(0, 10)
