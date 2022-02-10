@@ -240,12 +240,21 @@ export default {
           this.contacts = response.data.data
         },
         error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
@@ -259,13 +268,21 @@ export default {
           this.selectsPosition = response.data.data
         },
         error: (response) => {
-          console.log(response)
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
@@ -279,13 +296,21 @@ export default {
           this.selectsClient = response.data.data
         },
         error: (response) => {
-          console.log(response)
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
@@ -305,13 +330,21 @@ export default {
             this.loadPositions()
           },
           error: (response) => {
-            console.log(response)
-            if (response.status === 500) {
-              this.alertMsg = "Ошибка соединения с сервером"
-            } else if (response.status === 401) {
-              this.$refresh()
-            } else {
-              this.alertMsg = "Непредвиденная ошибка"
+            switch (response.status) {
+              case 500:
+                this.alertMsg = "Ошибка соединения с сервером"
+                break
+              case 400:
+                this.alertMsg = "Ошибка в данных"
+                break
+              case 401:
+                this.$refresh()
+                break
+              case 403:
+                this.alertMsg = "Нет доступа"
+                break
+              default:
+                this.alertMsg = "Непредвиденная ошибка"
             }
             this.alertError = true
           }
@@ -334,12 +367,21 @@ export default {
           this.confirmArchiveDialog = false
         },
         error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
@@ -357,13 +399,21 @@ export default {
           this.confirmDeleteDialog = false
         },
         error: (response) => {
-          console.log(response)
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }

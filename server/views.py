@@ -12,6 +12,26 @@ from server.serializers import *
 from server.test_pdf import print_profile_form
 
 
+def check_permissions(request, page):
+    user = UserSerializer(request.user)
+    group = Group.objects.get(user=user.data["id"])
+    functions = GroupFunctions.objects.filter(group_id=group.id).filter(edit=True) \
+        .values_list('functions_id__text', flat=True)
+    if page in functions:
+        return True
+    else:
+        return False
+
+
+def check_admin(request):
+    user = UserSerializer(request.user)
+    group = Group.objects.get(user=user.data["id"])
+    if group.name == "Администраторы":
+        return True
+    else:
+        return False
+
+
 class MainView(APIView):
     """Статистика для главной страницы"""
     permission_classes = [permissions.IsAuthenticated]
@@ -36,7 +56,7 @@ class MainView(APIView):
 
 class UserView(APIView):
     """Пользователи"""
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, permissions.AllowAny]
 
     def get(self, request):
         user = UserSerializer(request.user)
@@ -84,7 +104,7 @@ class ActiveProfilesView(APIView):
 
 class ProfilesView(APIView):
     """Получение списка работников, профили"""
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, permissions.AllowAny]
 
     def get(self, request, id=None):
         user_profile = UserProfile.objects.all()
@@ -147,17 +167,23 @@ class PositionProfileView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = PositionProfileSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_admin(request):
+            serializer = PositionProfileSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response(status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved_position = get_object_or_404(PositionProfile.objects.all(), id=request.data["id"])
-        saved_position.delete()
-        return Response(status=204)
+        if check_admin(request):
+            saved_position = get_object_or_404(PositionProfile.objects.all(), id=request.data["id"])
+            saved_position.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class UserDocumentsView(APIView):
@@ -174,6 +200,8 @@ class UserDocumentsView(APIView):
         return Response({"profile": profile_serializer.data, "documents": serializer.data}, status=200)
 
     def put(self, request):
+        # todo Сделать чтобы пользователь добавлял документы только для себя,
+        # либо проверка прав редактирования
         create_date = datetime.date.today()
         name = ''
         if len(request.FILES) == 1:
@@ -198,20 +226,26 @@ class UserDocumentsView(APIView):
             serializer.save()
             return Response(status=201)
         else:
-            return Response(status=400)
+            return Response("Некорректные данные", status=400)
 
     def delete(self, request):
+        # todo удаление только своих или с правами редактирования
         document = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
         document.delete()
         return Response(status=204)
 
 
 class UserGroupsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def put(self, request):
-        user = User.objects.get(pk=request.data['auth_user_id'])
-        user.groups.clear()
-        user.groups.add(request.data['group_id'])
-        return Response({"data": user.groups.all().values_list('name', flat=True)})
+        if check_admin(request):
+            user = User.objects.get(pk=request.data['auth_user_id'])
+            user.groups.clear()
+            user.groups.add(request.data['group_id'])
+            return Response({"data": user.groups.all().values_list('name', flat=True)})
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class GroupView(APIView):
@@ -235,17 +269,23 @@ class GroupView(APIView):
         return Response({"read": read, "edit": edit, "admin": admin})
 
     def post(self, request):
-        serializer = GroupSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_admin(request):
+            serializer = GroupSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        group = get_object_or_404(Group.objects.all(), id=request.data['id'])
-        group.delete()
-        return Response(status=204)
+        if check_admin(request):
+            group = get_object_or_404(Group.objects.all(), id=request.data['id'])
+            group.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class GroupsView(APIView):
@@ -281,21 +321,27 @@ class GroupFunctionsView(APIView):
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     def get(self, request):
-        functions = GroupFunctions.objects.all()
-        serializer = GroupFunctionsSerializer(functions, many=True)
-        return Response({"data": serializer.data})
+        if check_admin(request):
+            functions = GroupFunctions.objects.all()
+            serializer = GroupFunctionsSerializer(functions, many=True)
+            return Response({"data": serializer.data})
+        else:
+            return Response("Доступ запрещен", status=403)
 
     def put(self, request):
-        if request.data["id"] == "0":
-            serializer = GroupFunctionsSerializer(data=request.data)
+        if check_admin(request):
+            if request.data["id"] == "0":
+                serializer = GroupFunctionsSerializer(data=request.data)
+            else:
+                saved_function = get_object_or_404(GroupFunctions.objects.all(), id=request.data["id"])
+                serializer = GroupFunctionsSerializer(saved_function, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"id": serializer.data["id"]}, status=201)
+            else:
+                return Response(status=400)
         else:
-            saved_function = get_object_or_404(GroupFunctions.objects.all(), id=request.data["id"])
-            serializer = GroupFunctionsSerializer(saved_function, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"id": serializer.data["id"]}, status=201)
-        else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
 
 class NewsView(APIView):
@@ -374,27 +420,36 @@ class ObjectsView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = ObjectsPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(create_date=datetime.date.today())
-            return Response(status=201)
+        if check_permissions(request, "Объекты"):
+            serializer = ObjectsPostSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(create_date=datetime.date.today())
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def put(self, request):
-        saved_object = get_object_or_404(Objects.objects.all(), id=request.data["id"])
-        data = request.data
-        serializer = ObjectsSerializer(saved_object, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_permissions(request, "Объекты"):
+            saved_object = get_object_or_404(Objects.objects.all(), id=request.data["id"])
+            data = request.data
+            serializer = ObjectsSerializer(saved_object, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        object = get_object_or_404(Objects.objects.all(), id=request.data["id"])
-        object.delete()
-        return Response(status=204)
+        if check_permissions(request, "Объекты"):
+            object = get_object_or_404(Objects.objects.all(), id=request.data["id"])
+            object.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class ObjectUserView(APIView):
@@ -413,34 +468,41 @@ class ObjectUserView(APIView):
         return Response({"data": serializer.data})
 
     def put(self, request):
-        if request.data["id"] == "0":
-            end_date = request.data['end_date']
-            if request.data['end_date'] == "":
-                end_date = None
-            serializer = ObjectUserPostSerializer(data={
-                "user_profile_id": int(request.data['user_profile_id']),
-                "objects_id": int(request.data['objects_id']),
-                "start_date": request.data['start_date'],
-                "end_date": end_date,
-                "comment": request.data['comment'],
-            })
+        if check_permissions(request, "Объекты"):
+            if request.data["id"] == "0":
+                end_date = request.data['end_date']
+                if request.data['end_date'] == "":
+                    end_date = None
+                serializer = ObjectUserPostSerializer(data={
+                    "user_profile_id": int(request.data['user_profile_id']),
+                    "objects_id": int(request.data['objects_id']),
+                    "start_date": request.data['start_date'],
+                    "end_date": end_date,
+                    "comment": request.data['comment'],
+                })
+            else:
+                saved_object = get_object_or_404(ObjectUser.objects.all(), id=request.data["id"])
+                serializer = ObjectUserSerializer(saved_object, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            saved_object = get_object_or_404(ObjectUser.objects.all(), id=request.data["id"])
-            serializer = ObjectUserSerializer(saved_object, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
-        else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        object_user = get_object_or_404(ObjectUser.objects.all(), id=request.data['id'])
-        object_user.delete()
-        return Response(status=204)
+        if check_permissions(request, "Объекты"):
+            object_user = get_object_or_404(ObjectUser.objects.all(), id=request.data['id'])
+            object_user.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class ObjectPhotoView(APIView):
     """Фото объектов"""
+    # todo нужен ли вообще?
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, objects_id):
@@ -523,33 +585,42 @@ class ClientView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = ClientPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(create_date=datetime.date.today())
-            return Response(status=201)
+        if check_permissions(request, 'Клиенты'):
+            serializer = ClientPostSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(create_date=datetime.date.today())
+                return Response(status=201)
+            else:
+                return Response("Неверные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def put(self, request):
-        saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
-        data = request.data
-        if len(request.FILES) == 1:
-            name = '/clients/' + request.FILES['image'].name
-            with open('media' + name, 'wb+') as destination:
-                for chunk in request.FILES['image'].chunks():
-                    destination.write(chunk)
-            data = {"logo_path": name}
-        serializer = ClientSerializer(saved_client, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_permissions(request, 'Клиенты'):
+            saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
+            data = request.data
+            if len(request.FILES) == 1:
+                name = '/clients/' + request.FILES['image'].name
+                with open('media' + name, 'wb+') as destination:
+                    for chunk in request.FILES['image'].chunks():
+                        destination.write(chunk)
+                data = {"logo_path": name}
+            serializer = ClientSerializer(saved_client, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Неверные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
-        saved_client.delete()
-        return Response(status=204)
+        if check_permissions(request, 'Клиенты'):
+            saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
+            saved_client.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class ClientBranchesView(APIView):
@@ -577,33 +648,42 @@ class ClientEmployeesView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = ClientEmployeesPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_permissions(request, "Контакты"):
+            serializer = ClientEmployeesPostSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def put(self, request):
-        saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
-        data = request.data
-        if len(request.FILES) == 1:
-            name = '/contacts/' + request.FILES['image'].name
-            with open('media' + name, 'wb+') as destination:
-                for chunk in request.FILES['image'].chunks():
-                    destination.write(chunk)
-            data = {"photo_path": name}
-        serializer = ClientEmployeesPostSerializer(saved_employee, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_permissions(request, "Контакты"):
+            saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
+            data = request.data
+            if len(request.FILES) == 1:
+                name = '/contacts/' + request.FILES['image'].name
+                with open('media' + name, 'wb+') as destination:
+                    for chunk in request.FILES['image'].chunks():
+                        destination.write(chunk)
+                data = {"photo_path": name}
+            serializer = ClientEmployeesPostSerializer(saved_employee, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
-        saved_employee.delete()
-        return Response(status=204)
+        if check_permissions(request, "Контакты"):
+            saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
+            saved_employee.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class PositionClientView(APIView):
@@ -616,17 +696,23 @@ class PositionClientView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = PositionClientSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_admin(request):
+            serializer = PositionClientSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved_position = get_object_or_404(PositionClient.objects.all(), id=request.data["id"])
-        saved_position.delete()
-        return Response(status=204)
+        if check_admin(request):
+            saved_position = get_object_or_404(PositionClient.objects.all(), id=request.data["id"])
+            saved_position.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class NotesView(APIView):
@@ -643,7 +729,7 @@ class NotesView(APIView):
             "text": request.data['text'],
             "color": request.data['color'],
             "user": UserSerializer(request.user).data['id'],
-            # "last_save": datetime.datetime.now()
+            "last_save": datetime.datetime.now()
         })
         if serializer.is_valid():
             serializer.save()
@@ -680,17 +766,23 @@ class ChequeCategoryView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = ChequeCategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_admin(request):
+            serializer = ChequeCategorySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved_category = get_object_or_404(ChequeCategory.objects.all(), id=request.data["id"])
-        saved_category.delete()
-        return Response(status=204)
+        if check_admin(request):
+            saved_category = get_object_or_404(ChequeCategory.objects.all(), id=request.data["id"])
+            saved_category.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class TermView(APIView):
@@ -703,17 +795,23 @@ class TermView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = TermSerializer(data={"days": request.data['name']})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_admin(request):
+            serializer = TermSerializer(data={"days": request.data['name']})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved_term = get_object_or_404(Term.objects.all(), id=request.data["id"])
-        saved_term.delete()
-        return Response(status=204)
+        if check_admin(request):
+            saved_term = get_object_or_404(Term.objects.all(), id=request.data["id"])
+            saved_term.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class TaxView(APIView):
@@ -726,17 +824,23 @@ class TaxView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = TaxSerializer(data={"tax": request.data['name']})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_admin(request):
+            serializer = TaxSerializer(data={"tax": request.data['name']})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved_term = get_object_or_404(Tax.objects.all(), id=request.data["id"])
-        saved_term.delete()
-        return Response(status=204)
+        if check_admin(request):
+            saved_term = get_object_or_404(Tax.objects.all(), id=request.data["id"])
+            saved_term.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class PurchasesView(APIView):
@@ -771,26 +875,35 @@ class PurchasesView(APIView):
                          "statistic": statistic})
 
     def post(self, request):
-        serializer = PurchasesPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"id": serializer.data['id']}, status=201)
+        if check_permissions(request, "Бухгалтерия"):
+            serializer = PurchasesPostSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"id": serializer.data['id']}, status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def put(self, request):
-        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
-        serializer = PurchasesPostSerializer(saved, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+            serializer = PurchasesPostSerializer(saved, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response(status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
-        saved.delete()
-        return Response(status=204)
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(Purchases.objects.all(), id=request.data["id"])
+            saved.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class SalesView(APIView):
@@ -833,48 +946,58 @@ class SalesView(APIView):
                          "statistic": statistic})
 
     def post(self, request):
-        items = json.loads(request.data['items'])
-        serializer = SalesPostSerializer(data={
-            'id': request.data['id'],
-            'create_date': request.data['create_date'],
-            'object_number': request.data['object_number'],
-            'client': request.data['client'],
-            'object': request.data['object'],
-            'payment_terms': request.data['payment_terms'],
-            'number_link': request.data['number_link'],
-            'comment': request.data['comment'],
-            'description': request.data['description'],
-        })
-        if serializer.is_valid():
-            serializer.save()
-            sale = Sales.objects.get(pk=serializer.data['id'])
-            for item in items:
-                sale.items.create(name=item['name'], price=item['price'], tax=item['tax'], discount=item['discount'],
-                                  quantity=item['quantity'], measurement=item['measurement'])
-            return Response({"id": serializer.data['id']}, status=201)
-        else:
-            return Response(status=400)
-
-    def put(self, request):
-        saved = get_object_or_404(Sales.objects.all(), id=request.data["id"])
-        serializer = SalesPostSerializer(saved, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
+        if check_permissions(request, "Бухгалтерия"):
             items = json.loads(request.data['items'])
-            sale = Sales.objects.get(pk=serializer.data['id'])
-            for item in items:
-                if 'id' not in item:
+            serializer = SalesPostSerializer(data={
+                'id': request.data['id'],
+                'create_date': request.data['create_date'],
+                'object_number': request.data['object_number'],
+                'client': request.data['client'],
+                'object': request.data['object'],
+                'payment_terms': request.data['payment_terms'],
+                'number_link': request.data['number_link'],
+                'comment': request.data['comment'],
+                'description': request.data['description'],
+            })
+            if serializer.is_valid():
+                serializer.save()
+                sale = Sales.objects.get(pk=serializer.data['id'])
+                for item in items:
                     sale.items.create(name=item['name'], price=item['price'], tax=item['tax'],
                                       discount=item['discount'], quantity=item['quantity'],
                                       measurement=item['measurement'])
-            return Response(status=201)
+                return Response({"id": serializer.data['id']}, status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
+
+    def put(self, request):
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(Sales.objects.all(), id=request.data["id"])
+            serializer = SalesPostSerializer(saved, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                items = json.loads(request.data['items'])
+                sale = Sales.objects.get(pk=serializer.data['id'])
+                for item in items:
+                    if 'id' not in item:
+                        sale.items.create(name=item['name'], price=item['price'], tax=item['tax'],
+                                          discount=item['discount'], quantity=item['quantity'],
+                                          measurement=item['measurement'])
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
+        else:
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved = get_object_or_404(Sales.objects.all(), id=request.data["id"])
-        saved.delete()
-        return Response(status=204)
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(Sales.objects.all(), id=request.data["id"])
+            saved.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class ChequeDocumentsView(APIView):
@@ -923,46 +1046,52 @@ class DocumentsAccountingView(APIView):
         return Response({"data": serializer.data})
 
     def put(self, request, mode_id):
-        path = ''
-        if len(request.FILES) >= 0:
-            for i in range(1, len(request.FILES) + 1):
-                name = '/accounting/' + request.FILES['document' + str(i)].name
-                with open('media' + name, 'wb+') as destination:
-                    for chunk in request.FILES['document' + str(i)].chunks():
-                        destination.write(chunk)
-                path += name
-                if i != len(request.FILES):
-                    path += ';'
+        if check_permissions(request, "Бухгалтерия"):
+            path = ''
+            if len(request.FILES) >= 0:
+                for i in range(1, len(request.FILES) + 1):
+                    name = '/accounting/' + request.FILES['document' + str(i)].name
+                    with open('media' + name, 'wb+') as destination:
+                        for chunk in request.FILES['document' + str(i)].chunks():
+                            destination.write(chunk)
+                    path += name
+                    if i != len(request.FILES):
+                        path += ';'
+            else:
+                path = request.data['path']
+            data = {
+                "name": request.data['name'],
+                "create_date": request.data['create_date'],
+                "path": path,
+                "mode": mode_id,
+            }
+            if request.data["id"] == "0":
+                serializer = DocumentsAccountingSerializer(data=data)
+            else:
+                saved = get_object_or_404(DocumentsAccounting.objects.all(), id=request.data["id"])
+                serializer = DocumentsAccountingSerializer(saved, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            path = request.data['path']
-        data = {
-            "name": request.data['name'],
-            "create_date": request.data['create_date'],
-            "path": path,
-            "mode": mode_id,
-        }
-        if request.data["id"] == "0":
-            serializer = DocumentsAccountingSerializer(data=data)
-        else:
-            saved = get_object_or_404(DocumentsAccounting.objects.all(), id=request.data["id"])
-            serializer = DocumentsAccountingSerializer(saved, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
-        else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved = get_object_or_404(DocumentsAccounting.objects.all(), id=request.data["id"])
-        # @todo сделать удаление файлов
-        # path = saved.path
-        # path = path.split(";")
-        # return Response({"data": path})
-        # for item in path:
-        #     del_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "/media" + item)
-        #     os.remove(del_path)
-        saved.delete()
-        return Response(status=204)
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(DocumentsAccounting.objects.all(), id=request.data["id"])
+            # @todo сделать удаление файлов
+            # path = saved.path
+            # path = path.split(";")
+            # return Response({"data": path})
+            # for item in path:
+            #     del_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "/media" + item)
+            #     os.remove(del_path)
+            saved.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class DocumentsClientView(APIView):
@@ -977,40 +1106,46 @@ class DocumentsClientView(APIView):
         return Response({"data": serializer.data})
 
     def put(self, request, mode_id):
-        path = ''
-        if len(request.FILES) >= 0:
-            for i in range(1, len(request.FILES) + 1):
-                name = '/accounting/clients/' + request.FILES['document' + str(i)].name
-                with open('media' + name, 'wb+') as destination:
-                    for chunk in request.FILES['document' + str(i)].chunks():
-                        destination.write(chunk)
-                path += name
-                if i != len(request.FILES):
-                    path += ';'
+        if check_permissions(request, "Бухгалтерия"):
+            path = ''
+            if len(request.FILES) >= 0:
+                for i in range(1, len(request.FILES) + 1):
+                    name = '/accounting/clients/' + request.FILES['document' + str(i)].name
+                    with open('media' + name, 'wb+') as destination:
+                        for chunk in request.FILES['document' + str(i)].chunks():
+                            destination.write(chunk)
+                    path += name
+                    if i != len(request.FILES):
+                        path += ';'
+            else:
+                path = request.data['path']
+            data = {
+                "name": request.data['name'],
+                "create_date": request.data['create_date'],
+                "path": path,
+                "client": request.data['client'],
+                "mode": mode_id,
+            }
+            if request.data["id"] == "0":
+                serializer = DocumentsClientPostSerializer(data=data)
+            else:
+                saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
+                serializer = DocumentsClientPostSerializer(saved, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            path = request.data['path']
-        data = {
-            "name": request.data['name'],
-            "create_date": request.data['create_date'],
-            "path": path,
-            "client": request.data['client'],
-            "mode": mode_id,
-        }
-        if request.data["id"] == "0":
-            serializer = DocumentsClientPostSerializer(data=data)
-        else:
-            saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
-            serializer = DocumentsClientPostSerializer(saved, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
-        else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
-        saved.delete()
-        return Response(status=204)
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(DocumentsClient.objects.all(), id=request.data["id"])
+            saved.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class WaybillGoalView(APIView):
@@ -1023,17 +1158,23 @@ class WaybillGoalView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = WaybillGoalSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
+        if check_admin(request):
+            serializer = WaybillGoalSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved = get_object_or_404(WaybillGoal.objects.all(), id=request.data["id"])
-        saved.delete()
-        return Response(status=204)
+        if check_admin(request):
+            saved = get_object_or_404(WaybillGoal.objects.all(), id=request.data["id"])
+            saved.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class WaybillView(APIView):
@@ -1109,43 +1250,53 @@ class OfferView(APIView):
         return Response({"data": serializer.data, "items": items})
 
     def post(self, request):
-        items = json.loads(request.data['items'])
-        serializer = OfferPostSerializer(data={
-            'create_date': request.data["create_date"],
-            'active': request.data["active"],
-            'term': request.data["term"],
-            'client': request.data["client"],
-        })
-        if serializer.is_valid():
-            serializer.save()
-            offer = Offer.objects.get(pk=serializer.data['id'])
-            for item in items:
-                offer.items.create(name=item['name'], price=item['price'], tax=item['tax'], discount=item['discount'],
-                                   quantity=item['quantity'], measurement=item['measurement'])
-            return Response(status=201)
+        if check_permissions(request, "Бухгалтерия"):
+            items = json.loads(request.data['items'])
+            serializer = OfferPostSerializer(data={
+                'create_date': request.data["create_date"],
+                'active': request.data["active"],
+                'term': request.data["term"],
+                'client': request.data["client"],
+            })
+            if serializer.is_valid():
+                serializer.save()
+                offer = Offer.objects.get(pk=serializer.data['id'])
+                for item in items:
+                    offer.items.create(name=item['name'], price=item['price'], tax=item['tax'],
+                                       discount=item['discount'],
+                                       quantity=item['quantity'], measurement=item['measurement'])
+                return Response(status=201)
+            else:
+                return Response("Некоррекные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def put(self, request):
-        saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
-        serializer = OfferPostSerializer(saved, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            items = json.loads(request.data['items'])
-            offer = Offer.objects.get(pk=serializer.data['id'])
-            for item in items:
-                if 'id' not in item:
-                    offer.items.create(name=item['name'], price=item['price'], tax=item['tax'],
-                                       discount=item['discount'], quantity=item['quantity'],
-                                       measurement=item['measurement'])
-            return Response(status=201)
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
+            serializer = OfferPostSerializer(saved, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                items = json.loads(request.data['items'])
+                offer = Offer.objects.get(pk=serializer.data['id'])
+                for item in items:
+                    if 'id' not in item:
+                        offer.items.create(name=item['name'], price=item['price'], tax=item['tax'],
+                                           discount=item['discount'], quantity=item['quantity'],
+                                           measurement=item['measurement'])
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
-        saved.delete()
-        return Response(status=204)
+        if check_permissions(request, "Бухгалтерия"):
+            saved = get_object_or_404(Offer.objects.all(), id=request.data["id"])
+            saved.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class ItemsView(APIView):

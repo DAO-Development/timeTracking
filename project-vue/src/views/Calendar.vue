@@ -85,7 +85,7 @@
         <h3>{{ formTitle }}</h3>
         <v-card-text>
           <v-form ref="form" :model="newEvent">
-            <h3>Для кого событие</h3>
+            <h3 v-if="$parent.$parent.admin">Для кого событие</h3>
             <v-row>
               <v-checkbox v-if="$parent.$parent.admin" label="Для себя" v-model="newEvent.self"
                           :disabled="newEvent.group !== null || newEvent.profile !== null || newEvent.all"></v-checkbox>
@@ -296,12 +296,21 @@ export default {
           })
         },
         error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
@@ -315,12 +324,21 @@ export default {
           this.groups = response.data.groups
         },
         error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         },
@@ -337,12 +355,21 @@ export default {
           })
         },
         error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
@@ -400,12 +427,21 @@ export default {
               }
             },
             error: (response) => {
-              if (response.status === 500) {
-                this.alertMsg = "Ошибка соединения с сервером"
-              } else if (response.status === 401) {
-                this.$refresh()
-              } else {
-                this.alertMsg = "Непредвиденная ошибка"
+              switch (response.status) {
+                case 500:
+                  this.alertMsg = "Ошибка соединения с сервером"
+                  break
+                case 400:
+                  this.alertMsg = "Ошибка в данных"
+                  break
+                case 401:
+                  this.$refresh()
+                  break
+                case 403:
+                  this.alertMsg = "Нет доступа"
+                  break
+                default:
+                  this.alertMsg = "Непредвиденная ошибка"
               }
               this.alertError = true
             }
@@ -436,12 +472,21 @@ export default {
           this.addForm = false
         },
         error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
@@ -459,12 +504,21 @@ export default {
           this.confirmDeleteDialog = false
         },
         error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
