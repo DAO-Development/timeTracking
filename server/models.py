@@ -465,6 +465,16 @@ class Calendar(models.Model):
         verbose_name = "Календарь"
         verbose_name_plural = "Календарь"
 
+
+class UserSettings(models.Model):
+    user_profile = models.OneToOneField("UserProfile", on_delete=models.CASCADE, verbose_name="Профиль")
+    theme = models.CharField(verbose_name="Тема", max_length=10, default="light")
+    language = models.CharField(verbose_name="Язык", max_length=2, default="ru")
+
+    class Meta:
+        db_table = "user_settings"
+        verbose_name = "Настройки польщователя"
+        verbose_name_plural = "Настройки пользователя"
 # class WidgetUser(models.Model):
 #     """Виджеты"""
 #     name = models.CharField(verbose_name="Название виджета", max_length=120)

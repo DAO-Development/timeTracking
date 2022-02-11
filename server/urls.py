@@ -7,6 +7,7 @@ urlpatterns = [
     path('statistics', MainView.as_view()),
     path('user', UserView.as_view()),
     path('user-groups', UserGroupsView.as_view()),
+    path('user-settings', UserSettingsView.as_view()),
     path('profiles', ProfilesView.as_view()),
     path('profiles/active', ActiveProfilesView.as_view()),
     path('profiles/positions', PositionProfileView.as_view()),

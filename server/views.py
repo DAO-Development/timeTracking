@@ -1492,6 +1492,44 @@ class TimeReportPositionsView(APIView):
         return Response({"positions": positions}, status=200)
 
 
+class UserSettingsView(APIView):
+    """Настройки пользователя"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"])
+        serializer = UserSettingsSerializer(user_profile.usersettings)
+        return Response({"data": serializer.data}, status=200)
+
+    def post(self, request):
+        new_settings = UserSettingsSerializer(data={
+            "user_profile": request.data["user_profile"]
+        })
+        if new_settings.is_valid():
+            new_settings.save()
+            return Response(status=201)
+        else:
+            return Response("Некорректные данные", status=400)
+
+    def put(self, request):
+        serializer = None
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+        if user_profile not in UserSettings.objects.all().values_list("user_profile", flat=True):
+            serializer = UserSettingsSerializer(data={
+                "user_profile": user_profile
+            })
+        else:
+            saved = UserSettings.objects.get(user_profile=user_profile)
+            serializer = UserSettingsSerializer(saved, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response("Некорректные данные", status=400)
+
+
 class ToZipView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

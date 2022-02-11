@@ -439,3 +439,11 @@ class TimeReportPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeReport
         fields = '__all__'
+
+
+class UserSettingsSerializer(serializers.ModelSerializer):
+    """Сериализация настроек пользователя"""
+
+    class Meta:
+        model = UserSettings
+        fields = '__all__'
