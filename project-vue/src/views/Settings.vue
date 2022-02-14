@@ -2,11 +2,13 @@
   <div class="settings flex-content">
     <Header/>
     <section class="summary-box">
-      <h1>Настройки</h1>
+      <h1>{{ $vuetify.lang.t('$vuetify.settings.h1Label') }}</h1>
       <v-row>
-        <v-select v-model="selectedTheme" label="Тема" :items="items" item-text="name" item-value="theme"
-                  @change="$toggleTheme(selectedTheme)"></v-select>
-<!--        <v-select v-model="selectedLanguage" label="Язык" :items="languages" @change="toggleLanguage"></v-select>-->
+        <v-select v-model="settings.theme" :label="$vuetify.lang.t('$vuetify.settings.selectThemeLabel')"
+                  :items="items" item-text="name" item-value="theme"
+                  @change="putSettings"></v-select>
+        <v-select v-model="settings.language" :label="$vuetify.lang.t('$vuetify.settings.selectLangLabel')"
+                  :items="languages" @change="putSettings"></v-select>
       </v-row>
       <v-list>
         <v-list-item v-if="$parent.$parent.admin" @click="$router.push({name: 'Groups'})">
@@ -85,8 +87,10 @@ export default {
   components: {Header},
   data() {
     return {
-      selectedTheme: 'light',
-      selectedLanguage: 'ru',
+      settings: {
+        theme: 'light',
+        language: 'ru',
+      },
       items: [
         {theme: 'light', name: 'Светлая'},
         {theme: 'dark', name: 'Темная'},
@@ -117,19 +121,57 @@ export default {
         url: this.$hostname + "time-tracking/user-settings",
         type: "GET",
         success: (response) => {
-          this.selectedTheme = response.data.data.theme
-          this.$toggleTheme(response.data.data.theme)
+          this.settings = response.data.data
+          this.$toggleTheme(response.data.data.theme, response.data.data.language)
         },
         error: (response) => {
-          if (response.status === 500) {
-            console.log("Ошибка соединения с сервером")
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            console.log("Непредвиденная ошибка")
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
           }
+          this.alertError = true
         },
-        async: false,
+      })
+    },
+    putSettings() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/user-settings",
+        type: "PUT",
+        data: this.settings,
+        success: () => {
+          this.$toggleTheme(this.settings.theme, this.settings.language)
+        },
+        error: (response) => {
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
       })
     },
     toggleLanguage() {

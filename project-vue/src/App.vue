@@ -30,8 +30,9 @@ Vue.prototype.$refresh = function () {
   this.$router.push({name: "Index"})
 }
 
-Vue.prototype.$toggleTheme = function (color) {
+Vue.prototype.$toggleTheme = function (color, language) {
   console.log("toggleTheme global")
+  this.$vuetify.lang.current = language
   switch (color) {
     case "dark":
       this.$vuetify.theme.light = false

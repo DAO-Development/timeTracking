@@ -1,5 +1,8 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib/framework';
+// import {ru, en} from "vuetify/lib/locale";
+import ru from "../languages/ru";
+import en from "../languages/en";
 import loginIcon from "../components/icons/loginIcon";
 import passwordIcon from "../components/icons/passwordIcon";
 import deleteIcon from "../components/icons/deleteIcon";
@@ -11,6 +14,7 @@ import editIcon from "../components/icons/editIcon";
 import archiveIcon from "../components/icons/archiveIcon";
 import supportIcon from "../components/icons/supportIcon";
 import tileIcon from "../components/icons/tileIcon";
+
 
 Vue.use(Vuetify);
 
@@ -36,6 +40,10 @@ export default new Vuetify({
                 }
             },
         },
+    },
+    lang: {
+        locales: {ru, en},
+        current: 'ru',
     },
     icons: {
         values: {
