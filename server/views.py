@@ -1499,8 +1499,14 @@ class UserSettingsView(APIView):
     def get(self, request):
         user = UserSerializer(request.user)
         user_profile = UserProfile.objects.get(auth_user_id=user.data["id"])
-        serializer = UserSettingsSerializer(user_profile.usersettings)
-        return Response({"data": serializer.data}, status=200)
+        try:
+            serializer = UserSettingsSerializer(user_profile.usersettings)
+            return Response({"data": serializer.data}, status=200)
+        except UserSettings.DoesNotExist:
+            return Response({"data": {
+                "theme": "light",
+                "language": "ru"
+            }})
 
     def post(self, request):
         new_settings = UserSettingsSerializer(data={

@@ -3,8 +3,11 @@
     <Header/>
     <section class="summary-box">
       <h1>Настройки</h1>
-      <v-select v-model="selected" label="Тема" :items="items" item-text="name" item-value="theme"
-                @change="toggleTheme"></v-select>
+      <v-row>
+        <v-select v-model="selectedTheme" label="Тема" :items="items" item-text="name" item-value="theme"
+                  @change="$toggleTheme(selectedTheme)"></v-select>
+<!--        <v-select v-model="selectedLanguage" label="Язык" :items="languages" @change="toggleLanguage"></v-select>-->
+      </v-row>
       <v-list>
         <v-list-item v-if="$parent.$parent.admin" @click="$router.push({name: 'Groups'})">
           <v-list-item-icon>
@@ -82,13 +85,15 @@ export default {
   components: {Header},
   data() {
     return {
-      selected: 'light',
+      selectedTheme: 'light',
+      selectedLanguage: 'ru',
       items: [
         {theme: 'light', name: 'Светлая'},
         {theme: 'dark', name: 'Темная'},
         {theme: '#EA80FC', name: 'Фиолетовый'},
         {theme: '#8BC34A', name: 'Зеленый'},
-      ]
+      ],
+      languages: ["ru", "en"]
     }
   },
   created() {
@@ -99,29 +104,36 @@ export default {
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
+      this.loadSettings()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },
   methods: {
-    toggleTheme() {
-      switch (this.selected) {
-        case "dark":
-          this.$vuetify.theme.light = false
-          this.$vuetify.theme.dark = true
-          break
-        case "light":
-          this.$vuetify.theme.dark = false
-          this.$vuetify.theme.light = true
-          break
-        default:
-          this.$vuetify.theme.dark = false
-          this.$vuetify.theme.light = true
-          this.$vuetify.theme.themes.light.primary = this.selected
-          break
-      }
-
+    loadSettings() {
+      console.log("loadSettings")
+      $.ajax({
+        url: this.$hostname + "time-tracking/user-settings",
+        type: "GET",
+        success: (response) => {
+          this.selectedTheme = response.data.data.theme
+          this.$toggleTheme(response.data.data.theme)
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            console.log("Ошибка соединения с сервером")
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            console.log("Непредвиденная ошибка")
+          }
+        },
+        async: false,
+      })
+    },
+    toggleLanguage() {
+      console.log(this.selectedLanguage)
     }
   }
 }

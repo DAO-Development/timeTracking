@@ -17,8 +17,8 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
-// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 // Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
@@ -30,6 +30,25 @@ Vue.prototype.$refresh = function () {
   this.$router.push({name: "Index"})
 }
 
+Vue.prototype.$toggleTheme = function (color) {
+  console.log("toggleTheme global")
+  switch (color) {
+    case "dark":
+      this.$vuetify.theme.light = false
+      this.$vuetify.theme.dark = true
+      break
+    case "light":
+      this.$vuetify.theme.dark = false
+      this.$vuetify.theme.light = true
+      break
+    default:
+      this.$vuetify.theme.dark = false
+      this.$vuetify.theme.light = true
+      this.$vuetify.theme.themes.light.primary = color
+      break
+  }
+}
+
 export default {
   name: 'App',
   components: {Menu},
@@ -39,6 +58,7 @@ export default {
       this.auth = true
       this.loadFunctions()
       this.loadUser()
+      this.loadSettings()
     }
   },
   data() {
@@ -102,6 +122,28 @@ export default {
             this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
+        },
+        async: false,
+      })
+    },
+    loadSettings() {
+      console.log("loadSettings")
+      $.ajax({
+        url: this.$hostname + "time-tracking/user-settings",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          console.log(response.data.data.theme)
+          this.$toggleTheme(response.data.data.theme)
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            console.log("Ошибка соединения с сервером")
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            console.log("Непредвиденная ошибка")
+          }
         },
         async: false,
       })
