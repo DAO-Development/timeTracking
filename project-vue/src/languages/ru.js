@@ -66,10 +66,48 @@ export default {
             icon: 'Rating {0} of {1}'
         }
     },
+    index: {
+        h1Label: "Главная",
+        hello: "Добро пожаловать, ",
+        todayLabel: "На сегодня",
+        statistics: {
+            news: {
+                label: "Новости: ",
+                text: "новостей"
+            },
+            workers: {
+                label: "Работники: ",
+                all: "работников",
+                new: "Новых на сегодня",
+                text: "Работает: ",
+            },
+            clients: {
+                label: "Клиенты: ",
+                all: "клиентов",
+                new: "Новых на сегодня",
+            },
+            objects: {
+                label: "Объекты: ",
+                all: "обектов",
+                text: "В работе",
+            },
+            calendar: {
+                label: "Календарь: ",
+                all: "событий",
+                week: "На этой неделе",
+                today: "Сегодня",
+            },
+        },
+    },
+    widgets: {
+        h1Label: "Виджеты",
+        noteLabel: "Блокнот",
+        lastSave: "Последнее сохранение",
+    },
     settings: {
         h1Label: "Настройки",
         selectThemeLabel: "Тема",
         selectLangLabel: "Язык",
-    }
+    },
 };
 //# sourceMappingURL=ru.js.map

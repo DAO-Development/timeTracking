@@ -19,6 +19,10 @@ import tileIcon from "../components/icons/tileIcon";
 Vue.use(Vuetify);
 
 export default new Vuetify({
+    lang: {
+        locales: {ru, en},
+        current: 'ru',
+    },
     theme: {
         themes: {
             options: {
@@ -40,10 +44,6 @@ export default new Vuetify({
                 }
             },
         },
-    },
-    lang: {
-        locales: {ru, en},
-        current: 'ru',
     },
     icons: {
         values: {

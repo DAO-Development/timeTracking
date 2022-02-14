@@ -66,6 +66,44 @@ export default {
             icon: 'Rating {0} of {1}'
         }
     },
+    index: {
+        h1Label: "Main",
+        hello: "Welcome, ",
+        todayLabel: "Today",
+        statistics: {
+            news: {
+                label: "News: ",
+                text: "news"
+            },
+            workers: {
+                label: "Workers: ",
+                all: "workers",
+                new: "New for today",
+                text: "At work: ",
+            },
+            clients: {
+                label: "Clients: ",
+                all: "clients",
+                new: "New for today",
+            },
+            objects: {
+                label: "Objects: ",
+                all: "objects",
+                text: "At work",
+            },
+            calendar: {
+                label: "Calendar: ",
+                all: "events",
+                week: "This week",
+                today: "Today",
+            },
+        },
+    },
+    widgets: {
+        h1Label: "Widgets",
+        noteLabel: "Note",
+        lastSave: "Last save",
+    },
     settings: {
         h1Label: "Settings",
         selectThemeLabel: "Theme",

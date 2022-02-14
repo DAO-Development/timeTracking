@@ -6,6 +6,7 @@
                    v-on:set-not-auth="setNotAuth"
                    v-on:set-admin="setAdmin"
                    v-on:load-functions="loadFunctions"
+                   v-on:load-settings="loadSettings"
                    :key="$route.path"/>
     </v-container>
   </v-app>

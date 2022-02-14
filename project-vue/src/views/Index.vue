@@ -2,46 +2,47 @@
   <div class="index news flex-content">
     <Header/>
     <div class="summary-box">
-      <h1>Главная</h1>
+      <h1>{{ $vuetify.lang.t('$vuetify.index.h1Label') }}</h1>
       <section v-if="auth">
         <div class="index__hello">
-          Добро пожаловать, {{ user.name }} {{ user.lastname }}
+          {{ $vuetify.lang.t('$vuetify.index.hello') }} {{ user.name }} {{ user.lastname }}
         </div>
         <div class="index__today">
-          <h2>На сегодня</h2>
+          <h2>{{ $vuetify.lang.t('$vuetify.index.todayLabel') }}</h2>
           <ul class="today-list">
             <li>
-              <span class="today__unit bold-text">Новости:</span>
-              <span class="today__quantity">{{ statistics.news }} новостей</span>
+              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.news.label') }}</span>
+              <span class="today__quantity">{{ statistics.news }}
+                {{ $vuetify.lang.t('$vuetify.index.statistics.news.text') }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">Работники:</span>
-              <span class="today__quantity">{{ statistics.workers.all }} работников</span>
-              <span class="today__now">Новых на сегодня: {{ statistics.workers.today }}</span>
-              <span class="today__now">Работает: {{ statistics.workers.in_work }}</span>
+              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.workers.label') }}</span>
+              <span class="today__quantity">{{ statistics.workers.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.workers.all') }}</span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.workers.new') }}: {{ statistics.workers.today }}</span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.workers.text') }} {{ statistics.workers.in_work }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">Клиенты:</span>
-              <span class="today__quantity">{{ statistics.clients.all }} клиентов</span>
-              <span class="today__now">Новых на сегодня: {{ statistics.clients.today }}</span>
+              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.clients.label') }}</span>
+              <span class="today__quantity">{{ statistics.clients.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.clients.all') }}</span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.clients.new') }}: {{ statistics.clients.today }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">Объекты:</span>
-              <span class="today__quantity">{{ statistics.objects.all }} объектов</span>
-              <span class="today__now">В работе: {{ statistics.objects.in_work }}</span>
+              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.objects.label') }}</span>
+              <span class="today__quantity">{{ statistics.objects.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.objects.all') }}</span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.objects.text') }}: {{ statistics.objects.in_work }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">Календарь:</span>
-              <span class="today__quantity">12 события</span>
-              <span class="today__now">На этой неделе: </span>
-              <span class="today__now">Сегодня:</span>
+              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.label') }}</span>
+              <span class="today__quantity">12 {{ $vuetify.lang.t('$vuetify.index.statistics.calendar.all') }}</span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.week') }}: </span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.today') }}:</span>
             </li>
           </ul>
         </div>
       </section>
       <section v-if="auth" class="widgets">
         <div class="unit-title">
-          <h1>Виджеты</h1>
+          <h1>{{ $vuetify.lang.t('$vuetify.widgets.h1Label') }}</h1>
           <v-btn color="primary" fab x-small @click="addWidgetForm = true">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
@@ -50,7 +51,7 @@
           <template v-for="(note, i) in notes">
             <div class="widgets-single" :key="note.id">
               <div class="widgets-single__header">
-                <h3>Блокнот {{ i + 1 }}</h3>
+                <h3>{{ $vuetify.lang.t('$vuetify.widgets.noteLabel') }} {{ i + 1 }}</h3>
                 <div class="widgets-single__actions">
                   <v-btn color="error" fab x-small @click="deleteNote(note.id)">
                     <v-icon>mdi-delete</v-icon>
@@ -62,7 +63,7 @@
               </div>
               <div class="widgets-single__content">
                 <div class="note__header">
-                  Последнее сохранение:
+                  {{ $vuetify.lang.t('$vuetify.widgets.lastSave') }}:
                   <span>{{ note.last_save }}</span>
                   <div class="widgets-single__actions">
                     <v-btn color="secondary" fab x-small @click="newNote = note; addNoteForm = true">
@@ -155,6 +156,7 @@ export default {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.auth = true
       this.$emit('load-functions')
+      this.$emit('load-settings')
     }
     this.loadData()
   },
