@@ -300,6 +300,18 @@ class GroupView(APIView):
                 edit.append(Functions.objects.get(id=func.functions_id.id).text)
         return Response({"read": read, "edit": edit, "admin": admin})
 
+    def put(self, request):
+        if check_admin(request):
+            saved_group = get_object_or_404(Group.objects.all(), pk=request.data['id'])
+            serializer = GroupSerializer(saved_group, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
+        else:
+            return Response("Доступ запрещен", status=403)
+
     def post(self, request):
         if check_admin(request):
             serializer = GroupSerializer(data=request.data)

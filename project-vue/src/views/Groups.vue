@@ -19,8 +19,11 @@
             </div>
           </template>
           <div class="groups-single__action">
-            <v-btn class="action-btn" color="error" @click="currentGroup = group.id; confirmDeleteGroup = true">Удалить
-              группу
+            <v-btn class="action-btn" color="error" @click="currentGroup = group.id; confirmDeleteGroup = true">
+              Удалить группу
+            </v-btn>
+            <v-btn class="action-btn" color="primary" @click="addGroupForm = true; newGroup = group;">
+              Переименовать группу
             </v-btn>
           </div>
         </v-list-group>
@@ -165,44 +168,82 @@ export default {
     },
     addGroup() {
       if (this.$refs.addForm.validate()) {
-        $.ajax({
-          url: this.$hostname + "time-tracking/group",
-          type: "POST",
-          data: this.newGroup,
-          success: () => {
-            console.log("Даннные добавлены")
-            this.loadData()
-            this.addGroupForm = false
-            this.newGroup = {
-              id: 0,
-              name: ''
-            }
-          },
-          error: (response) => {
-            switch (response.status) {
-              case 500:
-                this.alertMsg = "Ошибка соединения с сервером"
-                break
-              case 400:
-                this.alertMsg = "Ошибка в данных"
-                break
-              case 401:
-                this.$refresh()
-                break
-              case 403:
-                this.alertMsg = "Нет доступа"
-                break
-              default:
-                this.alertMsg = "Непредвиденная ошибка"
-            }
-            this.alertError = true
-          },
-        })
+        if (this.newGroup.id !== 0) {
+          this.putGroup()
+        } else {
+          $.ajax({
+            url: this.$hostname + "time-tracking/group",
+            type: "POST",
+            data: this.newGroup,
+            success: () => {
+              console.log("Даннные добавлены")
+              this.loadData()
+              this.addGroupForm = false
+              this.newGroup = {
+                id: 0,
+                name: ''
+              }
+            },
+            error: (response) => {
+              switch (response.status) {
+                case 500:
+                  this.alertMsg = "Ошибка соединения с сервером"
+                  break
+                case 400:
+                  this.alertMsg = "Ошибка в данных"
+                  break
+                case 401:
+                  this.$refresh()
+                  break
+                case 403:
+                  this.alertMsg = "Нет доступа"
+                  break
+                default:
+                  this.alertMsg = "Непредвиденная ошибка"
+              }
+              this.alertError = true
+            },
+          })
+        }
       } else {
         console.log("Заполните обязательные поля")
         this.alertMsg = "Заполните обязательные поля"
         this.alertError = true
       }
+    },
+    putGroup() {
+          $.ajax({
+            url: this.$hostname + "time-tracking/group",
+            type: "PUT",
+            data: this.newGroup,
+            success: () => {
+              this.loadData()
+              this.addGroupForm = false
+              this.newGroup = {
+                id: 0,
+                name: ''
+              }
+            },
+            error: (response) => {
+              switch (response.status) {
+                case 500:
+                  this.alertMsg = "Ошибка соединения с сервером"
+                  break
+                case 400:
+                  this.alertMsg = "Ошибка в данных"
+                  break
+                case 401:
+                  this.$refresh()
+                  break
+                case 403:
+                  this.alertMsg = "Нет доступа"
+                  break
+                default:
+                  this.alertMsg = "Непредвиденная ошибка"
+              }
+              this.alertError = true
+            },
+          })
     },
     deleteGroup() {
       console.log("Удаляется группа " + this.currentGroup)
