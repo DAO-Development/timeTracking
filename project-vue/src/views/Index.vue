@@ -33,9 +33,9 @@
             </li>
             <li>
               <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.label') }}</span>
-              <span class="today__quantity">12 {{ $vuetify.lang.t('$vuetify.index.statistics.calendar.all') }}</span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.week') }}: </span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.today') }}:</span>
+              <span class="today__quantity">{{ statistics.calendar.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.calendar.all') }}</span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.week') }}: {{ statistics.calendar.week }}</span>
+              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.today') }}: {{ statistics.calendar.today }}</span>
             </li>
           </ul>
         </div>
@@ -170,6 +170,7 @@ export default {
         workers: {},
         clients: {},
         objects: {},
+        calendar: {},
       },
       widgets: [],
       notes: [],

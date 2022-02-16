@@ -48,6 +48,8 @@ class MainView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        user = UserSerializer(request.user)
+        user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
         news = News.objects.all().count()
         workers = UserProfile.objects.all().count()
         new_workers = UserProfile.objects.filter(create_date=datetime.date.today()).count()
@@ -58,10 +60,18 @@ class MainView(APIView):
         objects = Objects.objects.all().count()
         work_objects = Objects.objects.filter(date_start__lte=datetime.date.today(),
                                               date_end__gte=datetime.date.today(), active=False).count()
+        events = Calendar.objects.all().count()
+        start_week = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
+        end_week = datetime.date.today() + datetime.timedelta(days=(7 - datetime.date.today().weekday()))
+        user_event = Calendar.objects.filter(
+            Q(profile=user_profile) | Q(group__in=user.data['groups']) | (Q(group=None) & Q(profile=None)))
+        week_events = user_event.filter(start__range=(start_week, end_week)).count()
+        today_events = user_event.filter(start=datetime.date.today()).count()
         return Response({"news": news,
                          "workers": {"all": workers, "today": new_workers, "in_work": work_workers},
                          "clients": {"all": clients, "today": new_clients},
                          "objects": {"all": objects, "in_work": work_objects},
+                         "calendar": {"all": events, "week": week_events, "today": today_events}
                          })
 
 
@@ -120,12 +130,14 @@ class ProfilesView(APIView):
     def get(self, request, id=None):
         if check_read_permissions(request, "Работники"):
             user_profile = UserProfile.objects.all()
+            busy = []
             if id is not None:
                 user_profile = user_profile.filter(pk=id)
             else:
                 user_profile = user_profile.order_by('lastname').order_by('name')
+                busy = user_profile.filter(objectuser__end_date__gte=datetime.date.today()).values_list('id', flat=True)
             serializer = UserProfileSerializer(user_profile, many=True)
-            return Response({"data": serializer.data})
+            return Response({"data": serializer.data, "busy": busy})
         else:
             return Response("Доступ запрещен", status=403)
 
@@ -168,10 +180,13 @@ class PrintProfile(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, id=None):
-        user_profile = UserProfile.objects.get(pk=id)
-        serializer = UserProfileSerializer(user_profile)
-        path = print_profile_form(serializer.data)
-        return Response({"path": path}, status=200)
+        if check_read_permissions(request, "Работники"):
+            user_profile = UserProfile.objects.get(pk=id)
+            serializer = UserProfileSerializer(user_profile)
+            path = print_profile_form(serializer.data)
+            return Response({"path": path}, status=200)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class PositionProfileView(APIView):

@@ -90,8 +90,9 @@ def print_profile_form(profile):
     my_canvas.drawString(40 + 138 * 3, 304, profile['pants'] if profile['pants'] is not None else '')
     my_canvas.drawString(40 + 138 * 4, 304, profile['shirt'] if profile['shirt'] is not None else '')
 
-    my_canvas.drawImage('media' + profile['photo_path'], 370, 25,
-                        width=212, height=275)
+    if profile['photo_path'] is not None and profile['photo_path'] != '':
+        my_canvas.drawImage('media' + profile['photo_path'], 370, 25,
+                            width=212, height=275)
 
     my_canvas.grid([370, 582], [25, 300])
 

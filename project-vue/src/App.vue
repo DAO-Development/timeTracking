@@ -18,8 +18,8 @@ import Vue from 'vue';
 import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
-Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+// Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
+Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 // Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
@@ -42,6 +42,7 @@ Vue.prototype.$toggleTheme = function (color, language) {
     case "light":
       this.$vuetify.theme.dark = false
       this.$vuetify.theme.light = true
+      this.$vuetify.theme.themes.light.primary = "#3D6FB6"
       break
     default:
       this.$vuetify.theme.dark = false

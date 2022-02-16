@@ -286,7 +286,10 @@ export default {
           this.events.forEach(event => {
             if (event.allDay) {
               event.start = event.start.substr(0, 10)
-              event.end = event.end.substr(0, 10)
+              if (event.end === null)
+                event.end = event.start.substr(0, 10)
+              else
+                event.end = event.end.substr(0, 10)
             } else {
               event.start = event.start.substr(0, 10) + ' ' + event.start.substr(11, 5)
               if (event.end !== null)
