@@ -1257,11 +1257,21 @@ class WaybillView(APIView):
         else:
             user = UserSerializer(request.user)
             user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
-            waybills = Waybill.objects.all()
+            waybills = Waybill.objects.all().order_by('-date_start', '-time_start')
             if 1 not in user.data['groups']:
                 waybills = waybills.filter(user_profile=user_profile)
+            else:
+                if request.GET['place'] != "Все":
+                    waybills = waybills.filter(
+                        Q(departure=request.GET['place']) | Q(destination=request.GET['place']))
+                if request.GET['worker'] != "Все":
+                    waybills = waybills.filter(user_profile=request.GET["worker"])
         serializer = WaybillSerializer(waybills, many=True)
-        return Response({"data": serializer.data})
+        places = list(Waybill.objects.all().values_list('departure', flat=True).distinct())
+        for item in list(Waybill.objects.all().values_list('destination', flat=True).distinct()):
+            if item not in places:
+                places.append(item)
+        return Response({"data": serializer.data, "places": places})
 
     def post(self, request):
         user = UserSerializer(request.user)

@@ -3,7 +3,13 @@
     <Header/>
     <section class="summary-box">
       <h1>Путевые листы</h1>
-      <v-btn class="action-btn" color="primary" @click="addForm = true">Добавить</v-btn>
+      <v-row>
+        <v-btn class="action-btn" color="primary" @click="addForm = true">Добавить</v-btn>
+        <v-autocomplete v-model="filter.place" label="Места" :items="places" outlined
+                        @change="loadData"></v-autocomplete>
+        <v-autocomplete v-model="filter.worker" label="Работник" :items="users" item-value="id" item-text="label"
+                        outlined @change="loadData"></v-autocomplete>
+      </v-row>
       <v-data-table :headers="headers" :items="waybills" item-key="id">
         <template v-slot:item.actions="{ item }">
           <v-icon small @click="currentWaybill=item.id; confirmDeleteDialog=true"
@@ -154,6 +160,8 @@ export default {
     return {
       waybills: [],
       goals: [],
+      places: [],
+      users: [],
       newWaybill: {
         id: 0,
         date_start: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -185,6 +193,10 @@ export default {
         {text: '', value: 'actions', sortable: false},
       ],
       currentWaybill: 0,
+      filter: {
+        place: 'Все',
+        worker: 'Все',
+      },
       formTitle: 'Добавление',
       addForm: false,
       confirmDeleteDialog: false,
@@ -200,6 +212,7 @@ export default {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       this.$emit('load-functions')
+      this.$emit('load-settings')
       if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
         this.$router.push({name: "Index"})
       $.ajaxSetup({
@@ -207,6 +220,7 @@ export default {
       })
       this.loadData()
       this.loadGoals()
+      this.loadActiveUsers()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
@@ -217,8 +231,10 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/waybill",
         type: "GET",
+        data: this.filter,
         success: (response) => {
           this.waybills = response.data.data
+          this.places = ["Все"].concat(response.data.places)
         },
         error: (response) => {
           switch (response.status) {
@@ -264,6 +280,29 @@ export default {
               break
             default:
               this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadActiveUsers() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/active",
+        type: "GET",
+        success: (response) => {
+          this.users = response.data.data
+          this.users.forEach(user => {
+            user.label = user.lastname + ' ' + user.name
+          })
+          this.users = [{label: "Все", id: "Все"}].concat(this.users)
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
           }
           this.alertError = true
         }
