@@ -1322,6 +1322,14 @@ class OfferView(APIView):
             items = {}
             if id is not None:
                 offers = offers.filter(id=id)
+            else:
+                if request.GET['active'] != "Все":
+                    if request.GET['active'] == "true":
+                        offers = offers.filter(active=True)
+                    else:
+                        offers = offers.filter(active=False)
+                if request.GET['client'] != "Все":
+                    offers = offers.filter(client=request.GET["client"])
             for item in offers:
                 serializer = OfferSerializer(item)
                 things = Items.objects.filter(pk__in=serializer.data['items']).order_by('id')

@@ -136,8 +136,7 @@ export default {
         type: "GET",
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
-          console.log(response.data.data.theme)
-          this.$toggleTheme(response.data.data.theme)
+          this.$toggleTheme(response.data.data.theme, response.data.data.language)
         },
         error: (response) => {
           if (response.status === 500) {

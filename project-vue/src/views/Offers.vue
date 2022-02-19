@@ -3,7 +3,13 @@
     <Header/>
     <section class="summary-box">
       <h1>Ценовые предложения</h1>
-      <v-btn class="action-btn" color="primary" @click="formTitle='Добавление'; addForm = true">Добавить</v-btn>
+      <v-row>
+        <v-btn class="action-btn" color="primary" @click="formTitle='Добавление'; addForm = true">Добавить</v-btn>
+        <v-autocomplete v-model="filter.active" label="Статус" :items="status" item-text="name" item-value="value"
+                        outlined @change="loadData"></v-autocomplete>
+        <v-autocomplete v-model="filter.client" label="Клиент" :items="[{name: 'Все', id: 'Все'}].concat(clients)"
+                        item-value="id" item-text="name" outlined @change="loadData"></v-autocomplete>
+      </v-row>
       <div class="offers__content">
         <template v-for="offer in offers">
           <div class="offers-single" :key="offer.id">
@@ -166,6 +172,11 @@ export default {
       items: [],
       terms: [],
       clients: [],
+      status: [
+        {name: 'Все', value: 'Все'},
+        {name: 'Активно', value: true},
+        {name: 'Не активно', value: false},
+      ],
       newOffer: {
         id: 0,
         create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -177,6 +188,10 @@ export default {
       newItems: [],
       deletedItems: [],
       currentOffer: 0,
+      filter: {
+        active: 'Все',
+        client: 'Все',
+      },
       formTitle: 'Добавление',
       addForm: false,
       confirmDeleteDialog: false,
@@ -210,6 +225,7 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/offer",
         type: "GET",
+        data: this.filter,
         success: (response) => {
           this.offers = response.data.data
           this.items = response.data.items
