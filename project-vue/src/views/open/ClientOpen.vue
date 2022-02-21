@@ -128,6 +128,52 @@
             <div class="addition-btn" @click="$router.push({name: 'ClientsEmployees', params: {idClient: id}})">
               Контакты
             </div>
+            <!--                        <div class="addition-btn" @click="$router.push({name: 'ClientsEmployees', params: {idClient: id}})">-->
+            <!--              Объекты-->
+            <!--            </div>-->
+          </div>
+          <h3>Комментарии</h3>
+          <div class="objects-open__comments">
+            <div class="objects-open__comments-single" v-for="com in comments.comments" :key="com.id">
+              <h4> {{ com.user_profile.lastname }} {{ com.user_profile.name }}
+                ({{ com.user_profile.position.name }})</h4>
+              <div v-html="com.text"></div>
+              <div class="open__actions">
+                <div class="addition-btn" @click="answer=com.text; newComment.client_comments=com.id">
+                  Ответить
+                </div>
+                <div class="addition-btn" @click="deleteComment(com.id)"
+                     v-if="com.user_profile.id === comments.profile">
+                  Удалить
+                </div>
+              </div>
+              <v-divider></v-divider>
+              <div class="objects-open__comments-answers" v-for="ans in comments.data[com.id]" :key="ans.id">
+                <h4> {{ ans.user_profile.lastname }} {{ ans.user_profile.name }}
+                  ({{ ans.user_profile.position.name }})</h4>
+                <div v-html="ans.text"></div>
+                <div class="open__actions">
+                  <div class="addition-btn" @click="deleteComment(ans.id)"
+                       v-if="ans.user_profile.id === comments.profile">
+                    Удалить
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="objects-open__comments-add">
+            <v-textarea v-model="newComment.text" placeholder="текст комментария" outlined></v-textarea>
+            <div class="objects-open__comments-add-actions">
+              <div class="objects-open__comments-add-answerfor" v-if="newComment.client_comments != null">
+                <div>Ответ на:
+                  <div class="comments__answer" v-html="answer"></div>
+                </div>
+                <v-icon @click="newComment.client_comments=null" style="width: 16px">$deleteIcon</v-icon>
+              </div>
+              <v-btn class="action-btn" color="secondary" @click="addComment">
+                Добавить
+              </v-btn>
+            </div>
           </div>
           <div class="news-open__actions open__actions" v-if="$parent.$parent.edit.indexOf('Клиенты') !== -1">
             <div class="addition-btn" @click="openEditForm">
@@ -302,6 +348,10 @@ export default {
     return {
       page: 'clients',
       employees: [],
+      comments: {
+        comments: [],
+        data: {}
+      },
       currentClient: {
         id: 0,
         name: '',
@@ -340,6 +390,12 @@ export default {
         logo_path: '',
         active: true
       },
+      newComment: {
+        text: "",
+        client_comments: null,
+        client: null
+      },
+      answer: "",
       selectsVat: [
         {text: '0%', value: 0},
         {text: '10%', value: 10},
@@ -378,6 +434,7 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
+      this.loadComments()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
@@ -401,6 +458,34 @@ export default {
               flat: '',
             }
           }
+        },
+        error: (response) => {
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadComments() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients/comments/" + this.id,
+        type: "GET",
+        success: (response) => {
+          this.comments = response.data
         },
         error: (response) => {
           switch (response.status) {
@@ -479,6 +564,43 @@ export default {
         }
       })
     },
+    addComment() {
+      if (this.newComment.text !== "") {
+        this.newComment.client = this.id
+        $.ajax({
+          url: this.$hostname + "time-tracking/clients/comments",
+          type: "POST",
+          data: this.newComment,
+          success: () => {
+            this.loadComments()
+            this.newComment = {
+              text: "",
+              client_comments: null,
+              client: null
+            }
+          },
+          error: (response) => {
+            switch (response.status) {
+              case 500:
+                this.alertMsg = "Ошибка соединения с сервером"
+                break
+              case 400:
+                this.alertMsg = "Ошибка в данных"
+                break
+              case 401:
+                this.$refresh()
+                break
+              case 403:
+                this.alertMsg = "Нет доступа"
+                break
+              default:
+                this.alertMsg = "Непредвиденная ошибка"
+            }
+            this.alertError = true
+          }
+        })
+      }
+    },
     archiveClientOpen() {
       this.currentClient.active = !this.currentClient.active
       $.ajax({
@@ -555,6 +677,35 @@ export default {
         success: () => {
           this.confirmDeleteDialog = false
           this.$router.push({name: 'Clients'})
+        },
+        error: (response) => {
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    deleteComment(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/clients/comments",
+        type: "DELETE",
+        data: {id: id},
+        success: () => {
+          this.loadComments()
         },
         error: (response) => {
           switch (response.status) {

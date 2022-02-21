@@ -31,6 +31,8 @@ urlpatterns = [
     path('objects/photos/<int:objects_id>', ObjectPhotoView.as_view()),
     path('clients', ClientView.as_view()),
     path('clients/branches', ClientBranchesView.as_view()),
+    path('clients/comments', ClientCommentsView.as_view()),
+    path('clients/comments/<int:id>', ClientCommentsView.as_view()),
     path('clients/<int:id>', ClientView.as_view()),
     path('clients-employees', ClientEmployeesView.as_view()),
     path('clients/employees/<int:idclient>', ClientEmployeesView.as_view()),

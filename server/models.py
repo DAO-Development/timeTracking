@@ -144,6 +144,20 @@ class Client(models.Model):
         verbose_name_plural = "Клиенты"
 
 
+class ClientComments(models.Model):
+    """Комментарии к клиентам"""
+    text = models.TextField(verbose_name="Текст комментария")
+    user_profile = models.ForeignKey("UserProfile", models.RESTRICT, verbose_name='Пользователь')
+    client = models.ForeignKey("Client", models.CASCADE, verbose_name='Клиент')
+    client_comments = models.ForeignKey("ClientComments", models.RESTRICT, verbose_name='Родительский комментарий',
+                                        null=True, blank=True)
+
+    class Meta:
+        db_table = "client_comments"
+        verbose_name = 'Комментарий к клиенту'
+        verbose_name_plural = 'Комментарии к клиентам'
+
+
 class PositionClient(models.Model):
     name = models.CharField(verbose_name='Специальность', max_length=60)
 
@@ -171,6 +185,20 @@ class ClientEmployees(models.Model):
         db_table = "client_employees"
         verbose_name = "Контакт"
         verbose_name_plural = "Контакты"
+
+
+class ContactComments(models.Model):
+    """Комментарии к контактам"""
+    text = models.TextField(verbose_name="Текст комментария")
+    user_profile = models.ForeignKey("UserProfile", models.RESTRICT, verbose_name='Пользователь')
+    contact = models.ForeignKey("ClientEmployees", models.CASCADE, verbose_name='Клиент')
+    contact_comments = models.ForeignKey("ContactComments", models.RESTRICT, verbose_name='Родительский комментарий',
+                                         null=True, blank=True)
+
+    class Meta:
+        db_table = "contact_comments"
+        verbose_name = 'Комментарий к контакту'
+        verbose_name_plural = 'Комментарии к контактам'
 
 
 class Objects(models.Model):
@@ -233,6 +261,8 @@ class ObjectComments(models.Model):
 
     class Meta:
         db_table = "object_comments"
+        verbose_name = 'Комментарий к объекту'
+        verbose_name_plural = 'Комментарии к объектам'
 
 
 class TimeReport(models.Model):

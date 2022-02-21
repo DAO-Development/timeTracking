@@ -8,7 +8,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 # 612х792
 def print_profile_form(profile):
-    print(profile)
     my_canvas = canvas.Canvas("media/users/" + profile['auth_user_id']['email'] + ".pdf")
     pdfmetrics.registerFont(TTFont('Arial-Bold', './static/fonts/Arial Bold.ttf'))
     pdfmetrics.registerFont(TTFont('Arial', './static/fonts/arialmt.ttf'))
@@ -116,3 +115,15 @@ def print_profile_form(profile):
 
     my_canvas.save()
     return "media/users/" + profile['auth_user_id']['email'] + ".pdf"
+
+
+def print_offer():
+    my_canvas = canvas.Canvas("media/accounting/" + '1' + ".pdf")
+    pdfmetrics.registerFont(TTFont('Arial-Bold', './static/fonts/Arial Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('Arial', './static/fonts/arialmt.ttf'))
+    my_canvas.setLineWidth(.5)
+    my_canvas.setFont('Arial-Bold', 12)
+
+    my_canvas.save()
+    return "media/accounting/" + '1' + ".pdf"
+

@@ -137,6 +137,23 @@ class ClientPostSerializer(serializers.ModelSerializer):
             'electronic_number', 'account_email', 'create_date')
 
 
+class ClientCommentsSerializer(serializers.ModelSerializer):
+    """Сериализация комментариев к клиентам"""
+    user_profile = UserProfileSerializer()
+
+    class Meta:
+        model = ClientComments
+        fields = '__all__'
+
+
+class ClientCommentsPostSerializer(serializers.ModelSerializer):
+    """Сериализация комментариев к клиентам для POST-запросов"""
+
+    class Meta:
+        model = ClientComments
+        fields = '__all__'
+
+
 class PositionClientSerializer(serializers.ModelSerializer):
     """Сериализация должностей клиентов"""
 
@@ -162,6 +179,14 @@ class ClientEmployeesPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientEmployees
         fields = ('name', 'lastname', 'position', 'phone', 'work_phone', 'email', 'work_email', 'client', 'photo_path')
+
+
+class ContactCommentsSerializer(serializers.ModelSerializer):
+    """Сериализация комментариев к rjynfrnfv"""
+
+    class Meta:
+        model = ContactComments
+        fields = '__all__'
 
 
 class ObjectsSerializer(serializers.ModelSerializer):

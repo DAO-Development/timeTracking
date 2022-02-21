@@ -678,6 +678,55 @@ class ClientView(APIView):
             return Response("Доступ запрещен", status=403)
 
 
+class ClientCommentsView(APIView):
+    """Комментарии к клиентам"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, id=None):
+        if check_read_permissions(request, "Клиенты"):
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+            comments = ClientComments.objects.all()
+            if id is not None:
+                comments = comments.filter(client=id).filter(client_comments__isnull=True)
+            data = {}
+            for com in comments:
+                children = ClientComments.objects.filter(client_comments=com.id)
+                children_serializer = ClientCommentsSerializer(children, many=True)
+                data.update({com.id: children_serializer.data})
+            serializer = ClientCommentsSerializer(comments, many=True)
+            return Response({"profile": user_profile, "comments": serializer.data, "data": data})
+        else:
+            return Response("Доступ запрещен", status=403)
+
+    def post(self, request):
+        if check_read_permissions(request, "Клиенты"):
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+            serializer = ClientCommentsPostSerializer(data={
+                'text': request.data['text'],
+                'client_comments': request.data['client_comments'],
+                'user_profile': user_profile,
+                'client': request.data['client']
+            })
+            # return Response(request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
+        else:
+            return Response("Доступ запрещен", status=403)
+
+    def delete(self, request):
+        if check_read_permissions(request, "Клиенты"):
+            comment = get_object_or_404(ClientComments.objects.all(), id=request.data["id"])
+            comment.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
+
+
 class ClientBranchesView(APIView):
     """Получение всех существующих отраслей клиентов"""
     permission_classes = [permissions.IsAuthenticated]
