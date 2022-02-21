@@ -182,7 +182,16 @@ class ClientEmployeesPostSerializer(serializers.ModelSerializer):
 
 
 class ContactCommentsSerializer(serializers.ModelSerializer):
-    """Сериализация комментариев к rjynfrnfv"""
+    """Сериализация комментариев к контактам"""
+    user_profile = UserProfileSerializer()
+
+    class Meta:
+        model = ContactComments
+        fields = '__all__'
+
+
+class ContactCommentsPostSerializer(serializers.ModelSerializer):
+    """Сериализация комментариев к контактам для POST-запросов"""
 
     class Meta:
         model = ContactComments

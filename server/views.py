@@ -822,6 +822,55 @@ class PositionClientView(APIView):
             return Response("Доступ запрещен", status=403)
 
 
+class ContactCommentsView(APIView):
+    """Комментарии к контактам"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, id=None):
+        if check_read_permissions(request, "Контакты"):
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+            comments = ContactComments.objects.all()
+            if id is not None:
+                comments = comments.filter(contact=id).filter(contact_comments__isnull=True)
+            data = {}
+            for com in comments:
+                children = ContactComments.objects.filter(contact_comments=com.id)
+                children_serializer = ContactCommentsSerializer(children, many=True)
+                data.update({com.id: children_serializer.data})
+            serializer = ContactCommentsSerializer(comments, many=True)
+            return Response({"profile": user_profile, "comments": serializer.data, "data": data})
+        else:
+            return Response("Доступ запрещен", status=403)
+
+    def post(self, request):
+        if check_read_permissions(request, "Контакты"):
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
+            serializer = ContactCommentsPostSerializer(data={
+                'text': request.data['text'],
+                'contact_comments': request.data['contact_comments'],
+                'user_profile': user_profile,
+                'contact': request.data['contact']
+            })
+            # return Response(request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
+        else:
+            return Response("Доступ запрещен", status=403)
+
+    def delete(self, request):
+        if check_read_permissions(request, "Контакты"):
+            comment = get_object_or_404(ContactComments.objects.all(), id=request.data["id"])
+            comment.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
+
+
 class NotesView(APIView):
     """Виджет-блокнот"""
     permission_classes = [permissions.IsAuthenticated]
