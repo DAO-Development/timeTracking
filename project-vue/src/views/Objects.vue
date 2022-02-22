@@ -17,7 +17,8 @@
             $deleteIcon
           </v-icon>
           <v-text-field placeholder="Адрес" v-model="filter.address" outlined></v-text-field>
-          <v-select v-model="filter.client" :items="selects" outlined></v-select>
+          <v-select v-model="filter.client" :items="[{name: 'Все', id: 'Все'}].concat(clients)" item-text="name"
+                    item-value="id" outlined></v-select>
           <v-menu ref="menu_filter" v-model="datePickers.menu_filter" :close-on-content-click="false"
                   :return-value.sync="filter.dates"
                   transition="scale-transition" offset-y min-width="auto">
@@ -35,7 +36,7 @@
         <v-list three-line class="objects__list content-list">
           <template v-for="object in objects">
             <v-list-item :key="object.id"
-                         v-if="object.active === archive && (object.city + ' ' + object.street + ' ' + object.house).includes(filter.address) && (filter.client==='Все' || object.client_id.name===filter.client) && ((typeof(filter.dates[0]) === 'undefined' || object.date_start >= filter.dates[0]) && (object.date_start <= filter.dates[1] || typeof(filter.dates[1]) === 'undefined'))">
+                         v-if="object.active === archive && (object.city + ' ' + object.street + ' ' + object.house).includes(filter.address) && (filter.client==='Все' || object.client_id.id===filter.client) && ((typeof(filter.dates[0]) === 'undefined' || object.date_start >= filter.dates[0]) && (object.date_start <= filter.dates[1] || typeof(filter.dates[1]) === 'undefined'))">
               <v-list-item-content @click="openObject(object)">
                 <v-list-item-title>{{ object.city }} {{ object.street }} {{ object.house }}</v-list-item-title>
                 <v-list-item-subtitle>
@@ -457,6 +458,9 @@ import EditIcon from "../components/icons/editIcon";
 export default {
   name: "Objects",
   components: {EditIcon, WasteIcon, BackIcon, /*AddPhotoIcon*/},
+  props: {
+    idClient: [String, Number, null]
+  },
   data() {
     return {
       page: 'objects',
@@ -524,7 +528,6 @@ export default {
       clients: [],
       contacts: [],
       workers: [],
-      selects: ["Все", "ООО \"Праздник\"", "ООО \"Цветы\""],
       filter: {
         address: "",
         client: "Все",
@@ -621,8 +624,14 @@ export default {
       // };
     },
     loadData() {
+      let url = ""
+      if (this.idClient !== null && this.idClient !== undefined) {
+        url = "time-tracking/objects/" + this.idClient
+        this.filter.client = Number(this.idClient)
+      } else
+        url = "time-tracking/objects"
       $.ajax({
-        url: this.$hostname + "time-tracking/objects",
+        url: this.$hostname + url,
         type: "GET",
         success: (response) => {
           this.objects = response.data.data

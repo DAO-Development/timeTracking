@@ -75,6 +75,12 @@ const routes = [
         component: Objects
     },
     {
+        path: '/clients/objects/:idClient',
+        name: 'ClientObjects',
+        component: Objects,
+        props: true
+    },
+    {
         path: '/workers',
         name: 'Workers',
         component: Workers

@@ -229,9 +229,10 @@ export default {
   methods: {
     loadData() {
       let url = ""
-      if (this.idClient !== null && this.idClient !== undefined)
+      if (this.idClient !== null && this.idClient !== undefined) {
         url = "time-tracking/clients/employees/" + this.idClient
-      else
+        this.filter.client = this.idClient
+      } else
         url = "time-tracking/clients-employees"
       $.ajax({
         url: this.$hostname + url,

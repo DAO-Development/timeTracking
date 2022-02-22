@@ -128,9 +128,10 @@
             <div class="addition-btn" @click="$router.push({name: 'ClientsEmployees', params: {idClient: id}})">
               Контакты
             </div>
-            <!--                        <div class="addition-btn" @click="$router.push({name: 'ClientsEmployees', params: {idClient: id}})">-->
-            <!--              Объекты-->
-            <!--            </div>-->
+            <div class="addition-btn"
+                 @click="$router.push({name: 'ClientObjects', params: {idClient: id}})">
+              Объекты
+            </div>
           </div>
           <h3>Комментарии</h3>
           <div class="objects-open__comments">
