@@ -13,13 +13,16 @@
             $deleteIcon
           </v-icon>
           <v-text-field placeholder="Название" v-model="filter.name" outlined></v-text-field>
-          <v-select v-model="filter.branch" :items="['Все'].concat(selectsBranch)" placeholder="Отрасль"
-                    outlined></v-select>
+          <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>
+          <v-text-field placeholder="Телефон" v-model="filter.phone" outlined></v-text-field>
+          <!--          <v-select v-model="filter.branch" :items="['Все'].concat(selectsBranch)" placeholder="Отрасль"-->
+          <!--                    outlined></v-select>-->
         </div>
         <v-list three-line class="clients__list content-list">
           <template v-for="client in clients">
             <v-list-item :key="client.id"
-                         v-if="client.active === !archive && client.name.includes(filter.name) && (client.branch === filter.branch || filter.branch === 'Все')">
+                         v-if="client.active === !archive && client.name.toLowerCase().includes(filter.name.toLowerCase()) && client.email.includes(filter.email) && client.phone.includes(filter.phone)">
+              <!--                         v-if="client.active === !archive && client.name.includes(filter.name) && (client.branch === filter.branch || filter.branch === 'Все')">-->
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="client.logo_path" :src="$hostname+'media'+client.logo_path"></v-img>
               </v-list-item-avatar>
@@ -252,7 +255,9 @@ export default {
       selectsBranch: [],
       filter: {
         name: "",
-        branch: "Все"
+        email: "",
+        phone: "",
+        // branch: "Все"
       },
       photoField: null,
       formTitle: "Добавление клиента",
@@ -299,6 +304,7 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/clients",
         type: "GET",
+        data: this.filter,
         success: (response) => {
           this.clients = response.data.data
         },
@@ -322,6 +328,8 @@ export default {
           this.alertError = true
         }
       })
+    },
+    loadBranches() {
       $.ajax({
         url: this.$hostname + "time-tracking/clients/branches",
         type: "GET",

@@ -629,11 +629,9 @@ class ClientView(APIView):
 
     def get(self, request, id=None):
         if check_read_permissions(request, "Клиенты"):
-            clients = Client.objects.all()
+            clients = Client.objects.all().order_by('name')
             if id is not None:
                 clients = clients.filter(pk=id)
-            else:
-                clients = clients.order_by('name')
             serializer = ClientSerializer(clients, many=True)
             return Response({"data": serializer.data})
         else:
@@ -742,13 +740,17 @@ class ClientEmployeesView(APIView):
 
     def get(self, request, id=None, idclient=None):
         if check_read_permissions(request, "Контакты"):
-            employees = ClientEmployees.objects.all()
+            employees = ClientEmployees.objects.all().order_by('lastname', 'name')
             if idclient is not None:
                 employees = employees.filter(client_id=idclient).order_by('lastname', 'name')
             if id is not None:
                 employees = employees.filter(pk=id)
             else:
-                employees = employees.order_by('lastname', 'name')
+                if request.GET['client'] != "Все":
+                    employees = employees.filter(client=request.GET['client'])
+                if request.GET['position'] != "Все":
+                    employees = employees.filter(position=request.GET["position"])
+
             serializer = ClientEmployeesSerializer(employees, many=True)
             return Response({"data": serializer.data})
         else:

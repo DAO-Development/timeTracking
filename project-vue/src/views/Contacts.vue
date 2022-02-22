@@ -13,15 +13,18 @@
             $deleteIcon
           </v-icon>
           <v-text-field placeholder="ФИО" v-model="filter.name" outlined></v-text-field>
-          <v-select v-model="filter.client" :items="['Все'].concat(selectsClient)" item-text="name" placeholder="Клиент"
-                    outlined></v-select>
-          <v-select v-model="filter.position" :items="[{id: 0, name: 'Все'}].concat(selectsPosition)"
-                    item-text="name" item-value="name" placeholder="Должность" outlined></v-select>
+          <v-text-field placeholder="Почта" v-model="filter.email" outlined></v-text-field>
+          <v-text-field placeholder="Телефон" v-model="filter.phone" outlined></v-text-field>
+          <v-select v-model="filter.client" :items="['Все'].concat(selectsClient)" item-text="name" item-value="id"
+                    placeholder="Клиент" outlined @change="loadData"></v-select>
+          <v-select v-model="filter.position" :items="[{id: 'Все', name: 'Все'}].concat(selectsPosition)"
+                    item-text="name" item-value="id" placeholder="Должность" outlined @change="loadData"></v-select>
         </div>
         <v-list three-line class="clients__list content-list">
           <template v-for="contact in contacts">
             <v-list-item :key="contact.id"
-                         v-if="contact.active === !archive && (contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position.name === filter.position || filter.position === 'Все')">
+                         v-if="contact.active === !archive && (contact.lastname + ' ' + contact.name).toLowerCase().includes(filter.name.toLowerCase()) && contact.email.includes(filter.email) && contact.phone.includes(filter.phone)">
+              <!--                         v-if="contact.active === !archive && (contact.lastname + ' ' + contact.name).includes(filter.name) && (contact.client.name === filter.client || filter.client === 'Все') && (contact.position.name === filter.position || filter.position === 'Все')">-->
               <v-list-item-avatar class="content-list__image">
                 <v-img v-if="contact.photo_path" :src="$hostname+'media'+contact.photo_path"></v-img>
               </v-list-item-avatar>
@@ -183,6 +186,8 @@ export default {
       },
       filter: {
         name: "",
+        email: "",
+        phone: "",
         client: "Все",
         position: "Все"
       },
@@ -228,15 +233,16 @@ export default {
   },
   methods: {
     loadData() {
-      let url = ""
+      // let url = ""
       if (this.idClient !== null && this.idClient !== undefined) {
-        url = "time-tracking/clients/employees/" + this.idClient
+        // url = "time-tracking/clients/employees/" + this.idClient
         this.filter.client = this.idClient
-      } else
-        url = "time-tracking/clients-employees"
+      }
+        // url = "time-tracking/clients-employees"
       $.ajax({
-        url: this.$hostname + url,
+        url: this.$hostname + "time-tracking/clients-employees",
         type: "GET",
+        data: this.filter,
         success: (response) => {
           this.contacts = response.data.data
         },
