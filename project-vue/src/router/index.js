@@ -164,6 +164,12 @@ const routes = [
         props: true
     },
     {
+        path: '/workers/:profile/waybills',
+        name: 'WorkersWaybill',
+        component: Waybill,
+        props: true
+    },
+    {
         path: '/purchases',
         name: 'Purchases',
         component: Purchases

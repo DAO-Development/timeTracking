@@ -5,6 +5,11 @@
         <v-img v-if="user.photo_path != null" :lazy-src="$hostname+'media'+user.photo_path"
                :src="$hostname+'media'+user.photo_path"></v-img>
         <v-btn class="action-btn" color="primary" @click="$router.push({name: 'Timing'})">Часовая отчетность</v-btn>
+
+        <v-btn class="action-btn" color="primary"
+               @click="$router.push({name: 'WorkersWaybill', params: {profile: user.id}})">
+          Путевые листы
+        </v-btn>
       </div>
       <div class="profile__info">
         <h3>Личная информация</h3>

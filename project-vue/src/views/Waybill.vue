@@ -7,8 +7,8 @@
         <v-btn class="action-btn" color="primary" @click="addForm = true">Добавить</v-btn>
         <v-autocomplete v-model="filter.place" label="Места" :items="places" outlined
                         @change="loadData"></v-autocomplete>
-        <v-autocomplete v-model="filter.worker" label="Работник" :items="users" item-value="id" item-text="label"
-                        outlined @change="loadData"></v-autocomplete>
+        <v-autocomplete v-if="$parent.$parent.admin" v-model="filter.worker" label="Работник" :items="users"
+                        item-value="id" item-text="label" outlined @change="loadData"></v-autocomplete>
       </v-row>
       <v-data-table :headers="headers" :items="waybills" item-key="id">
         <template v-slot:item.actions="{ item }">
@@ -156,6 +156,9 @@ import $ from "jquery";
 export default {
   name: "Waybill",
   components: {Header},
+  props: {
+    profile: {Number, String, undefined}
+  },
   data() {
     return {
       waybills: [],
@@ -213,7 +216,7 @@ export default {
       this.$emit('set-auth')
       this.$emit('load-functions')
       this.$emit('load-settings')
-      if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
+      if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1 && this.profile === undefined)
         this.$router.push({name: "Index"})
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
@@ -228,6 +231,9 @@ export default {
   },
   methods: {
     loadData() {
+      if (this.profile !== undefined) {
+        this.filter.worker = this.profile
+      }
       $.ajax({
         url: this.$hostname + "time-tracking/waybill",
         type: "GET",

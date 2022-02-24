@@ -233,13 +233,12 @@ export default {
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
       this.$emit('set-auth')
       this.$emit('load-functions')
-      if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
-        this.$router.push({name: "Index"})
       $.ajaxSetup({
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       this.loadData()
-      this.loadGoals()
+      if (this.$parent.$parent.read.indexOf('Бухгалтерия') !== -1)
+        this.loadGoals()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
