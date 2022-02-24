@@ -219,7 +219,7 @@ class Objects(models.Model):
     accident_insurance = models.CharField(verbose_name='Страховка от несчастных случаев', max_length=100, null=True,
                                           blank=True)
     health_insurance = models.CharField(verbose_name='Страховка здоровья', max_length=100, null=True, blank=True)
-
+    photo_path = models.CharField(verbose_name='Фото', max_length=250, default="/objects/preview.jpg")
     create_date = models.DateField(verbose_name="Дата создания", null=True)
 
     class Meta:

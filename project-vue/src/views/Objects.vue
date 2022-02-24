@@ -79,6 +79,17 @@
         </v-list>
       </div>
       <div class="objects-open" v-else>
+        <div class="profile__image">
+          <v-img v-if="currentObject.photo_path != null && currentObject.photo_path != undefined"
+                 :lazy-src="$hostname+'media'+currentObject.photo_path"
+                 :src="$hostname+'media'+currentObject.photo_path"></v-img>
+          <v-img v-else :lazy-src="$hostname+'media/objects/preview.jpg'"
+                 :src="$hostname+'media/objects/preview.jpg'"></v-img>
+          <v-btn class="action-btn" color="primary" v-if="$parent.$parent.edit.indexOf('Объекты') !== -1"
+                 @click="photoDialog = true">
+            Сменить фото
+          </v-btn>
+        </div>
         <div class="objects-open__info profile__info">
           <h3>Информация об объекте</h3>
           <div class="news-open__actions open__actions" v-if="$parent.$parent.edit.indexOf('Объекты') !== -1">
@@ -409,19 +420,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="confirmAddDialog" max-width="500">
-      <v-card>
-        <v-card-title>
-          Подтверждение
-        </v-card-title>
-        <v-card-text>Проверьте корректность всех данных. Внести изменения сможет только администратор</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="secondary" text @click="confirmAddDialog = false">Отменить</v-btn>
-          <v-btn color="primary" text @click="addTiming">Подтвердить</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-dialog v-model="addWorkerForm" max-width="500">
       <v-card>
         <v-toolbar flat>
@@ -470,6 +468,34 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="putObjectUser">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="photoDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Сменить фото
+        </v-card-title>
+        <v-card-text>
+          <v-file-input v-model="photoField" placeholder="Фото профиля" accept="image/*"
+                        prepend-icon="" outlined></v-file-input>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="savePhoto">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="confirmAddDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Подтверждение
+        </v-card-title>
+        <v-card-text>Проверьте корректность всех данных. Внести изменения сможет только администратор</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmAddDialog = false">Отменить</v-btn>
+          <v-btn color="primary" text @click="addTiming">Подтвердить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -637,9 +663,11 @@ export default {
       },
       formTitle: "Добавление объекта",
       formBtnText: "Добавить объект",
+      photoField: null,
       addForm: false,
       addTimingForm: false,
       addWorkerForm: false,
+      photoDialog: false,
       confirmArchiveDialog: false,
       confirmAddDialog: false,
       confirmDeleteDialog: false,
@@ -711,16 +739,16 @@ export default {
   },
   methods: {
     allowedDates: val => val <= new Date().toISOString(),
-    initSocket() {
-      // socket.onmessage = function (e) {
-      //   const data = JSON.parse(e.data);
-      //   console.log(data.message);
-      // };
-      //
-      // socket.onclose = function () {
-      //   console.error('Chat socket closed unexpectedly');
-      // };
-    },
+    // initSocket() {
+    // socket.onmessage = function (e) {
+    //   const data = JSON.parse(e.data);
+    //   console.log(data.message);
+    // };
+    //
+    // socket.onclose = function () {
+    //   console.error('Chat socket closed unexpectedly');
+    // };
+    // },
     loadData() {
       let url = ""
       if (this.idClient !== null && this.idClient !== undefined) {
@@ -905,7 +933,7 @@ export default {
     openObject(item) {
       this.currentObject = item
       this.currentObject.label = this.currentObject.city + ' ' + this.currentObject.street + ' ' + this.currentObject.house
-      this.loadPhoto(item.id)
+      // this.loadPhoto(item.id)
       this.all = false
       this.loadWorkers()
       this.loadComments(false)
@@ -913,25 +941,25 @@ export default {
       //   this.loadComments(true)
       // }, 25000)
     },
-    loadPhoto(id) {
-      $.ajax({
-        url: this.$hostname + "time-tracking/objects/photos/" + id,
-        type: "GET",
-        success: (response) => {
-          this.photos = response.data.data
-        },
-        error: (response) => {
-          if (response.status === 500) {
-            this.alertMsg = "Ошибка соединения с сервером"
-          } else if (response.status === 401) {
-            this.$refresh()
-          } else {
-            this.alertMsg = "Непредвиденная ошибка"
-          }
-          this.alertError = true
-        },
-      })
-    },
+    // loadPhoto(id) {
+    //   $.ajax({
+    //     url: this.$hostname + "time-tracking/objects/photos/" + id,
+    //     type: "GET",
+    //     success: (response) => {
+    //       this.photos = response.data.data
+    //     },
+    //     error: (response) => {
+    //       if (response.status === 500) {
+    //         this.alertMsg = "Ошибка соединения с сервером"
+    //       } else if (response.status === 401) {
+    //         this.$refresh()
+    //       } else {
+    //         this.alertMsg = "Непредвиденная ошибка"
+    //       }
+    //       this.alertError = true
+    //     },
+    //   })
+    // },
     loadWorkers() {
       $.ajax({
         url: this.$hostname + "time-tracking/objects/employees/" + this.currentObject.id,
@@ -1121,26 +1149,6 @@ export default {
         },
       })
     },
-    openAddForm() {
-      this.formTitle = "Добавление объекта"
-      this.formBtnText = "Добавить объект"
-      this.addForm = true
-    },
-    openEditForm(item) {
-      this.formTitle = "Редактирование объекта"
-      this.formBtnText = "Сохранить объект"
-      this.newObject = item
-      this.addForm = true
-    },
-    openAddWorkerForm() {
-      this.formTitle = "Добавление работника на объект"
-      this.addWorkerForm = true
-    },
-    openEditWorkerForm(worker) {
-      this.addWorker = worker
-      this.formTitle = "Редактирование работника на объекте"
-      this.addWorkerForm = true
-    },
     addTiming() {
       $.ajax({
         url: this.$hostname + "time-tracking/time-reports",
@@ -1172,6 +1180,51 @@ export default {
           this.alertError = true
         },
       })
+    },
+    savePhoto() {
+      const axios = require('axios')
+      // чтение файла в formData
+      let fd = new FormData();
+      let avatar = this.photoField;
+      if (avatar !== undefined) {
+        fd.append('image', avatar)
+      } else {
+        console.log("ERROR")
+        return
+      }
+      axios({
+        method: 'put',
+        url: this.$hostname + "time-tracking/objects/" + this.currentObject.id,
+        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        data: fd
+      })
+          .then(response => {
+            console.log(response.data.data)
+            this.photoDialog = false
+            this.photoField = null
+            this.currentObject.photo_path = response.data.data.name
+            this.loadData()
+          });
+    },
+    openAddForm() {
+      this.formTitle = "Добавление объекта"
+      this.formBtnText = "Добавить объект"
+      this.addForm = true
+    },
+    openEditForm(item) {
+      this.formTitle = "Редактирование объекта"
+      this.formBtnText = "Сохранить объект"
+      this.newObject = item
+      this.addForm = true
+    },
+    openAddWorkerForm() {
+      this.formTitle = "Добавление работника на объект"
+      this.addWorkerForm = true
+    },
+    openEditWorkerForm(worker) {
+      this.addWorker = worker
+      this.formTitle = "Редактирование работника на объекте"
+      this.addWorkerForm = true
     },
     openConfirmAdd() {
       if (this.$refs.form.validate()) {
@@ -1249,5 +1302,7 @@ export default {
 </script>
 
 <style scoped>
-
+.profile__image {
+  max-width: 200px;
+}
 </style>

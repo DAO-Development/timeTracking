@@ -478,16 +478,30 @@ class ObjectsView(APIView):
         else:
             return Response("Доступ запрещен", status=403)
 
-    def put(self, request):
+    def put(self, request, id=None):
         if check_edit_permissions(request, "Объекты"):
-            saved_object = get_object_or_404(Objects.objects.all(), id=request.data["id"])
-            data = request.data
-            serializer = ObjectsSerializer(saved_object, data=data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(status=201)
+            serializer = None
+            if id is not None:
+                name = '/objects/' + request.FILES['image'].name
+                with open('media' + name, 'wb+') as destination:
+                    for chunk in request.FILES['image'].chunks():
+                        destination.write(chunk)
+                saved_object = get_object_or_404(Objects.objects.all(), id=id)
+                serializer = ObjectsSerializer(saved_object, data={"photo_path": name},
+                                               partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"name": name}, status=201)
+                else:
+                    return Response("Некорректные данные", status=400)
             else:
-                return Response("Некорректные данные", status=400)
+                saved_object = get_object_or_404(Objects.objects.all(), id=request.data["id"])
+                serializer = ObjectsSerializer(saved_object, data=request.data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(status=201)
+                else:
+                    return Response("Некорректные данные", status=400)
         else:
             return Response("Доступ запрещен", status=403)
 
