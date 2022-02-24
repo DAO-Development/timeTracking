@@ -91,6 +91,9 @@
               Удалить объект
             </div>
           </div>
+          <v-btn color="primary" @click="addTimingForm=true; newTiming.objects_id=currentObject.id; loadPositions()">
+            Добавить часовой отчет
+          </v-btn>
           <ul>
             <li>
               <span class="profile__info-title">Объект сдан</span>
@@ -344,6 +347,81 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="addTimingForm">
+      <v-card>
+        <v-toolbar flat>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="addTimingForm = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <h3>Добавление часов</h3>
+        <v-card-text>
+          <v-form ref="form" :model="newTiming">
+            <v-row>
+              <v-menu ref="dateMenu" v-model="menus.dateMenu"
+                      :close-on-content-click="false"
+                      :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newTiming.date" label="Дата" readonly v-bind="attrs"
+                                v-on="on" outlined :rules="reqRules"></v-text-field>
+                </template>
+                <v-date-picker v-model="newTiming.date" @input="menus.dateMenu = false"
+                               :allowed-dates="allowedDates"></v-date-picker>
+              </v-menu>
+            </v-row>
+            <v-autocomplete label="Объект" v-model="newTiming.objects_id" :items="objects" item-text="label"
+                            item-value="id" :rules="reqRules" disabled></v-autocomplete>
+            <v-combobox label="Профиль работ" v-model="newTiming.position" :items="positions"
+                        :rules="reqRules"></v-combobox>
+            <v-row>
+              <v-menu ref="menuStartTime" v-model="menus.timeStartMenu"
+                      :close-on-content-click="false" :nudge-right="40" :return-value.sync="newTiming.time_start"
+                      transition="scale-transition" offset-y max-width="290px" min-width="290px">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newTiming.time_start" label="Время начала" readonly v-bind="attrs"
+                                v-on="on" outlined :rules="reqRules" required></v-text-field>
+                </template>
+                <v-time-picker v-if="menus.timeStartMenu" v-model="newTiming.time_start" full-width format="24hr"
+                               @click:minute="$refs.menuStartTime.save(newTiming.time_start)"></v-time-picker>
+              </v-menu>
+              <v-menu ref="menuEndTime" v-model="menus.timeEndMenu" :close-on-content-click="false"
+                      :nudge-right="40" :return-value.sync="newTiming.time_end" transition="scale-transition"
+                      offset-y max-width="290px" min-width="290px">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field v-model="newTiming.time_end" label="Время окончания" readonly v-bind="attrs"
+                                v-on="on" outlined required></v-text-field>
+                </template>
+                <v-time-picker v-if="menus.timeEndMenu" v-model="newTiming.time_end" full-width format="24hr"
+                               :min="newTiming.time_start"
+                               @click:minute="$refs.menuEndTime.save(newTiming.time_end)"></v-time-picker>
+              </v-menu>
+            </v-row>
+            <v-textarea label="Описание" v-model="newTiming.comment"></v-textarea>
+          </v-form>
+          <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
+            {{ alertMsg }}
+          </v-alert>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="action-btn" color="primary" @click="openConfirmAdd">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="confirmAddDialog" max-width="500">
+      <v-card>
+        <v-card-title>
+          Подтверждение
+        </v-card-title>
+        <v-card-text>Проверьте корректность всех данных. Внести изменения сможет только администратор</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="confirmAddDialog = false">Отменить</v-btn>
+          <v-btn color="primary" text @click="addTiming">Подтвердить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="addWorkerForm" max-width="500">
       <v-card>
         <v-toolbar flat>
@@ -528,6 +606,18 @@ export default {
       clients: [],
       contacts: [],
       workers: [],
+      positions: [],
+      newTiming: {
+        id: 0,
+        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        time_start: '',
+        time_end: '',
+        position: '',
+        objects_id: '',
+        user_profile_id: null,
+        comment: ''
+      },
+      colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1', 'yellow', 'pink', 'lime'],
       filter: {
         address: "",
         client: "Все",
@@ -540,11 +630,18 @@ export default {
         worker_start: false,
         worker_end: false,
       },
+      menus: {
+        dateMenu: false,
+        timeStartMenu: false,
+        timeEndMenu: false,
+      },
       formTitle: "Добавление объекта",
       formBtnText: "Добавить объект",
       addForm: false,
+      addTimingForm: false,
       addWorkerForm: false,
       confirmArchiveDialog: false,
+      confirmAddDialog: false,
       confirmDeleteDialog: false,
       confirmDeleteWorkerDialog: false,
       reqRules: [
@@ -613,6 +710,7 @@ export default {
     }
   },
   methods: {
+    allowedDates: val => val <= new Date().toISOString(),
     initSocket() {
       // socket.onmessage = function (e) {
       //   const data = JSON.parse(e.data);
@@ -690,6 +788,25 @@ export default {
           }
           this.alertError = true
         },
+      })
+    },
+    loadPositions() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/time-reports-positions",
+        type: "GET",
+        success: (response) => {
+          this.positions = response.data.positions
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
       })
     },
     addObject() {
@@ -787,6 +904,7 @@ export default {
     },
     openObject(item) {
       this.currentObject = item
+      this.currentObject.label = this.currentObject.city + ' ' + this.currentObject.street + ' ' + this.currentObject.house
       this.loadPhoto(item.id)
       this.all = false
       this.loadWorkers()
@@ -1022,6 +1140,46 @@ export default {
       this.addWorker = worker
       this.formTitle = "Редактирование работника на объекте"
       this.addWorkerForm = true
+    },
+    addTiming() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/time-reports",
+        type: "POST",
+        data: this.newTiming,
+        success: () => {
+          this.loadData()
+          this.loadPositions()
+          this.addTimingForm = false
+          this.confirmAddDialog = false
+          this.newTiming = {
+            date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            time_start: '',
+            time_end: '',
+            position: '',
+            objects_id: '',
+            user_profile_id: '',
+            comment: ''
+          }
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
+    openConfirmAdd() {
+      if (this.$refs.form.validate()) {
+        this.confirmAddDialog = true
+      } else {
+        this.alertMsg = "Заполните все необходимые поля"
+        this.alertError = true
+      }
     },
     openConfirmArchiveDialog() {
       if ((this.currentObject.active && !this.all) || (!this.currentObject.active && this.all)) {
