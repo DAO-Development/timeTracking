@@ -10,8 +10,8 @@ __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media
-#server/test_pdf.py
+media/cheque
+server/test_pdf.py
 #*.pdf
 #*.ttf
 
