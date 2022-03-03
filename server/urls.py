@@ -49,6 +49,7 @@ urlpatterns = [
     path('cheque/categories', ChequeCategoryView.as_view()),
     path('cheque/sales', SalesView.as_view()),
     path('cheque/sales/<int:id>', SalesView.as_view()),
+    path('print-sale/<int:id>', PrintSalesView.as_view()),
     path('cheque/purchases', PurchasesView.as_view()),
     path('cheque/purchases/<int:id>', PurchasesView.as_view()),
     path('cheque/documents', ChequeDocumentsView.as_view()),
