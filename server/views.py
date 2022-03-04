@@ -1177,16 +1177,20 @@ class SalesView(APIView):
         else:
             return Response("Доступ запрещен", status=403)
 
+
 class PrintSalesView(APIView):
 
     def get(self, request, id=None):
         if check_read_permissions(request, "Бухгалтерия"):
             sale = Sales.objects.get(pk=id)
             serializer = SalesSerializer(sale)
-            path = print_sale(serializer.data)
+            items = Items.objects.filter(pk__in=serializer.data['items']).order_by('id')
+            items_serializer = ItemsSerializer(items, many=True)
+            path = print_sale(serializer.data, items_serializer.data)
             return Response({"path": path}, status=200)
         else:
             return Response("Доступ запрещен", status=403)
+
 
 class ChequeDocumentsView(APIView):
     """Фото чеков"""

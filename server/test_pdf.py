@@ -117,10 +117,10 @@ def print_profile_form(profile):
     return "media/users/" + profile['auth_user_id']['email'] + ".pdf"
 
 
-def print_sale(sale):
+def print_sale(sale, items):
     count = 0  # номер страницы
-    pages = 1  # количество страниц (количество items/10)
-    my_canvas = canvas.Canvas("media/accounting/" + '1' + ".pdf")
+    pages = len(items) // 10 + 1  # количество страниц (количество items/10)
+    my_canvas = canvas.Canvas("media/accounting/" + str(sale['id']) + ".pdf")
     pdfmetrics.registerFont(TTFont('Arial-Bold', './static/fonts/Arial Bold.ttf'))
     pdfmetrics.registerFont(TTFont('Arial', './static/fonts/arialmt.ttf'))
     my_canvas.setLineWidth(.5)
@@ -128,11 +128,14 @@ def print_sale(sale):
     my_canvas.setFont('Arial-Bold', 11)
     my_canvas.setFillColor(orangered)
     # Название клиента
-    my_canvas.drawString(55, 795, "Luxor Talot OY")
+    my_canvas.drawString(55, 795, sale['client']['name'])
     my_canvas.setFont('Arial-Bold', 9)
     my_canvas.setFillColor(black)
     # юридический адрес?
-    my_canvas.drawString(55, 780, "HIRSIKUJA 6C, 01680 Vantaa")
+    my_canvas.drawString(55, 780,
+                         sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
+                             'house'] + ', ' + sale['client']['business_address']['index'] + ' ' +
+                         sale['client']['business_address']['city'])
     my_canvas.setFont('Arial-Bold', 10)
     my_canvas.drawString(370, 795, "Дата")
     my_canvas.setFont('Arial', 10)
@@ -149,7 +152,7 @@ def print_sale(sale):
     my_canvas.drawString(55, 670, '01490 HELSINKI'.upper())
     my_canvas.setFont('Arial-Bold', 9)
     my_canvas.drawString(55, 580, 'Регистрационный номер')
-    my_canvas.drawString(55, 573, 'или личный код: 2535570-5')
+    my_canvas.drawString(55, 570, 'или личный код: 2535570-5')  # todo что за номер?
 
     my_canvas.grid([320, 450, 580], [730, 760])
     my_canvas.grid([320, 580], [700, 730])
@@ -172,6 +175,22 @@ def print_sale(sale):
     my_canvas.drawString(455, 600, 'Заметки')
     my_canvas.drawString(325, 570, 'Адрес объекта')
 
+    my_canvas.setFont('Arial-Bold', 12)
+    my_canvas.drawString(325, 735, datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d').strftime('%d.%m.%Y'))
+    my_canvas.drawString(455, 735, str(sale['id']))
+    my_canvas.drawString(325, 705, sale['number_link'])
+    my_canvas.drawString(325, 675, str(sale['client']['id']))
+    my_canvas.drawString(455, 675, '-')
+    my_canvas.drawString(325, 645, str(sale['payment_terms']['days']) + ' дн.')
+    my_canvas.drawString(455, 645, (datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d') + datetime.timedelta(
+        days=sale['payment_terms']['days'])).strftime('%d.%m.%Y'))
+    my_canvas.drawString(325, 615, '-')
+    my_canvas.drawString(455, 615, '-')
+    my_canvas.drawString(325, 585, sale['object_number'])
+    my_canvas.drawString(455, 585, sale['description'])
+    my_canvas.drawString(325, 555, sale['object']['street'] + ' ' + sale['object']['house'] + ', ' + sale['object'][
+        'index'] + ' ' + sale['object']['city'])
+
     my_canvas.setFont('Arial', 7)
     my_canvas.drawString(68, 510, 'Наименование'.upper())
     my_canvas.drawString(225, 510, 'НДС%')
@@ -190,16 +209,50 @@ def print_sale(sale):
     my_canvas.drawRightString(575, 510, 'EUR'.upper())
     my_canvas.line(50, 508, 580, 508)
 
-    my_canvas.setFont('Arial-Bold', 10)
-    for i in range(10):
-        my_canvas.drawString(55, 510 - 13 * (i + 1), str(i + 1))
+    i = 0
+    sum = 0
+    vat = {}
+    sum_no_vat = 0
+    for item in range(i, len(items)):
+        i += 1
+        y = 510 - 13 * i
+        my_canvas.setFont('Arial-Bold', 10)
+        my_canvas.drawString(55, y, str(i))
+        my_canvas.setFont('Arial-Bold', 9)
+        name = items[item]['name']
+        my_canvas.drawString(68, y, name)
+        my_canvas.drawString(225, y, str(items[item]['tax']))
+        if items[item]['tax'] not in vat:
+            vat[items[item]['tax']] = items[item]['price'] * (float(items[item]['tax']) / 100)
+        else:
+            vat[items[item]['tax']] += items[item]['price'] * (float(items[item]['tax']) / 100)
+
+        my_canvas.drawRightString(300, y, str(items[item]['quantity']))
+        my_canvas.drawString(305, y, items[item]['measurement'])
+        my_canvas.drawRightString(375, y, str(items[item]['price']))
+        sum_no_vat += items[item]['price'] * items[item]['quantity']
+        my_canvas.drawRightString(435, y, str(round(items[item]['price'] * (1 + float(items[item]['tax']) / 100), 2)))
+        my_canvas.drawRightString(460, y, str(items[item]['discount']) if items[item]['discount'] > 0 else '-')
+        my_canvas.drawRightString(520, y, str(
+            round(items[item]['price'] * items[item]['quantity'] * (1 - float(items[item]['discount']) / 100), 2)))
+        my_canvas.drawRightString(575, y, str(
+            round(items[item]['price'] * items[item]['quantity'] * (1 + float(items[item]['tax']) / 100) * (
+                    1 - float(items[item]['discount']) / 100), 2)))
+        sum += round(items[item]['price'] * items[item]['quantity'] * (1 + float(items[item]['tax']) / 100) * (
+                1 - float(items[item]['discount']) / 100), 2)
 
     my_canvas.setFont('Arial', 8)
+    vat_str = ''
+    sum_vat = 0
+    for key in vat.keys():
+        vat_str += ' + НДС ' + str(key) + '% ' + str(vat[key])
+        sum_vat += vat[key]
+
     my_canvas.drawString(55, 510 - 13 * (10 + 2),
-                         '(' + str(23433) + ' + НДС' + str(24) + '%' + str(786) + ' = ' + str(4005) + ')')
+                         '(' + str(sum_no_vat) + vat_str + ' = ' + str(sum) + ')')
     my_canvas.setFont('Arial-Bold', 10)
     my_canvas.drawString(440, 510 - 13 * (10 + 2), 'ВСЕГО EUR')
-    my_canvas.drawRightString(565, 510 - 13 * (10 + 2), str(4005))
+    my_canvas.drawRightString(565, 510 - 13 * (10 + 2), str(sum))
 
     my_canvas.grid([50, 145, 240, 355, 450, 580], [288, 303, 315])
     my_canvas.setFont('Arial', 8)
@@ -208,16 +261,27 @@ def print_sale(sale):
     my_canvas.drawString(245, 305, 'Цена без НДС EUR')
     my_canvas.drawString(360, 305, 'НДС EUR')
     my_canvas.drawString(455, 305, 'Общая сумма EUR')
+    my_canvas.setFont('Arial-Bold', 10)
+    my_canvas.drawString(55, 292, sale['number_link'])
+    my_canvas.drawString(150, 292, (datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d') + datetime.timedelta(
+        days=sale['payment_terms']['days'])).strftime('%d.%m.%Y'))
+    my_canvas.drawString(245, 292, str(sum_no_vat))
+    my_canvas.drawString(360, 292, str(sum_vat))
+    my_canvas.drawString(455, 292, str(sum))
 
-    my_canvas.drawString(55, 278, 'Luxor Talot OY')
-    my_canvas.drawString(55, 268, 'Hirsikuja 6C')
-    my_canvas.drawString(55, 258, '01680 Vantaa')
-    my_canvas.drawString(160, 278, 'Рег. нр: 2926641-9')
-    my_canvas.drawString(245, 278, 'Тел: ')
-    my_canvas.drawString(245, 268, 'e-mail: ')
-    my_canvas.drawString(245, 258, 'web: ')
+    my_canvas.setFont('Arial', 8)
+    my_canvas.drawString(55, 278, sale['client']['name'])
+    my_canvas.drawString(55, 268,
+                         sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
+                             'house'])
+    my_canvas.drawString(55, 258,
+                         sale['client']['business_address']['index'] + ' ' + sale['client']['business_address']['city'])
+    my_canvas.drawString(160, 278, 'Рег. нр: 2926641-9')  # todo что за номер?
+    my_canvas.drawString(245, 278, 'Тел: ' + sale['client']['phone'])
+    my_canvas.drawString(245, 268, 'e-mail: ' + sale['client']['email'])
+    my_canvas.drawString(245, 258, 'web: ' + sale['client']['site'])
     my_canvas.setFont('Arial', 10)
-    my_canvas.drawString(405, 275, 'FI30 1544 3000 0810 47 NORDEA'.upper())
+    my_canvas.drawString(405, 275, sale['client']['bank_account'].upper() + ' ' + sale['client']['bank'].upper())
 
     my_canvas.setDash([1.3, 2])
     my_canvas.line(50, 245, 540, 245)
@@ -267,8 +331,25 @@ def print_sale(sale):
     my_canvas.drawCentredString(346, 68, 'оплаты')
     my_canvas.drawString(470, 83, 'Euro')
 
+    my_canvas.setFont('Arial-Bold', 10)
+    my_canvas.drawString(125, 205, sale['client']['bank'].upper() + ' ' + sale['client']['bank_account'].upper())
+    my_canvas.drawString(331, 205, sale['client']['bic'])
+    my_canvas.drawString(125, 180, sale['client']['name'])
+    my_canvas.drawString(125, 155, 'SRV OY')
+    my_canvas.drawString(125, 143, 'KORENNONTIE 3B')
+    my_canvas.drawString(125, 131, '01490 HELSINKI')
+    my_canvas.drawString(331, 175, sale['comment'])
+    my_canvas.setFont('Arial-Bold', 12)
+    my_canvas.drawString(331, 125, str(sale['id']))
+    my_canvas.drawString(445, 125,
+                         '000/1/' + datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d').strftime('%d.%m.%Y'))
+    my_canvas.drawString(370, 102, sale['number_link'])
+    my_canvas.drawString(370, 70, (datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d') + datetime.timedelta(
+        days=sale['payment_terms']['days'])).strftime('%d.%m.%Y'))
+    my_canvas.drawRightString(560, 70, str(sum))
+
     my_canvas.save()
-    return "media/accounting/" + '1' + ".pdf"
+    return "media/accounting/" + str(sale['id']) + ".pdf"
 
 
 def print_offer():

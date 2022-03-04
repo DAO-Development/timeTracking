@@ -20,6 +20,7 @@
             Удалить
           </div>
         </div>
+        <v-btn class="action-btn" color="primary" @click="printSale">Скачать</v-btn>
         <div>Номер счета: {{ currentSale.id + 9999 }}</div>
         <div class="document_date">Дата создания: {{ currentSale.create_date }}</div>
         <div class="document_date">Клиент: {{ currentSale.client.name }}</div>
@@ -698,6 +699,53 @@ export default {
           this.alertError = true
         }
       })
+    },
+    printSale() {
+      let path = ''
+      $.ajax({
+        url: this.$hostname + "time-tracking/print-sale/" + this.id,
+        type: "GET",
+        success: (response) => {
+          path = response.data.path
+        },
+        error: (response) => {
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+        async: false
+      })
+      if (path !== '') {
+        const axios = require('axios')
+        axios({
+          url: this.$hostname + path,
+          method: 'GET',
+          responseType: 'blob',
+        }).then((response) => {
+          var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          var fileLink = document.createElement('a');
+
+          fileLink.href = fileURL;
+          fileLink.setAttribute('download', path.substr(path.lastIndexOf('/') + 1));
+          document.body.appendChild(fileLink);
+
+          fileLink.click();
+        })
+      }
     },
     downloadFile(item) {
       console.log(this.$hostname + 'media' + item)
