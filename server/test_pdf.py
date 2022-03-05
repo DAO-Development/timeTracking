@@ -1,4 +1,5 @@
 import datetime
+import math
 
 from reportlab.lib.colors import black, orangered
 from reportlab.pdfgen import canvas
@@ -352,16 +353,119 @@ def print_sale(sale, items):
     return "media/accounting/" + str(sale['id']) + ".pdf"
 
 
-def print_offer():
-    my_canvas = canvas.Canvas("media/accounting/" + '1' + ".pdf")
+def print_offer(offer, items):
+    # items = [
+    #     {
+    #         'name': 'As. B 11 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 12 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 13 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 14 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 15 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 16 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 17 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 18 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    #     {
+    #         'name': 'As. B 19 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
+    # ]
+    count_page = 0  # номер страницы
+    count_items = 0
+    count_str = 0
+    max_str = 0
+    max_page_str = 20
+    for item in items:
+        max_str += math.ceil(len(item['name']) / 65)
+    pages = math.ceil(max_str / max_page_str)
+    my_canvas = canvas.Canvas("media/accounting/" + 'tarjous1' + ".pdf")
     pdfmetrics.registerFont(TTFont('Arial-Bold', './static/fonts/Arial Bold.ttf'))
     pdfmetrics.registerFont(TTFont('Arial', './static/fonts/arialmt.ttf'))
     my_canvas.setLineWidth(.5)
-    my_canvas.setFont('Arial-Bold', 12)
+
+    my_canvas.setFont('Helvetica', 9.5)
+    my_canvas.drawString(30, 520, 'Yrttipolku 4 A, B, ja C Kerava / Huoneistoremontit')
+    my_canvas.drawString(30, 495, 'Materiaalit:')
+    my_canvas.drawString(30, 482, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
+    my_canvas.drawString(30, 469, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
+    my_canvas.drawString(30, 456, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
+    my_canvas.drawString(30, 443, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
+    my_canvas.drawString(30, 430, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
+    my_canvas.drawString(30, 402, 'Hinnat sisältää : materiaalit, oma roskien siivous + jätteille kustannukset.')
+
+    while count_str < max_str:
+        count_page += 1
+        my_canvas.setFont('Arial-Bold', 16)
+        my_canvas.drawString(330, 800, 'Tarjous')
+        my_canvas.setFont('Helvetica-Bold', 9)
+        my_canvas.drawString(330, 750, 'Tarjouksen numero:')
+        my_canvas.drawString(330, 735, 'Tarjouksen päivä:')
+        my_canvas.drawString(330, 720, 'Voimassa päivään:')
+        my_canvas.drawString(330, 705, 'Asiakasnumero:')
+        my_canvas.drawImage('project-vue/src/assets/logo.png', 60, 750, width=106, height=40)  # todo чей лого?
+        my_canvas.drawString(60, 730, 'Timanttitimpurit Oy')
+        my_canvas.drawString(60, 718, 'Sami Lahti')
+        my_canvas.drawString(60, 706, 'Kaivolantie 4')
+        my_canvas.drawString(60, 694, '04500 Kellokoski Kellokoski')
+        my_canvas.drawString(60, 682, 'Asiakasnumero: ' + str(3))
+
+        my_canvas.setFillColor('#c0c0c0')
+        my_canvas.rect(30, 360, 545, 20, stroke=0, fill=1)
+        my_canvas.setFillColor(black)
+        my_canvas.setFont('Helvetica-Bold', 9)
+        my_canvas.drawString(35, 367, 'Kuvaus')
+        my_canvas.drawRightString(340, 367, 'Päivä')
+        my_canvas.drawRightString(375, 367, 'Määrä')
+        my_canvas.drawRightString(420, 367, 'Yksikkö')
+        my_canvas.drawRightString(470, 367, 'À-hinta')
+        my_canvas.drawRightString(520, 367, 'Alv %')
+        my_canvas.drawRightString(570, 367, 'Yhteensä')
+        my_canvas.setFont('Helvetica', 9)
+        y = 345
+        count_str_local = 0
+        for item in items[count_items:]:
+            if (count_str_local + math.ceil(len(item['name']) / 65)) >= max_page_str:
+                break
+            else:
+                count_items += 1
+                count_str += math.ceil(len(item['name']) / 65)
+                count_str_local += math.ceil(len(item['name']) / 65)
+                for i in range(math.ceil(len(item['name']) / 65)):
+                    if 65 * (i + 1) < len(item['name']):
+                        my_canvas.drawString(35, y - 12 * i, item['name'][65 * i:65 * (i + 1)])
+                    else:
+                        my_canvas.drawString(35, y - 12 * i, item['name'][65 * i:])
+                y -= 12 * math.ceil(len(item['name']) / 65)
+        my_canvas.line(30, 70, 575, 70)
+        my_canvas.setFont('Helvetica-Bold', 9)
+        my_canvas.drawString(35, 58, 'AS profile')
+        my_canvas.drawString(280, 58, 'Yhteystiedot')  # контакт
+        my_canvas.setFont('Helvetica', 9)
+        my_canvas.drawString(35, 45, 'Everstinkuja 4c-58')
+        my_canvas.drawString(35, 30, '02600 Espoo')
+        my_canvas.drawString(35, 15, 'Y-tunnus: 2622146-9')
+        my_canvas.drawString(280, 45, 'Andrei Silevits')
+        my_canvas.drawString(280, 30, '+358405171188')
+        my_canvas.drawString(280, 15, 'andrei.silevits@gmail.com')
+        if count_str == max_str:
+            my_canvas.line(30, y, 575, y)
+            my_canvas.setFont('Helvetica-Bold', 8)
+            my_canvas.drawString(420, y - 20, 'Yhteensä (alv 0%)')
+            my_canvas.drawString(420, y - 30, 'Alv 24,00 %')
+            my_canvas.line(415, y - 35, 575, y - 35)
+            my_canvas.setFont('Helvetica-Bold', 10)
+            my_canvas.drawString(420, y - 50, 'Yhteensä')
+        my_canvas.setFont('Helvetica', 9)
+        my_canvas.drawRightString(575, 810, str(count_page) + '/' + str(pages))
+        my_canvas.showPage()
 
     my_canvas.save()
-    return "media/accounting/" + '1' + ".pdf"
+    return "media/accounting/" + 'tarjous1' + ".pdf"
 
 
 if __name__ == '__main__':
-    print_sale()
+    print_offer('offer', 'items')
