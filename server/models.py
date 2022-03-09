@@ -346,7 +346,7 @@ class Purchases(models.Model):
 
 class Sales(models.Model):
     """Счета"""
-    # todo Добавить поле "номер счета" - значение id+9999
+    # todo Добавить поле "номер счета" - значение id+9999 - ИЗМЕНИТЬ МИГРАЦИЮ
     create_date = models.DateField(verbose_name="Дата покупки")
     object_number = models.CharField(verbose_name='Номер объекта', max_length=60, null=True, blank=True)
     client = models.ForeignKey("Client", models.RESTRICT, verbose_name="Клиент", null=True, blank=True)
@@ -357,6 +357,9 @@ class Sales(models.Model):
     number_link = models.CharField(verbose_name="Номер ссылки", max_length=100, null=True, blank=True)
     status = models.CharField(verbose_name="Статус", max_length=30, default="Выставлен")
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги", blank=True)
+    remainder = models.IntegerField(verbose_name="Напоминание", null=True, blank=True)
+    percent_delay = models.IntegerField(verbose_name="Процент по просрочке", null=True, blank=True)
+    printed = models.BooleanField(verbose_name="Повторный счет", default=False)
 
     class Meta:
         db_table = "sales"

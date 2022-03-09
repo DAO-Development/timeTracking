@@ -11,6 +11,9 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media
+server/routing.py
+server/consumers.py
+server/tests.py
 #server/test_pdf.py
 #*.pdf
 #*.ttf

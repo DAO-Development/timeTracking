@@ -1,6 +1,7 @@
 import datetime
 import math
 
+from server.config import company
 from reportlab.lib.colors import black, orangered
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
@@ -128,15 +129,12 @@ def print_sale(sale, items):
 
     my_canvas.setFont('Arial-Bold', 11)
     my_canvas.setFillColor(orangered)
-    # Название клиента
-    my_canvas.drawString(55, 795, sale['client']['name'])
+    # тот, кто выставил
+    my_canvas.drawString(55, 795, company['name'])
     my_canvas.setFont('Arial-Bold', 9)
     my_canvas.setFillColor(black)
     # юридический адрес?
-    my_canvas.drawString(55, 780,
-                         sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
-                             'house'] + ', ' + sale['client']['business_address']['index'] + ' ' +
-                         sale['client']['business_address']['city'])
+    my_canvas.drawString(55, 780, company['address_house'] + ", " + company['address_city'])
     my_canvas.setFont('Arial-Bold', 10)
     my_canvas.drawString(370, 795, "Дата")
     my_canvas.setFont('Arial', 10)
@@ -148,12 +146,16 @@ def print_sale(sale, items):
     my_canvas.drawCentredString(280, 790, 'СЧЕТ')
 
     my_canvas.setFont('Arial-Bold', 10)
-    my_canvas.drawString(55, 700, 'SRV OY'.upper())
-    my_canvas.drawString(55, 685, 'KORENNONTIE 3B'.upper())
-    my_canvas.drawString(55, 670, '01490 HELSINKI'.upper())
+    my_canvas.drawString(55, 700, sale["client"]["name"].upper())
+    my_canvas.drawString(55, 685,
+                         sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
+                             'house'].upper())
+    my_canvas.drawString(55, 670,
+                         sale['client']['business_address']['index'] + ' ' + sale['client']['business_address'][
+                             'city'].upper())
     my_canvas.setFont('Arial-Bold', 9)
     my_canvas.drawString(55, 580, 'Регистрационный номер')
-    my_canvas.drawString(55, 570, 'или личный код: 2535570-5')  # todo что за номер?
+    my_canvas.drawString(55, 570, 'или личный код: ' + sale["client"]["ogrn"])
 
     my_canvas.grid([320, 450, 580], [730, 760])
     my_canvas.grid([320, 580], [700, 730])
@@ -167,11 +169,11 @@ def print_sale(sale, items):
     my_canvas.drawString(455, 750, 'Номер счета')
     my_canvas.drawString(325, 720, 'Ссылка')
     my_canvas.drawString(325, 690, 'Номер клиента')
-    my_canvas.drawString(455, 690, 'Напоминание')  # todo спросить про напоминание (нужно ли в бд?)
+    my_canvas.drawString(455, 690, 'Напоминание')
     my_canvas.drawString(325, 660, 'Срок оплаты')
     my_canvas.drawString(455, 660, 'Дата оплаты')
     my_canvas.drawString(325, 630, 'Срок уведомления')
-    my_canvas.drawString(455, 630, 'Проценты по просрочке')  # todo спросить нужно ли в бд
+    my_canvas.drawString(455, 630, 'Проценты по просрочке')
     my_canvas.drawString(325, 600, 'Номер объекта заказчика')
     my_canvas.drawString(455, 600, 'Заметки')
     my_canvas.drawString(325, 570, 'Адрес объекта')
@@ -179,7 +181,7 @@ def print_sale(sale, items):
     my_canvas.setFont('Arial-Bold', 12)
     my_canvas.drawString(325, 735, datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d').strftime('%d.%m.%Y'))
     my_canvas.drawString(455, 735, str(sale['id']))
-    my_canvas.drawString(325, 705, sale['number_link'])
+    my_canvas.drawString(325, 705, "")  # ссылка
     my_canvas.drawString(325, 675, str(sale['client']['id']))
     my_canvas.drawString(455, 675, '-')
     my_canvas.drawString(325, 645, str(sale['payment_terms']['days']) + ' дн.')
@@ -271,18 +273,15 @@ def print_sale(sale, items):
     my_canvas.drawString(455, 292, str(sum))
 
     my_canvas.setFont('Arial', 8)
-    my_canvas.drawString(55, 278, sale['client']['name'])
-    my_canvas.drawString(55, 268,
-                         sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
-                             'house'])
-    my_canvas.drawString(55, 258,
-                         sale['client']['business_address']['index'] + ' ' + sale['client']['business_address']['city'])
-    my_canvas.drawString(160, 278, 'Рег. нр: 2926641-9')  # todo что за номер?
-    my_canvas.drawString(245, 278, 'Тел: ' + sale['client']['phone'])
-    my_canvas.drawString(245, 268, 'e-mail: ' + sale['client']['email'])
-    my_canvas.drawString(245, 258, 'web: ' + sale['client']['site'])
+    my_canvas.drawString(55, 278, company["name"])
+    my_canvas.drawString(55, 268, company["address_house"])
+    my_canvas.drawString(55, 258, company["address_city"])
+    my_canvas.drawString(160, 278, 'Рег. нр: ' + company["ogrn"])
+    my_canvas.drawString(245, 278, 'Тел: ' + company["phone"])
+    my_canvas.drawString(245, 268, 'e-mail: ' + company["email"])
+    my_canvas.drawString(245, 258, 'web: ' + company["web"])
     my_canvas.setFont('Arial', 10)
-    my_canvas.drawString(405, 275, sale['client']['bank_account'].upper() + ' ' + sale['client']['bank'].upper())
+    my_canvas.drawString(405, 275, company["bank_account"].upper() + ' ' + company["bank"].upper())
 
     my_canvas.setDash([1.3, 2])
     my_canvas.line(50, 245, 540, 245)
@@ -333,12 +332,14 @@ def print_sale(sale, items):
     my_canvas.drawString(470, 83, 'Euro')
 
     my_canvas.setFont('Arial-Bold', 10)
-    my_canvas.drawString(125, 205, sale['client']['bank'].upper() + ' ' + sale['client']['bank_account'].upper())
-    my_canvas.drawString(331, 205, sale['client']['bic'])
-    my_canvas.drawString(125, 180, sale['client']['name'])
-    my_canvas.drawString(125, 155, 'SRV OY')
-    my_canvas.drawString(125, 143, 'KORENNONTIE 3B')
-    my_canvas.drawString(125, 131, '01490 HELSINKI')
+    my_canvas.drawString(125, 205, company["bank"].upper() + ' ' + company['bank_account'].upper())
+    my_canvas.drawString(331, 205, company['bic'])
+    my_canvas.drawString(125, 180, company['name'])
+    my_canvas.drawString(125, 155, sale["client"]["name"])
+    my_canvas.drawString(125, 143, sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
+                             'house'].upper())
+    my_canvas.drawString(125, 131, sale['client']['business_address']['index'] + ' ' + sale['client']['business_address'][
+                             'city'].upper())
     my_canvas.drawString(331, 175, sale['comment'])
     my_canvas.setFont('Arial-Bold', 12)
     my_canvas.drawString(331, 125, str(sale['id']))
