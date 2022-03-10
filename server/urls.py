@@ -67,6 +67,7 @@ urlpatterns = [
     path('item', ItemsView.as_view()),
     path('offer', OfferView.as_view()),
     path('offer/<int:id>', OfferView.as_view()),
+    path('print-offer/<int:id>', PrintOfferView.as_view()),
 
     path('to-zip', ToZipView.as_view()),
 

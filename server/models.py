@@ -457,6 +457,7 @@ class Items(models.Model):
     discount = models.IntegerField(verbose_name="Скидка (%)", null=True, blank=True)
     quantity = models.FloatField(verbose_name="Количество", null=True, blank=True)
     measurement = models.CharField(verbose_name="Единицы измерения", max_length=20, null=True, blank=True)
+    type = models.CharField(verbose_name="Тип", max_length=50, default="material")
 
     class Meta:
         db_table = "items"
@@ -467,10 +468,12 @@ class Items(models.Model):
 class Offer(models.Model):
     """Предложения"""
     create_date = models.DateField(verbose_name="Дата создания", auto_now_add=True, null=True, blank=True)
+    author = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, verbose_name="Автор", null=True)
     active = models.BooleanField(verbose_name="Активно", default=True)
     term = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок предложения")
     client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
+    from_client = models.JSONField(verbose_name="От заказчика", null=True, blank=True)
 
     class Meta:
         db_table = "offer"

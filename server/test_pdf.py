@@ -133,13 +133,11 @@ def print_sale(sale, items):
     my_canvas.drawString(55, 795, company['name'])
     my_canvas.setFont('Arial-Bold', 9)
     my_canvas.setFillColor(black)
-    # юридический адрес?
     my_canvas.drawString(55, 780, company['address_house'] + ", " + company['address_city'])
     my_canvas.setFont('Arial-Bold', 10)
     my_canvas.drawString(370, 795, "Дата")
     my_canvas.setFont('Arial', 10)
-    # create_date
-    my_canvas.drawString(370, 780, datetime.datetime.now().strftime('%d.%m.%Y'))
+    my_canvas.drawString(370, 780, datetime.datetime.now().strftime('%d.%m.%Y'))  # create_date
     count += 1
     my_canvas.drawString(523, 795, str(count) + ' (' + str(pages) + ')')
     my_canvas.setFont('Arial-Bold', 14)
@@ -336,15 +334,19 @@ def print_sale(sale, items):
     my_canvas.drawString(331, 205, company['bic'])
     my_canvas.drawString(125, 180, company['name'])
     my_canvas.drawString(125, 155, sale["client"]["name"])
-    my_canvas.drawString(125, 143, sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
+    my_canvas.drawString(125, 143,
+                         sale['client']['business_address']['street'] + ' ' + sale['client']['business_address'][
                              'house'].upper())
-    my_canvas.drawString(125, 131, sale['client']['business_address']['index'] + ' ' + sale['client']['business_address'][
+    my_canvas.drawString(125, 131,
+                         sale['client']['business_address']['index'] + ' ' + sale['client']['business_address'][
                              'city'].upper())
     my_canvas.drawString(331, 175, sale['comment'])
     my_canvas.setFont('Arial-Bold', 12)
     my_canvas.drawString(331, 125, str(sale['id']))
     my_canvas.drawString(445, 125,
-                         '000/1/' + datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d').strftime('%d.%m.%Y'))
+                         str(sale["client"]["id"]) + '/' + ('1' if not sale[
+                             "printed"] else '2') + '/' + datetime.datetime.strptime(sale['create_date'],
+                                                                                     '%Y-%m-%d').strftime('%d.%m.%Y'))
     my_canvas.drawString(370, 102, sale['number_link'])
     my_canvas.drawString(370, 70, (datetime.datetime.strptime(sale['create_date'], '%Y-%m-%d') + datetime.timedelta(
         days=sale['payment_terms']['days'])).strftime('%d.%m.%Y'))
@@ -402,17 +404,27 @@ def print_offer(offer, items):
         count_page += 1
         my_canvas.setFont('Arial-Bold', 16)
         my_canvas.drawString(330, 800, 'Tarjous')
+        if company["set_logo"]:
+            my_canvas.drawImage(company["logo"], 60, 750, width=106, height=40)
+        else:
+            my_canvas.setFont('Helvetica-Bold', 12)
+            my_canvas.drawString(60, 750, company["name"])
         my_canvas.setFont('Helvetica-Bold', 9)
-        my_canvas.drawString(330, 750, 'Tarjouksen numero:')
-        my_canvas.drawString(330, 735, 'Tarjouksen päivä:')
-        my_canvas.drawString(330, 720, 'Voimassa päivään:')
-        my_canvas.drawString(330, 705, 'Asiakasnumero:')
-        my_canvas.drawImage('project-vue/src/assets/logo.png', 60, 750, width=106, height=40)  # todo чей лого?
-        my_canvas.drawString(60, 730, 'Timanttitimpurit Oy')
-        my_canvas.drawString(60, 718, 'Sami Lahti')
-        my_canvas.drawString(60, 706, 'Kaivolantie 4')
-        my_canvas.drawString(60, 694, '04500 Kellokoski Kellokoski')
-        my_canvas.drawString(60, 682, 'Asiakasnumero: ' + str(3))
+        my_canvas.drawString(330, 750, 'Tarjouksen numero: ' + offer["id"])
+        my_canvas.drawString(330, 735, 'Tarjouksen päivä: ' + datetime.datetime.strptime(offer['create_date'],
+                                                                                         '%Y-%m-%d').strftime(
+            '%d.%m.%Y'))
+        my_canvas.drawString(330, 720, 'Voimassa päivään: ' + (
+                    datetime.datetime.strptime(offer['create_date'], '%Y-%m-%d') + datetime.timedelta(
+                days=offer["terms"]["days"])).strftime('%d.%m.%Y'))
+        my_canvas.drawString(330, 705,
+                             'Asiakasnumero:' + offer["client"]["id"] if offer["client"] is not None else "")
+        my_canvas.drawString(60, 730, offer["client"]["name"] if offer["client"] is not None else "")
+        my_canvas.drawString(60, 706, offer["client"]["business_address"]["street"] + " " + offer["client"]["business_address"]["house"] if offer["client"] is not None else "")
+        my_canvas.drawString(60, 694, offer["client"]["business_address"]["index"] + " " + offer["client"]["business_address"]["city"] if offer["client"] is not None else "")
+        my_canvas.drawString(60, 688, 'Sami Lahti')
+        my_canvas.drawString(60, 682, 'Kaivolantie 4')
+        my_canvas.drawString(60, 676, '04500 Kellokoski Kellokoski')
 
         my_canvas.setFillColor('#c0c0c0')
         my_canvas.rect(30, 360, 545, 20, stroke=0, fill=1)

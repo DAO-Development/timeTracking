@@ -1517,6 +1517,20 @@ class OfferView(APIView):
             return Response("Доступ запрещен", status=403)
 
 
+class PrintOfferView(APIView):
+
+    def get(self, request, id=None):
+        if check_read_permissions(request, "Бухгалтерия"):
+            offer = Offer.objects.get(pk=id)
+            serializer = OfferSerializer(offer)
+            items = Items.objects.filter(pk__in=serializer.data['items']).order_by('id')
+            items_serializer = ItemsSerializer(items, many=True)
+            path = print_offer(serializer.data, items_serializer.data)
+            return Response({"path": path}, status=200)
+        else:
+            return Response("Доступ запрещен", status=403)
+
+
 class ItemsView(APIView):
     """Товары и услуги"""
     permission_classes = [permissions.IsAuthenticated]

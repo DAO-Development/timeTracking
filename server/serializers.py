@@ -432,6 +432,7 @@ class WaybillPostSerializer(serializers.ModelSerializer):
 class OfferSerializer(serializers.ModelSerializer):
     """Сериализация Предложений"""
 
+    author = UserProfileSerializer()
     term = TermSerializer()
     client = ClientSerializer()
 
@@ -445,7 +446,7 @@ class OfferPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Offer
-        fields = ['id', 'create_date', 'active', 'client', 'term']
+        fields = ['id', 'create_date', 'author', 'active', 'client', 'term', 'from_client']
 
 
 class CalendarSerializer(serializers.ModelSerializer):
