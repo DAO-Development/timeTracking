@@ -435,6 +435,8 @@ class OfferSerializer(serializers.ModelSerializer):
     author = UserProfileSerializer()
     term = TermSerializer()
     client = ClientSerializer()
+    contact = UserProfileSerializer()
+    object = ObjectsSerializer()
 
     class Meta:
         model = Offer
@@ -446,7 +448,7 @@ class OfferPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Offer
-        fields = ['id', 'create_date', 'author', 'active', 'client', 'term', 'from_client']
+        fields = ['id', 'create_date', 'author', 'active', 'client', 'contact', 'object', 'term', 'from_client']
 
 
 class CalendarSerializer(serializers.ModelSerializer):

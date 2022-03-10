@@ -1525,6 +1525,7 @@ class PrintOfferView(APIView):
             serializer = OfferSerializer(offer)
             items = Items.objects.filter(pk__in=serializer.data['items']).order_by('id')
             items_serializer = ItemsSerializer(items, many=True)
+            # return Response({"offer": serializer.data, "items": items_serializer.data})
             path = print_offer(serializer.data, items_serializer.data)
             return Response({"path": path}, status=200)
         else:

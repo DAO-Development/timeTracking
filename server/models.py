@@ -468,10 +468,12 @@ class Items(models.Model):
 class Offer(models.Model):
     """Предложения"""
     create_date = models.DateField(verbose_name="Дата создания", auto_now_add=True, null=True, blank=True)
-    author = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, verbose_name="Автор", null=True)
+    author = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, related_name="offer_author", verbose_name="Автор", null=True)
     active = models.BooleanField(verbose_name="Активно", default=True)
     term = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок предложения")
-    client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент")
+    client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент", null=True)
+    object = models.ForeignKey("Objects", on_delete=models.RESTRICT, verbose_name="Объект", null=True)
+    contact = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, related_name="offer_contact", verbose_name="Контакт", null=True)
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
     from_client = models.JSONField(verbose_name="От заказчика", null=True, blank=True)
 

@@ -384,14 +384,18 @@ def print_offer(offer, items):
     max_page_str = 20
     for item in items:
         max_str += math.ceil(len(item['name']) / 65)
-    pages = math.ceil(max_str / max_page_str)
+    pages = 1
+    if len(items) != 0:
+        pages = math.ceil(max_str / max_page_str)
     my_canvas = canvas.Canvas("media/accounting/" + 'tarjous1' + ".pdf")
     pdfmetrics.registerFont(TTFont('Arial-Bold', './static/fonts/Arial Bold.ttf'))
     pdfmetrics.registerFont(TTFont('Arial', './static/fonts/arialmt.ttf'))
     my_canvas.setLineWidth(.5)
 
-    my_canvas.setFont('Helvetica', 9.5)
-    my_canvas.drawString(30, 520, 'Yrttipolku 4 A, B, ja C Kerava / Huoneistoremontit')
+    my_canvas.setFont('Arial-Bold', 9.5)
+    # my_canvas.setFont('Helvetica', 9.5)
+    my_canvas.drawString(30, 520, offer["object"]["street"] + " " + offer["object"]["house"] + ", " + offer["object"][
+        "city"] + ' / Huoneistoremontit')
     my_canvas.drawString(30, 495, 'Materiaalit:')
     my_canvas.drawString(30, 482, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
     my_canvas.drawString(30, 469, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
@@ -400,7 +404,7 @@ def print_offer(offer, items):
     my_canvas.drawString(30, 430, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
     my_canvas.drawString(30, 402, 'Hinnat sisältää : materiaalit, oma roskien siivous + jätteille kustannukset.')
 
-    while count_str < max_str:
+    while count_str < max_str or max_str == 0:
         count_page += 1
         my_canvas.setFont('Arial-Bold', 16)
         my_canvas.drawString(330, 800, 'Tarjous')
@@ -410,21 +414,28 @@ def print_offer(offer, items):
             my_canvas.setFont('Helvetica-Bold', 12)
             my_canvas.drawString(60, 750, company["name"])
         my_canvas.setFont('Helvetica-Bold', 9)
-        my_canvas.drawString(330, 750, 'Tarjouksen numero: ' + offer["id"])
+        my_canvas.drawString(330, 750, 'Tarjouksen numero: ' + str(offer["id"]))
         my_canvas.drawString(330, 735, 'Tarjouksen päivä: ' + datetime.datetime.strptime(offer['create_date'],
                                                                                          '%Y-%m-%d').strftime(
             '%d.%m.%Y'))
         my_canvas.drawString(330, 720, 'Voimassa päivään: ' + (
-                    datetime.datetime.strptime(offer['create_date'], '%Y-%m-%d') + datetime.timedelta(
-                days=offer["terms"]["days"])).strftime('%d.%m.%Y'))
+                datetime.datetime.strptime(offer['create_date'], '%Y-%m-%d') + datetime.timedelta(
+            days=offer["term"]["days"])).strftime('%d.%m.%Y'))
         my_canvas.drawString(330, 705,
-                             'Asiakasnumero:' + offer["client"]["id"] if offer["client"] is not None else "")
-        my_canvas.drawString(60, 730, offer["client"]["name"] if offer["client"] is not None else "")
-        my_canvas.drawString(60, 706, offer["client"]["business_address"]["street"] + " " + offer["client"]["business_address"]["house"] if offer["client"] is not None else "")
-        my_canvas.drawString(60, 694, offer["client"]["business_address"]["index"] + " " + offer["client"]["business_address"]["city"] if offer["client"] is not None else "")
-        my_canvas.drawString(60, 688, 'Sami Lahti')
-        my_canvas.drawString(60, 682, 'Kaivolantie 4')
-        my_canvas.drawString(60, 676, '04500 Kellokoski Kellokoski')
+                             'Asiakasnumero:' + str(offer["client"]["id"]) if offer["client"] is not None else "")
+        my_canvas.setFont('Arial-Bold', 9)
+        if offer["client"] is not None:
+            my_canvas.drawString(60, 730, offer["client"]["name"])
+            my_canvas.drawString(60, 706, offer["client"]["business_address"]["street"] + " " +
+                                 offer["client"]["business_address"]["house"])
+            my_canvas.drawString(60, 694, offer["client"]["business_address"]["index"] + " " +
+                                 offer["client"]["business_address"]["city"])
+        if offer["contact"] is not None:
+            my_canvas.drawString(60, 682, offer["contact"]["lastname"] + " " + offer["contact"]["name"] + ", " +
+                                 offer["contact"]["position"]["name"])
+        if offer["object"] is not None:
+            my_canvas.drawString(60, 670, offer["object"]["street"] + " " + offer["object"]["house"])
+            my_canvas.drawString(60, 658, offer["object"]["index"] + " " + offer["object"]["city"])
 
         my_canvas.setFillColor('#c0c0c0')
         my_canvas.rect(30, 360, 545, 20, stroke=0, fill=1)
@@ -453,17 +464,6 @@ def print_offer(offer, items):
                     else:
                         my_canvas.drawString(35, y - 12 * i, item['name'][65 * i:])
                 y -= 12 * math.ceil(len(item['name']) / 65)
-        my_canvas.line(30, 70, 575, 70)
-        my_canvas.setFont('Helvetica-Bold', 9)
-        my_canvas.drawString(35, 58, 'AS profile')
-        my_canvas.drawString(280, 58, 'Yhteystiedot')  # контакт
-        my_canvas.setFont('Helvetica', 9)
-        my_canvas.drawString(35, 45, 'Everstinkuja 4c-58')
-        my_canvas.drawString(35, 30, '02600 Espoo')
-        my_canvas.drawString(35, 15, 'Y-tunnus: 2622146-9')
-        my_canvas.drawString(280, 45, 'Andrei Silevits')
-        my_canvas.drawString(280, 30, '+358405171188')
-        my_canvas.drawString(280, 15, 'andrei.silevits@gmail.com')
         if count_str == max_str:
             my_canvas.line(30, y, 575, y)
             my_canvas.setFont('Helvetica-Bold', 8)
@@ -472,9 +472,24 @@ def print_offer(offer, items):
             my_canvas.line(415, y - 35, 575, y - 35)
             my_canvas.setFont('Helvetica-Bold', 10)
             my_canvas.drawString(420, y - 50, 'Yhteensä')
+
+        my_canvas.line(30, 70, 575, 70)
+        my_canvas.setFont('Helvetica-Bold', 9)
+        my_canvas.drawString(35, 58, company["name"])
+        my_canvas.drawString(280, 58, 'Yhteystiedot')  # контакт
+        my_canvas.setFont('Helvetica', 9)
+        my_canvas.drawString(35, 45, company["address_house"])
+        my_canvas.drawString(35, 30, company["address_city"])
+        my_canvas.drawString(35, 15, 'Y-tunnus: ' + company["ogrn"])
+        my_canvas.setFont('Arial', 9)
+        my_canvas.drawString(280, 45, offer["author"]["name"] + " " + offer["author"]["lastname"])
+        my_canvas.drawString(280, 30, offer["author"]["phone"])
+        my_canvas.drawString(280, 15, offer["author"]["auth_user_id"]["email"])
         my_canvas.setFont('Helvetica', 9)
         my_canvas.drawRightString(575, 810, str(count_page) + '/' + str(pages))
         my_canvas.showPage()
+        if max_str == 0:
+            break
 
     my_canvas.save()
     return "media/accounting/" + 'tarjous1' + ".pdf"
