@@ -357,26 +357,6 @@ def print_sale(sale, items):
 
 
 def print_offer(offer, items):
-    # items = [
-    #     {
-    #         'name': 'As. B 11 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 12 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 13 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 14 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 15 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 16 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 17 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 18 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    #     {
-    #         'name': 'As. B 19 / 44m2 / Suojaus, reikien kittaus, seinien ja kattojen maalaus / reikien kittaus, Kylpyhuoneesta lattiamatto pois ja epoksi pinnoitus'},
-    # ]
     count_page = 0  # номер страницы
     count_items = 0
     count_str = 0
@@ -387,24 +367,35 @@ def print_offer(offer, items):
     pages = 1
     if len(items) != 0:
         pages = math.ceil(max_str / max_page_str)
-    my_canvas = canvas.Canvas("media/accounting/" + 'tarjous1' + ".pdf")
+    my_canvas = canvas.Canvas("media/accounting/" + 'tarjous' + str(offer["id"]) + ".pdf")
     pdfmetrics.registerFont(TTFont('Arial-Bold', './static/fonts/Arial Bold.ttf'))
     pdfmetrics.registerFont(TTFont('Arial', './static/fonts/arialmt.ttf'))
     my_canvas.setLineWidth(.5)
 
-    my_canvas.setFont('Arial-Bold', 9.5)
+    my_canvas.setFont('Arial', 9.5)
     # my_canvas.setFont('Helvetica', 9.5)
     my_canvas.drawString(30, 520, offer["object"]["street"] + " " + offer["object"]["house"] + ", " + offer["object"][
-        "city"] + ' / Huoneistoremontit')
-    my_canvas.drawString(30, 495, 'Materiaalit:')
-    my_canvas.drawString(30, 482, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
-    my_canvas.drawString(30, 469, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
-    my_canvas.drawString(30, 456, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
-    my_canvas.drawString(30, 443, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
-    my_canvas.drawString(30, 430, 'Katton maalaus - Tikkurilan Siro 2 täyshimmeä')
-    my_canvas.drawString(30, 402, 'Hinnat sisältää : materiaalit, oma roskien siivous + jätteille kustannukset.')
+        "city"] + ' / Huoneistoremontit' if offer["object"] is not None else "")
+    from_client = ""
+    y = 495
+    if offer["from_client"] is not None:
+        for i in offer["from_client"]:
+            if offer["from_client"][i]:
+                if i == "materials":
+                    from_client += "materiaalit"
+    if offer["from_client"] is not None:
+        for i in offer["from_client"]:
+            if offer["from_client"][i]:
+                if i == "materials":
+                    from_client += "materiaalit"
+    my_canvas.drawString(30, 495, 'Hinnat sisältää : ' + from_client if from_client != "" else "")
 
+    sum_no_vat = 0
+    sum_vat = 0
+    vat = {}
+    flag = ""
     while count_str < max_str or max_str == 0:
+        y = 495
         count_page += 1
         my_canvas.setFont('Arial-Bold', 16)
         my_canvas.drawString(330, 800, 'Tarjous')
@@ -438,26 +429,48 @@ def print_offer(offer, items):
             my_canvas.drawString(60, 658, offer["object"]["index"] + " " + offer["object"]["city"])
 
         my_canvas.setFillColor('#c0c0c0')
-        my_canvas.rect(30, 360, 545, 20, stroke=0, fill=1)
+        y -= 40
+        my_canvas.rect(30, y, 545, 20, stroke=0, fill=1)  # 360
         my_canvas.setFillColor(black)
         my_canvas.setFont('Helvetica-Bold', 9)
-        my_canvas.drawString(35, 367, 'Kuvaus')
-        my_canvas.drawRightString(340, 367, 'Päivä')
-        my_canvas.drawRightString(375, 367, 'Määrä')
-        my_canvas.drawRightString(420, 367, 'Yksikkö')
-        my_canvas.drawRightString(470, 367, 'À-hinta')
-        my_canvas.drawRightString(520, 367, 'Alv %')
-        my_canvas.drawRightString(570, 367, 'Yhteensä')
-        my_canvas.setFont('Helvetica', 9)
-        y = 345
+        y += 7
+        my_canvas.drawString(35, y, 'Kuvaus')  # 367
+        my_canvas.drawRightString(375, y, 'Määrä')
+        my_canvas.drawRightString(420, y, 'Yksikkö')
+        my_canvas.drawRightString(470, y, 'À-hinta')
+        my_canvas.drawRightString(520, y, 'Alv %')
+        my_canvas.drawRightString(570, y, 'Yhteensä')
+        y -= 22  # 345
         count_str_local = 0
         for item in items[count_items:]:
-            if (count_str_local + math.ceil(len(item['name']) / 65)) >= max_page_str:
+            if y - (math.ceil(len(item['name']) / 65) * 12) < 75:
+                # (count_str_local + math.ceil(len(item['name']) / 65)) >= max_page_str or
                 break
             else:
+                my_canvas.setFont('Arial-Bold', 9)
+                if item["type"] == "material" and flag != "material":
+                    my_canvas.drawCentredString(306, y, "Materiaalit")
+                    flag = item["type"]
+                    y -= 12
+                elif item["type"] == "service" and flag != "service":
+                    my_canvas.drawCentredString(306, y, "Palvelu")
+                    flag = item["type"]
+                    y -= 12
+                my_canvas.setFont('Arial', 9)
                 count_items += 1
                 count_str += math.ceil(len(item['name']) / 65)
                 count_str_local += math.ceil(len(item['name']) / 65)
+                my_canvas.drawRightString(375, y, str(item["quantity"]))
+                my_canvas.drawRightString(420, y, item["measurement"])
+                my_canvas.drawRightString(470, y, str(item["price"]))
+                sum_no_vat += item["price"] * item["quantity"]
+                if item['tax'] not in vat:
+                    vat[item['tax']] = item['price'] * (float(item['tax']) / 100)
+                else:
+                    vat[item['tax']] += item['price'] * (float(item['tax']) / 100)
+                my_canvas.drawRightString(520, y, str(item["tax"]))
+                my_canvas.drawRightString(570, y, str(
+                    round(item['price'] * item['quantity'] * (1 + float(item['tax']) / 100))))
                 for i in range(math.ceil(len(item['name']) / 65)):
                     if 65 * (i + 1) < len(item['name']):
                         my_canvas.drawString(35, y - 12 * i, item['name'][65 * i:65 * (i + 1)])
@@ -468,10 +481,17 @@ def print_offer(offer, items):
             my_canvas.line(30, y, 575, y)
             my_canvas.setFont('Helvetica-Bold', 8)
             my_canvas.drawString(420, y - 20, 'Yhteensä (alv 0%)')
-            my_canvas.drawString(420, y - 30, 'Alv 24,00 %')
-            my_canvas.line(415, y - 35, 575, y - 35)
+            my_canvas.drawRightString(570, y - 20, str(sum_no_vat))
+            i = 0
+            for key in vat.keys():
+                sum_vat += vat[key]
+                i += 1
+                my_canvas.drawString(420, y - 20 - 10 * i, 'Alv ' + str(key) + ' % ')
+                my_canvas.drawRightString(570, y - 20 - 10 * i, str(vat[key]))
+            my_canvas.line(415, y - 20 - 10 * i - 5, 575, y - 20 - 10 * i - 5)
             my_canvas.setFont('Helvetica-Bold', 10)
-            my_canvas.drawString(420, y - 50, 'Yhteensä')
+            my_canvas.drawString(420, y - 20 - 10 * i - 20, 'Yhteensä')
+            my_canvas.drawRightString(570, y - 20 - 10 * i - 20, str(sum_no_vat + sum_vat))
 
         my_canvas.line(30, 70, 575, 70)
         my_canvas.setFont('Helvetica-Bold', 9)
@@ -492,8 +512,4 @@ def print_offer(offer, items):
             break
 
     my_canvas.save()
-    return "media/accounting/" + 'tarjous1' + ".pdf"
-
-
-if __name__ == '__main__':
-    print_offer('offer', 'items')
+    return "media/accounting/" + 'tarjous' + str(offer["id"]) + ".pdf"

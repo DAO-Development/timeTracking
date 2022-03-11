@@ -1523,7 +1523,7 @@ class PrintOfferView(APIView):
         if check_read_permissions(request, "Бухгалтерия"):
             offer = Offer.objects.get(pk=id)
             serializer = OfferSerializer(offer)
-            items = Items.objects.filter(pk__in=serializer.data['items']).order_by('id')
+            items = Items.objects.filter(pk__in=serializer.data['items']).order_by('type', 'id')
             items_serializer = ItemsSerializer(items, many=True)
             # return Response({"offer": serializer.data, "items": items_serializer.data})
             path = print_offer(serializer.data, items_serializer.data)
