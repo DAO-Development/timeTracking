@@ -224,9 +224,10 @@ def print_sale(sale, items):
         my_canvas.drawString(68, y, name)
         my_canvas.drawString(225, y, str(items[item]['tax']))
         if items[item]['tax'] not in vat:
-            vat[items[item]['tax']] = items[item]['price'] * (float(items[item]['tax']) / 100)
+            vat[items[item]['tax']] = items[item]['price'] * (float(items[item]['tax']) / 100) * items[item]['quantity']
         else:
-            vat[items[item]['tax']] += items[item]['price'] * (float(items[item]['tax']) / 100)
+            vat[items[item]['tax']] += items[item]['price'] * (float(items[item]['tax']) / 100) * items[item][
+                'quantity']
 
         my_canvas.drawRightString(300, y, str(items[item]['quantity']))
         my_canvas.drawString(305, y, items[item]['measurement'])
@@ -465,9 +466,9 @@ def print_offer(offer, items):
                 my_canvas.drawRightString(470, y, str(item["price"]))
                 sum_no_vat += item["price"] * item["quantity"]
                 if item['tax'] not in vat:
-                    vat[item['tax']] = item['price'] * (float(item['tax']) / 100)
+                    vat[item['tax']] = item['price'] * (float(item['tax']) / 100) * item["quantity"]
                 else:
-                    vat[item['tax']] += item['price'] * (float(item['tax']) / 100)
+                    vat[item['tax']] += item['price'] * (float(item['tax']) / 100) * item["quantity"]
                 my_canvas.drawRightString(520, y, str(item["tax"]))
                 my_canvas.drawRightString(570, y, str(
                     round(item['price'] * item['quantity'] * (1 + float(item['tax']) / 100))))

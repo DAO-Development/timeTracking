@@ -477,15 +477,15 @@ class ObjectsView(APIView):
         else:
             return Response("Доступ запрещен", status=403)
 
-    def put(self, request, id=None):
+    def put(self, request, client_id=None): # client_id -- id
         if check_edit_permissions(request, "Объекты"):
             serializer = None
-            if id is not None:
+            if client_id is not None:
                 name = '/objects/' + request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
-                saved_object = get_object_or_404(Objects.objects.all(), id=id)
+                saved_object = get_object_or_404(Objects.objects.all(), id=client_id)
                 serializer = ObjectsSerializer(saved_object, data={"photo_path": name},
                                                partial=True)
                 if serializer.is_valid():
@@ -1469,6 +1469,8 @@ class OfferView(APIView):
 
     def post(self, request):
         if check_edit_permissions(request, "Бухгалтерия"):
+            user = UserSerializer(request.user)
+            user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
             items = json.loads(request.data['items'])
             serializer = OfferPostSerializer(data={
                 'create_date': request.data["create_date"],
@@ -1477,7 +1479,7 @@ class OfferView(APIView):
                 'client': request.data["client"],
             })
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(author=user_profile)
                 offer = Offer.objects.get(pk=serializer.data['id'])
                 for item in items:
                     offer.items.create(name=item['name'], price=item['price'], tax=item['tax'],

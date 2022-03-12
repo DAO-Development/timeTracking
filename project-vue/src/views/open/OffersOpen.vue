@@ -10,6 +10,7 @@
         </div>
       </div>
       <div class="offers__content">
+        <v-btn class="action-btn" color="primary" @click="printOffer">Скачать предложение</v-btn>
         <div v-if="$parent.$parent.edit.indexOf('Бухгалтерия') !== -1" class="open__actions">
           <div class="addition-btn" @click="addForm=true">
             <edit-icon/>
@@ -22,7 +23,7 @@
         </div>
         <div class="document_date">Дата создания: {{ currentOffer.create_date }}</div>
         <div class="document_date">Предложение <span v-if="!currentOffer.active">не</span> <span>действует</span></div>
-        <div class="document_date">Клиент: {{ currentOffer.client.name }}</div>
+        <div class="document_date" v-if="currentOffer.client != null">Клиент: {{ currentOffer.client.name }}</div>
         <div>Срок: {{ currentOffer.term.days }} дней</div>
 
         <h3>Товары:</h3>
@@ -242,9 +243,13 @@ export default {
       currentOffer: {
         id: 0,
         create_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        author: 0,
         active: true,
         term: '',
         client: '',
+        object: '',
+        contact: '',
+        from_client: {},
       },
       itemsQuantity: 0,
       newItems: [],
@@ -524,6 +529,53 @@ export default {
       this.itemsQuantity = this.itemsQuantity - 1
       this.newItems.splice(i - 1, 1)
     },
+    printOffer() {
+      let path = ''
+      $.ajax({
+        url: this.$hostname + "time-tracking/print-offer/" + this.id,
+        type: "GET",
+        success: (response) => {
+          path = response.data.path
+        },
+        error: (response) => {
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+        async: false
+      })
+      if (path !== '') {
+        const axios = require('axios')
+        axios({
+          url: this.$hostname + path,
+          method: 'GET',
+          responseType: 'blob',
+        }).then((response) => {
+          var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          var fileLink = document.createElement('a');
+
+          fileLink.href = fileURL;
+          fileLink.setAttribute('download', path.substr(path.lastIndexOf('/') + 1));
+          document.body.appendChild(fileLink);
+
+          fileLink.click();
+        })
+      }
+    }
   }
 }
 </script>

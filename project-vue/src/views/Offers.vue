@@ -28,7 +28,7 @@
             </div>
             <ul>
               <li>Дата создания: {{ offer.create_date }}</li>
-              <li>Клиент: {{ offer.client.name }}</li>
+              <li v-if="offer.client != null">Клиент: {{ offer.client.name }}</li>
               <li>Срок: {{ offer.term.days }} дней</li>
             </ul>
           </div>
@@ -48,7 +48,7 @@
           <v-form ref="form" :model="newOffer">
             <v-row>
               <v-autocomplete v-model="newOffer.client" :items="clients" item-text="name" item-value="id"
-                              label="Клиент" :rules="reqRules" required outlined>
+                              label="Клиент" :rules="reqRules" required outlined @change="loadObjects">
                 <template v-slot:no-data>
                   <v-list-item>
                     <v-list-item-title>
@@ -57,6 +57,31 @@
                   </v-list-item>
                 </template>
               </v-autocomplete>
+              <v-autocomplete v-model="newOffer.object" :items="objects" item-text="label" item-value="id"
+                              label="Объект" :rules="reqRules" required outlined @change="loadWorkers">
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-title>
+                      Объекты не найдены
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+              <v-autocomplete v-model="newOffer.contact" :items="contacts" item-text="label" item-value="id"
+                              label="Рабочий" outlined>
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <v-list-item-title v-if="newOffer.object">
+                      Рабочие не найдены
+                    </v-list-item-title>
+                    <v-list-item-title v-else>
+                      Выберите объект
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </v-row>
+            <v-row>
               <v-autocomplete v-model="newOffer.term" :items="terms" item-text="days" item-value="id"
                               label="Срок предложения" :rules="reqRules" required outlined>
                 <template v-slot:no-data>
@@ -68,6 +93,27 @@
                 </template>
               </v-autocomplete>
             </v-row>
+
+
+            <v-row>
+              <v-col cols="6"><strong>От клиента</strong></v-col>
+            </v-row>
+            <v-checkbox v-model="newOffer.from_client.material"
+                        label="материалы, все крепежи и расходники"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.delivery"
+                        label="доставка материала со склада или магазина на объект"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.tool" label="инструмент"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.lifts" label="подъемники"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.scaffolding" label="леса"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.montage_scaffolding" label="монтаж и демонтаж лесов"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.garbage" label="вывоз и утилизация мусора"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.garbage_containers" label="мусорные контейнера"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.security" label="охрана объекта"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.social_room"
+                        label="социальные помещения с водой, возможностью переодеваться и поесть, туалет"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.unloading" label="разгрузка материала"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.spreading" label="разнос материала по объекту"></v-checkbox>
+            <v-checkbox v-model="newOffer.from_client.cleaning" label="уборка на объекте"></v-checkbox>
 
             <v-row>
               <v-col cols="11"><h3>Товары/услуги</h3></v-col>
@@ -91,6 +137,12 @@
                     <v-btn icon @click="deleteNewItem(i)">
                       <v-icon>mdi-close</v-icon>
                     </v-btn>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-select v-model="newItems[i-1].type" label="Тип" :items="['Материал', 'Услуга']" outlined
+                              :rules="reqRules"></v-select>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -172,6 +224,8 @@ export default {
       items: [],
       terms: [],
       clients: [],
+      contacts: [],
+      objects: [],
       status: [
         {name: 'Все', value: 'Все'},
         {name: 'Активно', value: true},
@@ -183,6 +237,23 @@ export default {
         active: true,
         term: '',
         client: '',
+        object: '',
+        contact: '',
+        from_client: {
+          material: false,
+          delivery: false,
+          tool: false,
+          lifts: false,
+          scaffolding: false,
+          montage_scaffolding: false,
+          garbage: false,
+          garbage_containers: false,
+          security: false,
+          social_room: false,
+          unloading: false,
+          spreading: false,
+          cleaning: false,
+        },
       },
       itemsQuantity: 0,
       newItems: [],
@@ -215,6 +286,7 @@ export default {
       this.loadData()
       this.loadClients()
       this.loadTerms()
+      this.loadObjects()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
@@ -305,6 +377,89 @@ export default {
           }
           this.alertError = true
         }
+      })
+    },
+    loadObjects() {
+      let url = ''
+      if (this.newOffer.client)
+        url = this.$hostname + "time-tracking/objects/" + this.newOffer.client
+      else
+        url = this.$hostname + "time-tracking/objects"
+      $.ajax({
+        url: url,
+        type: "GET",
+        success: (response) => {
+          this.objects = response.data.data
+          this.objects.forEach(object => {
+            object.label = object.city + ' ' + object.street + ' ' + object.house
+          })
+        },
+        error: (response) => {
+          switch (response.status) {
+            case 500:
+              this.alertMsg = "Ошибка соединения с сервером"
+              break
+            case 400:
+              this.alertMsg = "Ошибка в данных"
+              break
+            case 401:
+              this.$refresh()
+              break
+            case 403:
+              this.alertMsg = "Нет доступа"
+              break
+            default:
+              this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
+    loadWorkers() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/employees/" + this.newOffer.object,
+        type: "GET",
+        success: (response) => {
+          this.contacts = response.data.data
+          let workers = []
+          this.contacts.forEach(contact => {
+            workers.push(contact.user_profile_id)
+          })
+          this.contacts = workers
+          this.contacts.forEach(contact => {
+            contact.label = contact.name + ' ' + contact.lastname + ', ' + contact.position.name
+          })
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+      $.ajax({
+        url: this.$hostname + "time-tracking/objects/employees",
+        type: "GET",
+        success: (response) => {
+          this.workers = response.data.data
+          this.workers.forEach(worker => {
+            worker.label = worker.lastname + ' ' + worker.name + ', ' + worker.position
+          })
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
       })
     },
     addOffer() {
@@ -480,7 +635,7 @@ export default {
     },
     addNewItem() {
       this.itemsQuantity += 1
-      this.newItems.push({name: '', price: '', tax: '', discount: '', quantity: '', measurement: ''})
+      this.newItems.push({name: '', price: '', tax: '', discount: '', quantity: '', measurement: '', type: ''})
     },
     deleteNewItem(i) {
       if (this.newItems[i - 1].id !== undefined) {
