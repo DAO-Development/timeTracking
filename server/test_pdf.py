@@ -451,9 +451,9 @@ def print_offer(offer, items):
         if offer["contact"] is not None:
             my_canvas.drawString(60, 682, offer["contact"]["lastname"] + " " + offer["contact"]["name"] + ", " +
                                  offer["contact"]["position"]["name"])
-        if offer["object"] is not None:
-            my_canvas.drawString(60, 670, offer["object"]["street"] + " " + offer["object"]["house"])
-            my_canvas.drawString(60, 658, offer["object"]["index"] + " " + offer["object"]["city"])
+            if offer["object"] is not None:
+                my_canvas.drawString(60, 670, offer["object"]["street"] + " " + offer["object"]["house"])
+                my_canvas.drawString(60, 658, offer["object"]["index"] + " " + offer["object"]["city"])
 
         my_canvas.setFillColor('#c0c0c0')
         y = 495 - 40
