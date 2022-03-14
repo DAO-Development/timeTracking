@@ -534,7 +534,7 @@ def print_offer(offer, items):
         my_canvas.drawString(35, 15, 'Y-tunnus: ' + company["ogrn"])
         my_canvas.setFont('Arial', 9)
         my_canvas.drawString(280, 45, offer["author"]["name"] + " " + offer["author"]["lastname"])
-        my_canvas.drawString(280, 30, offer["author"]["phone"])
+        my_canvas.drawString(280, 30, offer["author"]["phone"] if offer["author"]["phone"] is not None else "")
         my_canvas.drawString(280, 15, offer["author"]["auth_user_id"]["email"])
         my_canvas.setFont('Helvetica', 9)
         my_canvas.drawRightString(575, 810, str(count_page) + '/' + str(pages))
