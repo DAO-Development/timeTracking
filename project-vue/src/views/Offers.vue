@@ -141,8 +141,9 @@
                 </v-row>
                 <v-row>
                   <v-col>
-                    <v-select v-model="newItems[i-1].type" label="Тип" :items="['Материал', 'Услуга']" outlined
-                              :rules="reqRules"></v-select>
+                    <v-select v-model="newItems[i-1].type" label="Тип"
+                              :items="[{name: 'Материал', value: 'material'},{name:  'Услуга', value: 'service'}]"
+                              item-text="name" item-value="value" outlined :rules="reqRules"></v-select>
                   </v-col>
                 </v-row>
                 <v-row>
@@ -240,7 +241,7 @@ export default {
         object: '',
         contact: '',
         from_client: {
-          material: false,
+          materials: false,
           delivery: false,
           tool: false,
           lifts: false,
@@ -465,6 +466,7 @@ export default {
     addOffer() {
       if (this.$refs.form.validate()) {
         this.newOffer.items = JSON.stringify(this.newItems)
+        this.newOffer.from_client = JSON.stringify(this.newOffer.from_client)
         if (this.newOffer.id !== 0)
           this.putOffer()
         else {

@@ -477,7 +477,7 @@ class ObjectsView(APIView):
         else:
             return Response("Доступ запрещен", status=403)
 
-    def put(self, request, client_id=None): # client_id -- id
+    def put(self, request, client_id=None):  # client_id -- id
         if check_edit_permissions(request, "Объекты"):
             serializer = None
             if client_id is not None:
@@ -1473,17 +1473,21 @@ class OfferView(APIView):
             user_profile = UserProfile.objects.get(auth_user_id=user.data["id"]).serializable_value('id')
             items = json.loads(request.data['items'])
             serializer = OfferPostSerializer(data={
+                'author': user_profile,
                 'create_date': request.data["create_date"],
                 'active': request.data["active"],
                 'term': request.data["term"],
                 'client': request.data["client"],
+                'object': request.data["object"],
+                'contact': request.data["contact"],
+                'from_client': request.data["from_client"]
             })
             if serializer.is_valid():
-                serializer.save(author=user_profile)
+                serializer.save()
                 offer = Offer.objects.get(pk=serializer.data['id'])
                 for item in items:
                     offer.items.create(name=item['name'], price=item['price'], tax=item['tax'],
-                                       discount=item['discount'],
+                                       discount=item['discount'], type=item['type'],
                                        quantity=item['quantity'], measurement=item['measurement'])
                 return Response(status=201)
             else:

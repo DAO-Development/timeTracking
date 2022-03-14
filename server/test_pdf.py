@@ -1,4 +1,5 @@
 import datetime
+import json
 import math
 
 from server.config import company
@@ -377,19 +378,14 @@ def print_offer(offer, items):
     # my_canvas.setFont('Helvetica', 9.5)
     my_canvas.drawString(30, 520, offer["object"]["street"] + " " + offer["object"]["house"] + ", " + offer["object"][
         "city"] + ' / Huoneistoremontit' if offer["object"] is not None else "")
-    from_client = ""
-    y = 495
+    from_client_str = ""
     if offer["from_client"] is not None:
-        for i in offer["from_client"]:
-            if offer["from_client"][i]:
+        offer_from_client = json.loads(offer["from_client"])
+        for i in offer_from_client:
+            if offer_from_client[i]:
                 if i == "materials":
-                    from_client += "materiaalit"
-    if offer["from_client"] is not None:
-        for i in offer["from_client"]:
-            if offer["from_client"][i]:
-                if i == "materials":
-                    from_client += "materiaalit"
-    my_canvas.drawString(30, 495, 'Hinnat sisältää : ' + from_client if from_client != "" else "")
+                    from_client_str += "materiaalit"
+    my_canvas.drawString(30, 495, 'Hinnat sisältää : ' + from_client_str if from_client_str != "" else "")
 
     sum_no_vat = 0
     sum_vat = 0
@@ -449,6 +445,8 @@ def print_offer(offer, items):
                 break
             else:
                 my_canvas.setFont('Arial-Bold', 9)
+                print(item["type"])
+                print("flag: ", flag)
                 if item["type"] == "material" and flag != "material":
                     my_canvas.drawCentredString(306, y, "Materiaalit")
                     flag = item["type"]
