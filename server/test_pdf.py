@@ -383,16 +383,46 @@ def print_offer(offer, items):
         offer_from_client = json.loads(offer["from_client"])
         for i in offer_from_client:
             if offer_from_client[i]:
+                if len(from_client_str) != 0:
+                    from_client_str += ", "
                 if i == "materials":
                     from_client_str += "materiaalit"
-    my_canvas.drawString(30, 495, 'Hinnat sisältää : ' + from_client_str if from_client_str != "" else "")
+                elif i == "delivery":
+                    from_client_str += "materiaalin toimittaminen varastosta tai varastosta kohteeseen"
+                elif i == "tool":
+                    from_client_str += "työkalu"
+                elif i == "lifts":
+                    from_client_str += "nostaa"
+                elif i == "scaffolding":
+                    from_client_str += "metsä"
+                elif i == "montage_scaffolding":
+                    from_client_str += "rakennustelineiden asennus ja purkaminen"
+                elif i == "garbage":
+                    from_client_str += "oma roskien siivous"
+                elif i == "garbage_containers":
+                    from_client_str += "jätteille kustannukset"
+                elif i == "security":
+                    from_client_str += "object security"
+                elif i == "social_room":
+                    from_client_str += " sosiaaliset tilat vedellä, mahdollisuus vaihtaa vaatteita ja syödä, WC"
+                elif i == "unloading":
+                    from_client_str += "materiaalin purkaminen"
+                elif i == "spreading":
+                    from_client_str += "materiaalin leviäminen esineen ympärille"
+                elif i == "cleaning":
+                    from_client_str += "siivous laitoksessa"
+    if len(from_client_str) != 0:
+        from_client_str = 'Hinnat sisältää : ' + from_client_str
+    main_y = 495
+    for i in range(math.ceil(len(from_client_str) / 120)):
+        my_canvas.drawString(30, main_y - 12 * i, from_client_str[i * 120:(i + 1) * 120])
+    main_y = 495 - 12 * math.ceil(len(from_client_str) / 120)
 
     sum_no_vat = 0
     sum_vat = 0
     vat = {}
     flag = ""
     while count_str < max_str or max_str == 0:
-        y = 495
         count_page += 1
         my_canvas.setFont('Arial-Bold', 16)
         my_canvas.drawString(330, 800, 'Tarjous')
@@ -426,7 +456,9 @@ def print_offer(offer, items):
             my_canvas.drawString(60, 658, offer["object"]["index"] + " " + offer["object"]["city"])
 
         my_canvas.setFillColor('#c0c0c0')
-        y -= 40
+        y = 495 - 40
+        if main_y != 495 and count_page == 1:
+            y = main_y - 40
         my_canvas.rect(30, y, 545, 20, stroke=0, fill=1)  # 360
         my_canvas.setFillColor(black)
         my_canvas.setFont('Helvetica-Bold', 9)
