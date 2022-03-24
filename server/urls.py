@@ -11,6 +11,7 @@ urlpatterns = [
     path('profiles', ProfilesView.as_view()),
     path('profiles/active', ActiveProfilesView.as_view()),
     path('profiles/positions', PositionProfileView.as_view()),
+    path('profiles/cards', CardsView.as_view()),
     path('profiles/<int:id>', ProfilesView.as_view()),
     path('print-profiles/<int:id>', PrintProfile.as_view()),
     path('time-reports', TimeReportView.as_view()),

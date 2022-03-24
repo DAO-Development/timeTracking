@@ -26,7 +26,6 @@ class UserProfile(models.Model):
     address_fin = models.JSONField(verbose_name='Адрес в Финляндии', null=True, blank=True)
     phone = models.CharField(verbose_name='Телефон', max_length=45, null=True, blank=True)
     phone_fin = models.CharField(verbose_name='Телефон в Финляндии', max_length=45, null=True, blank=True)
-    # position = models.CharField(verbose_name='Специальность', max_length=60)
     position = models.ForeignKey('PositionProfile', models.RESTRICT, verbose_name='Специальность', null=True,
                                  blank=True)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
@@ -34,18 +33,21 @@ class UserProfile(models.Model):
     bank_account = models.CharField(verbose_name='Счет в банке', max_length=31, null=True, blank=True)
     tax_number = models.CharField(verbose_name='Налоговый номер', max_length=30, null=True, blank=True)
     auto = models.BooleanField(verbose_name='Свой автомобиль', default=False)
+    auto_category = models.CharField(verbose_name='Категория прав', max_length=3, null=True, blank=True)
     tool = models.BooleanField(verbose_name='Свой инструмент', default=False)
     english = models.BooleanField(verbose_name='Английский язык', default=False)
     estonian = models.BooleanField(verbose_name='Эстонский язык', default=False)
     finnish = models.BooleanField(verbose_name='Финский язык', default=False)
     russian = models.BooleanField(verbose_name='Русский язык', default=False)
     other_language = models.CharField(verbose_name='Другой язык', max_length=100, null=True, blank=True)
-    skills = models.TextField(verbose_name='Что умеет делать', max_length=500, null=True, blank=True)
+    skills = models.TextField(verbose_name='Что умеет делать', max_length=500, null=True, blank=True)  # @todo JSONField
 
     boots = models.IntegerField(verbose_name='Ботинки', null=True, blank=True)
     jacket = models.IntegerField(verbose_name='Куртка', null=True, blank=True)
     pants = models.IntegerField(verbose_name='Штаны', null=True, blank=True)
     shirt = models.IntegerField(verbose_name='Футболка', null=True, blank=True)
+
+    cards = models.ManyToManyField("Cards", through="CardsUsers", verbose_name="Карточки")
 
     create_date = models.DateField(verbose_name="Дата создания", null=True)
 
@@ -53,6 +55,27 @@ class UserProfile(models.Model):
         db_table = "user_profile"
         verbose_name = 'Профиль пользователя'
         verbose_name_plural = 'Профили пользователей'
+
+
+class Cards(models.Model):
+    name = models.CharField(verbose_name="Название", max_length=100)
+
+    class Meta:
+        db_table = "cards"
+        verbose_name = 'Карточка'
+        verbose_name_plural = 'Карточки'
+
+
+class CardsUsers(models.Model):
+    card = models.ForeignKey("Cards", verbose_name="Карточка", on_delete=models.CASCADE)
+    user_profile = models.ForeignKey("UserProfile", verbose_name="Пользователь", on_delete=models.CASCADE)
+    number = models.CharField(verbose_name="Номер карты", max_length=30)
+    due_date = models.CharField(verbose_name="Срок действия", max_length=7)
+
+    class Meta:
+        db_table = "cards_users"
+        verbose_name = 'Карточка пользователей'
+        verbose_name_plural = 'Карточки пользователей'
 
 
 class Functions(models.Model):
@@ -468,12 +491,14 @@ class Items(models.Model):
 class Offer(models.Model):
     """Предложения"""
     create_date = models.DateField(verbose_name="Дата создания", auto_now_add=True, null=True, blank=True)
-    author = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, related_name="offer_author", verbose_name="Автор", null=True)
+    author = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, related_name="offer_author",
+                               verbose_name="Автор", null=True)
     active = models.BooleanField(verbose_name="Активно", default=True)
     term = models.ForeignKey("Term", on_delete=models.RESTRICT, verbose_name="Срок предложения")
     client = models.ForeignKey("Client", on_delete=models.RESTRICT, verbose_name="Клиент", null=True)
     object = models.ForeignKey("Objects", on_delete=models.RESTRICT, verbose_name="Объект", null=True)
-    contact = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, related_name="offer_contact", verbose_name="Контакт", null=True)
+    contact = models.ForeignKey("UserProfile", on_delete=models.RESTRICT, related_name="offer_contact",
+                                verbose_name="Контакт", null=True)
     items = models.ManyToManyField("Items", verbose_name="Товары/услуги")
     from_client = models.JSONField(verbose_name="От заказчика", null=True, blank=True)
 

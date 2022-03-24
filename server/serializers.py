@@ -1,11 +1,20 @@
 from rest_framework import serializers
 
 from server.models import *
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    """Сериализация групп"""
+
+    class Meta:
+        model = Group
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализация пользователей"""
+    groups = GroupSerializer(many=True)
 
     class Meta:
         model = User
@@ -16,7 +25,6 @@ class UserSerializer(serializers.ModelSerializer):
         user = User(
             username=validated_data['username'],
             email=validated_data['email'],
-            is_staff=validated_data['is_staff'],
         )
         user.set_password(validated_data['password'])
         user.save()
@@ -40,11 +48,20 @@ class PositionProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CardsSerializer(serializers.ModelSerializer):
+    """Сериализация карточек"""
+
+    class Meta:
+        model = Cards
+        fields = '__all__'
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """Сериализация профилей пользователей"""
 
     auth_user_id = UserSerializer()
     position = PositionProfileSerializer()
+    cards = CardsSerializer(many=True)
 
     class Meta:
         model = UserProfile
@@ -70,22 +87,6 @@ class UserDocumentsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserDocumentsPostSerializer(serializers.ModelSerializer):
-    """Сериализация документов пользователей для POST-запросов"""
-
-    class Meta:
-        model = UserDocuments
-        fields = ('name', 'create_date', 'path', 'user_profile_id')
-
-
-class GroupSerializer(serializers.ModelSerializer):
-    """Сериализация групп"""
-
-    class Meta:
-        model = Group
-        fields = '__all__'
-
-
 class FunctionSerializer(serializers.ModelSerializer):
     """Сериализация функций для групп"""
 
@@ -107,15 +108,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ('id', 'title', 'text', 'photo_path', 'create_date')
-
-
-class NewsPostSerializer(serializers.ModelSerializer):
-    """Сериализация новостей для POST"""
-
-    class Meta:
-        model = News
-        fields = ('title', 'text', 'photo_path', 'create_date')
+        fields = '__all__'
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -124,17 +117,6 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = '__all__'
-
-
-class ClientPostSerializer(serializers.ModelSerializer):
-    """Сериализация клиентов для POST"""
-
-    class Meta:
-        model = Client
-        fields = (
-            'name', 'short_name', 'ogrn', 'business_address', 'warehouse_address', 'phone', 'email', 'site',
-            'logo_path', 'vat', 'branch', 'bank_account', 'bank', 'bic', 'account_operator', 'index_operator',
-            'electronic_number', 'account_email', 'create_date')
 
 
 class ClientCommentsSerializer(serializers.ModelSerializer):
@@ -178,7 +160,7 @@ class ClientEmployeesPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientEmployees
-        fields = ('name', 'lastname', 'position', 'phone', 'work_phone', 'email', 'work_email', 'client', 'photo_path')
+        fields = '__all__'
 
 
 class ContactCommentsSerializer(serializers.ModelSerializer):
@@ -214,9 +196,7 @@ class ObjectsPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Objects
-        fields = ('index', 'city', 'street', 'house', 'entrance', 'flat', 'date_start', 'date_end',
-                  'active', 'client_id', 'contact_id', 'habitation', 'accident_insurance', 'health_insurance',
-                  'create_date')
+        fields = '__all__'
 
 
 class ObjectUserSerializer(serializers.ModelSerializer):
@@ -234,23 +214,15 @@ class ObjectUserPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ObjectUser
-        fields = ('user_profile_id', 'objects_id', 'start_date', 'end_date', 'comment')
+        fields = '__all__'
 
 
 class ObjectPhotoSerializer(serializers.ModelSerializer):
-    """Сериализация рабочих на объектах"""
+    """Сериализация фото объектов"""
 
     class Meta:
         model = ObjectPhoto
-        fields = ('id', 'photo_path', 'objects_id')
-
-
-class ObjectPhotoPostSerializer(serializers.ModelSerializer):
-    """Сериализация рабочих на объектах"""
-
-    class Meta:
-        model = ObjectPhoto
-        fields = ('photo_path', 'objects_id')
+        fields = '__all__'
 
 
 class ObjectCommentsSerializer(serializers.ModelSerializer):
@@ -265,11 +237,11 @@ class ObjectCommentsSerializer(serializers.ModelSerializer):
 
 
 class ObjectCommentsPostSerializer(serializers.ModelSerializer):
-    """Сериализация комментариев к объектам"""
+    """Сериализация комментариев к объектам для POST-запросов"""
 
     class Meta:
         model = ObjectComments
-        fields = ('text', 'user_profile_id', 'objects_id', 'object_comments_id')
+        fields = '__all__'
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -278,14 +250,6 @@ class NotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notes
         fields = '__all__'
-
-
-class NotesPostSerializer(serializers.ModelSerializer):
-    """Сериализация виджета блокнота для POST-запросов"""
-
-    class Meta:
-        model = Notes
-        fields = ('color', 'text', 'user')
 
 
 class ChequeCategorySerializer(serializers.ModelSerializer):

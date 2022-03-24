@@ -217,6 +217,38 @@ class PositionProfileView(APIView):
             return Response("Доступ запрещен", status=403)
 
 
+class CardsView(APIView):
+    """Карточки"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        cards = Cards.objects.all()
+        serializer = CardsSerializer(cards, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        serializer = CardsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=200)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved_card = get_object_or_404(Cards.objects.all(), pk=request.data["id"])
+        serializer = CardsSerializer(saved_card, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=200)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_card = get_object_or_404(Cards.objects.all(), pk=request.data["id"])
+        saved_card.delete()
+        return Response(status=204)
+
+
 class UserDocumentsView(APIView):
     """Документы пользователей"""
     permission_classes = [permissions.IsAuthenticated]
@@ -361,7 +393,7 @@ class GroupsView(APIView):
 
 class GroupFunctionsView(APIView):
     """Функции групп"""
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         if check_admin(request):
@@ -405,7 +437,7 @@ class NewsView(APIView):
             with open('media' + name, 'wb+') as destination:
                 for chunk in request.FILES['image'].chunks():
                     destination.write(chunk)
-        serializer = NewsPostSerializer(data={
+        serializer = NewsSerializer(data={
             "title": request.data["title"],
             "text": request.data["text"],
             "photo_path": name,
@@ -448,6 +480,9 @@ class NewsView(APIView):
 class ObjectsView(APIView):
     """Объекты"""
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Objects.objects.all()
 
     def get(self, request, client_id=None):
         if check_read_permissions(request, "Объекты"):
@@ -580,7 +615,7 @@ class ObjectPhotoView(APIView):
             saved_object = ObjectPhoto.objects.get(pk=request.data['id'])
             serializer = ObjectPhoto(saved_object, data=request.data, partial=True)
         else:
-            serializer = ObjectPhotoPostSerializer(data={
+            serializer = ObjectPhotoSerializer(data={
                 "photo_path": request.data['photo_path'],
                 "objects_id": request.data['objects_id'],
             })
@@ -652,7 +687,7 @@ class ClientView(APIView):
 
     def post(self, request):
         if check_edit_permissions(request, 'Клиенты'):
-            serializer = ClientPostSerializer(data=request.data)
+            serializer = ClientSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(create_date=datetime.date.today())
                 return Response(status=201)
@@ -868,7 +903,6 @@ class ContactCommentsView(APIView):
                 'user_profile': user_profile,
                 'contact': request.data['contact']
             })
-            # return Response(request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(status=201)
@@ -896,7 +930,7 @@ class NotesView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = NotesPostSerializer(data={
+        serializer = NotesSerializer(data={
             "text": request.data['text'],
             "color": request.data['color'],
             "user": UserSerializer(request.user).data['id'],
