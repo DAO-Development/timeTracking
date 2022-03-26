@@ -89,7 +89,6 @@ class UserView(APIView):
             "username": request.data["username"],
             "password": request.data["password"],
             "email": request.data["email"],
-            "is_staff": request.data["is_staff"],
         })
         if serializer.is_valid():
             serializer.save()
@@ -136,7 +135,7 @@ class ProfilesView(APIView):
                 user_profile = user_profile.order_by('lastname').order_by('name')
                 busy = user_profile.filter(objectuser__end_date__gte=datetime.date.today()).values_list('id', flat=True)
             serializer = UserProfileSerializer(user_profile, many=True)
-            return Response({"data": serializer.data, "busy": busy})
+            return Response({"data": serializer.data, "busy": busy, "cards": CardsUsersSerializer(user_profile[0].cardsusers_set, many=True).data})
         else:
             return Response("Доступ запрещен", status=403)
 
@@ -144,6 +143,12 @@ class ProfilesView(APIView):
         serializer = UserProfilePostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(create_date=datetime.date.today())
+            if request.data["cards"] is not None:
+                user_profile = UserProfile.objects.get(auth_user_id=serializer.data["auth_user_id"])
+                cards = json.loads(request.data['cards'])
+                for card in cards:
+                    user_profile.cards.add(Cards.objects.get(pk=card["card"]),
+                                           through_defaults={'number': card["number"], "due_date": card["due_date"]})
             return Response({"data": serializer.data}, status=201)
         else:
             return Response(status=400)
@@ -164,10 +169,18 @@ class ProfilesView(APIView):
                 else:
                     return Response("Некорректные данные", status=400)
             saved_profile = get_object_or_404(UserProfile.objects.all(), id=request.data['id'])
+            cards = json.loads(request.data['cards'])
+            for card in cards:
+                if card["id"] == 0:
+                    saved_profile.cards.add(Cards.objects.get(pk=card["card"]),
+                                            through_defaults={'number': card["number"], "due_date": card["due_date"]})
+                else:
+                    card = CardsUsers.objects.get(pk=card["id"])
+                    card_serializer = CardsUsersSerializer(card, data=card, partial=True)
             serializer = UserProfilePostSerializer(saved_profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response({"data": serializer.data}, status=201)
+                return Response({"data": serializer.data, "cards": saved_profile.cards}, status=201)
             else:
                 return Response("Некорректные данные", status=400)
         else:
@@ -219,7 +232,7 @@ class PositionProfileView(APIView):
 
 class CardsView(APIView):
     """Карточки"""
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request):
         cards = Cards.objects.all()
@@ -227,12 +240,15 @@ class CardsView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        serializer = CardsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=200)
+        if check_admin(request):
+            serializer = CardsSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=200)
+            else:
+                return Response(status=400)
         else:
-            return Response(status=400)
+            return Response("Доступ запрещен", status=403)
 
     def put(self, request):
         saved_card = get_object_or_404(Cards.objects.all(), pk=request.data["id"])

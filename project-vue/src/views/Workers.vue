@@ -156,6 +156,18 @@
               <v-checkbox label="Свой автомобиль" v-model="newProfile.auto"></v-checkbox>
               <v-checkbox label="Свой инструмент" v-model="newProfile.tool"></v-checkbox>
             </v-row>
+            <v-row>
+              Категория прав
+              <v-radio-group v-model="newProfile.auto_category">
+                <v-radio value="A" label="A"></v-radio>
+                <v-radio value="B" label="B"></v-radio>
+                <v-radio value="C" label="C"></v-radio>
+                <v-radio value="D" label="D"></v-radio>
+                <v-radio value="BE" label="BE"></v-radio>
+                <v-radio value="CE" label="CE"></v-radio>
+                <v-radio value="DE" label="DE"></v-radio>
+              </v-radio-group>
+            </v-row>
             <h4>Языки</h4>
             <v-row>
               <v-checkbox label="Английский" v-model="newProfile.english"></v-checkbox>
@@ -174,13 +186,35 @@
               <v-text-field placeholder="Штаны" v-model="newProfile.pants" outlined></v-text-field>
               <v-text-field placeholder="Футболка" v-model="newProfile.shirt" outlined></v-text-field>
             </v-row>
+            <h3>Карточки</h3>
+            <v-row>
+              <v-btn @click="addProfileCard">Добавить карточку</v-btn>
+            </v-row>
+            <template v-for="i in cardsQuantity">
+              <div :key="i">
+                <v-row>
+                  <v-autocomplete :items="cards" item-value="id" item-text="name" v-model="newProfile.cards[i-1].card"
+                                  :rules="reqRules" outlined></v-autocomplete>
+                </v-row>
+                <v-row>
+                  <v-text-field v-model="newProfile.cards[i-1].number" :rules="reqRules" outlined></v-text-field>
+                  <v-menu ref="menuCard" v-model="menuCard" :close-on-content-click="false"
+                          :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field v-model="newProfile.cards[i-1].due_date" label="Срок действия" readonly
+                                    v-bind="attrs"
+                                    v-on="on" outlined></v-text-field>
+                    </template>
+                    <v-date-picker v-model="newProfile.cards[i-1].due_date" @input="menuCard = false"
+                                   type="month"
+                                   :min="new Date(Date.now()).toISOString().substr(0,7)"></v-date-picker>
+                  </v-menu>
+                </v-row>
+              </div>
+            </template>
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <!--          <div class="addition-btn">-->
-          <!--            <pdf-icon/>-->
-          <!--            Конвертировать в .pdf-->
-          <!--          </div>-->
           <v-spacer></v-spacer>
           <v-btn class="action-btn" color="primary" @click="addUser">{{ formBtnText }}</v-btn>
         </v-card-actions>
@@ -252,6 +286,7 @@ export default {
       archive: false,
       profiles: {},
       positions: [],
+      cards: [],
       // selects: ["Все", "Администратор", "Маляр", "Строитель"],
       newProfile: {
         id: 0,
@@ -285,6 +320,7 @@ export default {
         bank_account: "",
         tax_number: "",
         auto: false,
+        auto_category: null,
         tool: false,
         english: false,
         estonian: false,
@@ -299,7 +335,9 @@ export default {
         shirt: null,
         is_staff: false,
         photo_path: null,
+        cards: [],
       },
+      cardsQuantity: 0,
       currentProfile: {
         id: 0,
         auth_user_id: "",
@@ -325,6 +363,7 @@ export default {
       photoField: null,
       photoDialog: false,
       menu: false,
+      menuCard: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
@@ -356,12 +395,14 @@ export default {
       })
       this.loadData()
       this.loadPositions()
+      this.loadCards()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
     }
   },
   methods: {
+    allowedMonths: val => val >= Date.now(),
     loadData() {
       $.ajax({
         url: this.$hostname + "time-tracking/profiles",
@@ -387,6 +428,25 @@ export default {
         type: "GET",
         success: (response) => {
           this.positions = response.data.data
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    loadCards() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/cards",
+        type: "GET",
+        success: (response) => {
+          this.cards = response.data.data
         },
         error: (response) => {
           if (response.status === 500) {
@@ -453,6 +513,7 @@ export default {
           bank_account: this.newProfile.bank_account,
           tax_number: this.newProfile.tax_number,
           auto: this.newProfile.auto,
+          auto_category: this.newProfile.auto_category,
           tool: this.newProfile.tool,
           english: this.newProfile.english,
           estonian: this.newProfile.estonian,
@@ -467,6 +528,7 @@ export default {
           shirt: this.newProfile.shirt,
           photo_path: this.currentProfile.photo_path,
           active: true,
+          cards: JSON.stringify(this.newProfile.cards),
         },
         success: () => {
           this.alertMsg = "Пользователь добавлен"
@@ -479,6 +541,10 @@ export default {
           console.log(response.data)
         },
       })
+    },
+    addProfileCard() {
+      this.cardsQuantity += 1
+      this.newProfile.cards.push({card: 0, number: '', due_date: ''})
     },
     editProfile() {
       $.ajax({

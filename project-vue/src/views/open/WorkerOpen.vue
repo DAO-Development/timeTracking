@@ -281,6 +281,18 @@
               <v-checkbox label="Свой автомобиль" v-model="currentProfile.auto"></v-checkbox>
               <v-checkbox label="Свой инструмент" v-model="currentProfile.tool"></v-checkbox>
             </v-row>
+            <v-row>
+              Категория прав
+              <v-radio-group v-model="currentProfile.auto_category">
+                <v-radio value="A" label="A"></v-radio>
+                <v-radio value="B" label="B"></v-radio>
+                <v-radio value="C" label="C"></v-radio>
+                <v-radio value="D" label="D"></v-radio>
+                <v-radio value="BE" label="BE"></v-radio>
+                <v-radio value="CE" label="CE"></v-radio>
+                <v-radio value="DE" label="DE"></v-radio>
+              </v-radio-group>
+            </v-row>
             <h4>Языки</h4>
             <v-row>
               <v-checkbox label="Английский" v-model="currentProfile.english"></v-checkbox>
@@ -300,6 +312,34 @@
               <v-text-field placeholder="Штаны" v-model="currentProfile.pants" outlined></v-text-field>
               <v-text-field placeholder="Футболка" v-model="currentProfile.shirt" outlined></v-text-field>
             </v-row>
+            <h3>Карточки</h3>
+            <v-row>
+              <v-btn @click="addProfileCard">Добавить карточку</v-btn>
+            </v-row>
+            <template v-for="i in cardsQuantity">
+              <div :key="i">
+                <v-row>
+                  <v-autocomplete :items="cards" item-value="id" item-text="name"
+                                  v-model="currentProfile.cards[i-1].card"
+                                  :rules="reqRules" outlined></v-autocomplete>
+                </v-row>
+                <v-row>
+                  <v-text-field v-model="currentProfile.cards[i-1].number" label="Номер карты" :rules="reqRules"
+                                outlined></v-text-field>
+                  <v-menu ref="menuCard" v-model="menuCard" :close-on-content-click="false"
+                          :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field v-model="currentProfile.cards[i-1].due_date" label="Срок действия" readonly
+                                    v-bind="attrs"
+                                    v-on="on" outlined></v-text-field>
+                    </template>
+                    <v-date-picker v-model="currentProfile.cards[i-1].due_date" @input="menuCard = false"
+                                   type="month"
+                                   :min="new Date(Date.now()).toISOString().substr(0,7)"></v-date-picker>
+                  </v-menu>
+                </v-row>
+              </div>
+            </template>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -419,6 +459,7 @@ export default {
         bank_account: "",
         tax_number: "",
         auto: false,
+        auto_category: '',
         tool: false,
         english: false,
         estonian: false,
@@ -439,7 +480,8 @@ export default {
             id: 0,
             name: ""
           }
-        }
+        },
+        cards: [],
       },
       currentGroup: {
         id: 0,
@@ -447,6 +489,8 @@ export default {
       },
       groups: [],
       positions: [],
+      cards: [],
+      cardsQuantity: 0,
       full: false,
       formTitle: "Добавление работника",
       formBtnText: "Сохранить",
@@ -457,6 +501,7 @@ export default {
       photoDialog: false,
       changeGroupForm: false,
       menu: false,
+      menuCard: false,
       alertError: false,
       alertMsg: "",
       reqRules: [
@@ -487,6 +532,7 @@ export default {
       })
       this.loadData()
       this.loadPositions()
+      this.loadCards()
     } else {
       this.$emit('set-not-auth')
       this.$router.push({name: "Index"})
@@ -519,6 +565,8 @@ export default {
               entrance: '',
               flat: '',
             }
+          this.cardsQuantity = this.currentProfile.cardsusers_set.length
+          this.currentProfile.cards = this.currentProfile.cardsusers_set
           this.loadGroups()
         },
         error: (response) => {
@@ -604,9 +652,33 @@ export default {
         },
       })
     },
+    loadCards() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/cards",
+        type: "GET",
+        success: (response) => {
+          this.cards = response.data.data
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        }
+      })
+    },
+    addProfileCard() {
+      this.cardsQuantity += 1
+      this.currentProfile.cards.push({card: 0, number: '', due_date: ''})
+    },
     editProfile() {
       if (this.$refs.addForm.validate()) {
         this.currentProfile.position = this.currentProfile.position.id
+        this.currentProfile.cards = JSON.stringify(this.currentProfile.cards)
         $.ajax({
           url: this.$hostname + "time-tracking/profiles",
           type: "PUT",

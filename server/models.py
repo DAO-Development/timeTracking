@@ -29,7 +29,7 @@ class UserProfile(models.Model):
     position = models.ForeignKey('PositionProfile', models.RESTRICT, verbose_name='Специальность', null=True,
                                  blank=True)
     photo_path = models.CharField(verbose_name='Путь к фото', max_length=250, null=True, blank=True)
-    active = models.BooleanField(verbose_name='Работает')
+    active = models.BooleanField(verbose_name='Работает', default=True)
     bank_account = models.CharField(verbose_name='Счет в банке', max_length=31, null=True, blank=True)
     tax_number = models.CharField(verbose_name='Налоговый номер', max_length=30, null=True, blank=True)
     auto = models.BooleanField(verbose_name='Свой автомобиль', default=False)

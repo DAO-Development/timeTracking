@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from server.models import *
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -14,7 +14,8 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализация пользователей"""
-    groups = GroupSerializer(many=True)
+
+    # groups = GroupSerializer(many=True)
 
     class Meta:
         model = User
@@ -56,12 +57,22 @@ class CardsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CardsUsersSerializer(serializers.ModelSerializer):
+    """Сериализация карточек с пользователями"""
+
+    card = CardsSerializer()
+
+    class Meta:
+        model = CardsUsers
+        fields = '__all__'
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """Сериализация профилей пользователей"""
 
     auth_user_id = UserSerializer()
     position = PositionProfileSerializer()
-    cards = CardsSerializer(many=True)
+    cardsusers_set = CardsUsersSerializer(many=True)
 
     class Meta:
         model = UserProfile
@@ -75,8 +86,8 @@ class UserProfilePostSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ('auth_user_id', 'name', 'lastname', 'photo_path', 'active', 'citizenship', 'birthdate',
                   'social_code_own', 'social_code_fin', 'address_own', 'address_fin', 'phone', 'phone_fin',
-                  'bank_account', 'tax_number', 'auto', 'tool', 'english', 'estonian', 'finnish', 'russian',
-                  'other_language', 'position', 'skills', 'boots', 'jacket', 'pants', 'shirt', 'create_date')
+                  'bank_account', 'tax_number', 'auto', 'auto_category', 'tool', 'english', 'estonian', 'finnish',
+                  'russian', 'other_language', 'position', 'skills', 'boots', 'jacket', 'pants', 'shirt', 'create_date')
 
 
 class UserDocumentsSerializer(serializers.ModelSerializer):
