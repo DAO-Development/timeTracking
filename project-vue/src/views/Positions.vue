@@ -97,6 +97,7 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
       })
       switch (this.table) {
+          //@todo добавить карточки
         case 'profile':
           this.url = "time-tracking/profiles/positions"
           this.title = 'Специальности профилей'

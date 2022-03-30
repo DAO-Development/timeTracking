@@ -151,7 +151,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAdminUser',
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -177,16 +177,23 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+REQUIRED_FIELDS = ['username', 'email']
+
 # smtp
-# EMAIL_USE_TLS: True
-# EMAIL_HOST: 'smtp.gmail.com'
-# EMAIL_HOST_USER: 'polya.bagrowa@gmail.com'
-# EMAIL_HOST_PASSWORD: '070801pol'
-# EMAIL_PORT: 587
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS: True
+EMAIL_HOST: 'smtp.yandex.ru'
+EMAIL_HOST_USER: 'polya.bagrowa@yandex.ru'
+EMAIL_HOST_PASSWORD: '7801lfyz'
+EMAIL_PORT: 587
+DEFAULT_FROM_EMAIL: 'polya.bagrowa@yandex.ru'
 
 DJOSER = {
-    'LOGIN_FIELD': 'email',
+    # 'LOGIN_FIELD': 'email',
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
+    'EMAIL': {'activation': 'server.email.ActivationEmail'}
 }
 
 django_heroku.settings(locals())

@@ -1,7 +1,10 @@
+from django.core.mail import send_mail
 from rest_framework import serializers
 
 from server.models import *
 from django.contrib.auth.models import User, Group
+
+from timeTrack import settings
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -29,6 +32,16 @@ class UserSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         user.save()
+        if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+            # user.is_active = False
+            # user.save(update_fields=["is_active"])
+            context = {"user": user}
+            to = [user.email]
+            send_mail("Register work24",
+                      "You have been registered at work24. Your password: " + validated_data['password'],
+                      'polya.bagrowa@yandex.ru', [validated_data['email']])
+            # if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+            #     settings.DJOSER['EMAIL']['activation'](self.request, context).send(to)
         return user
 
     def update(self, instance, validated_data):

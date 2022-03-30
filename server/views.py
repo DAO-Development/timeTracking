@@ -1,4 +1,5 @@
 import json
+import random
 import zipfile
 
 from django.db.models import Sum, F, ExpressionWrapper, FloatField, Q
@@ -85,9 +86,13 @@ class UserView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
+        pas = ''
+        for x in range(10):  # Количество символов (16)
+            pas = pas + random.choice(list('1234567890abcdefghigklmnopqrstuvyxwzABCDEFGHIGKLMNOPQRSTUVYXWZ'))
+        print('your password is: ', pas)
         serializer = UserSerializer(data={
             "username": request.data["username"],
-            "password": request.data["password"],
+            "password": pas,
             "email": request.data["email"],
         })
         if serializer.is_valid():
@@ -135,7 +140,8 @@ class ProfilesView(APIView):
                 user_profile = user_profile.order_by('lastname').order_by('name')
                 busy = user_profile.filter(objectuser__end_date__gte=datetime.date.today()).values_list('id', flat=True)
             serializer = UserProfileSerializer(user_profile, many=True)
-            return Response({"data": serializer.data, "busy": busy, "cards": CardsUsersSerializer(user_profile[0].cardsusers_set, many=True).data})
+            return Response({"data": serializer.data, "busy": busy,
+                             "cards": CardsUsersSerializer(user_profile[0].cardsusers_set, many=True).data})
         else:
             return Response("Доступ запрещен", status=403)
 
