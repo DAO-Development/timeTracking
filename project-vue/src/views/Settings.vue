@@ -10,8 +10,8 @@
         <v-select v-model="settings.language" :label="$vuetify.lang.t('$vuetify.settings.selectLangLabel')"
                   :items="languages" @change="putSettings"></v-select>
       </v-row>
-      <v-list>
-        <v-list-item v-if="$parent.$parent.admin" @click="$router.push({name: 'Groups'})">
+      <v-list v-if="$parent.$parent.admin">
+        <v-list-item  @click="$router.push({name: 'Groups'})">
           <v-list-item-icon>
             <v-icon>mdi-plus</v-icon>
           </v-list-item-icon>
@@ -71,6 +71,15 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>Налог</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="$parent.$parent.admin"
+                     @click="$router.push({name: 'IntegerField',  params: {table: 'card'}})">
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Карточки</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>

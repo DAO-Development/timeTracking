@@ -32,16 +32,16 @@ class UserSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         user.save()
-        if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
-            # user.is_active = False
-            # user.save(update_fields=["is_active"])
-            context = {"user": user}
-            to = [user.email]
-            send_mail("Register work24",
-                      "You have been registered at work24. Your password: " + validated_data['password'],
-                      'polya.bagrowa@yandex.ru', [validated_data['email']])
-            # if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
-            #     settings.DJOSER['EMAIL']['activation'](self.request, context).send(to)
+        # if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+        # user.is_active = False
+        # user.save(update_fields=["is_active"])
+        context = {"user": user}
+        # to = [user.email]
+        # send_mail("Register work24",
+        #           "You have been registered at work24. Your password: " + validated_data['password'],
+        #           'polya.bagrowa@yandex.ru', [validated_data['email']])
+        # if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+        #     settings.DJOSER['EMAIL']['activation'](self.request, context).send(to)
         return user
 
     def update(self, instance, validated_data):
@@ -74,6 +74,14 @@ class CardsUsersSerializer(serializers.ModelSerializer):
     """Сериализация карточек с пользователями"""
 
     card = CardsSerializer()
+
+    class Meta:
+        model = CardsUsers
+        fields = '__all__'
+
+
+class CardsUsersPostSerializer(serializers.ModelSerializer):
+    """Сериализация карточек с пользователями для POST-запросов"""
 
     class Meta:
         model = CardsUsers

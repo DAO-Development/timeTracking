@@ -140,8 +140,7 @@ class ProfilesView(APIView):
                 user_profile = user_profile.order_by('lastname').order_by('name')
                 busy = user_profile.filter(objectuser__end_date__gte=datetime.date.today()).values_list('id', flat=True)
             serializer = UserProfileSerializer(user_profile, many=True)
-            return Response({"data": serializer.data, "busy": busy,
-                             "cards": CardsUsersSerializer(user_profile[0].cardsusers_set, many=True).data})
+            return Response({"data": serializer.data, "busy": busy})
         else:
             return Response("Доступ запрещен", status=403)
 
@@ -181,12 +180,21 @@ class ProfilesView(APIView):
                     saved_profile.cards.add(Cards.objects.get(pk=card["card"]),
                                             through_defaults={'number': card["number"], "due_date": card["due_date"]})
                 else:
-                    card = CardsUsers.objects.get(pk=card["id"])
-                    card_serializer = CardsUsersSerializer(card, data=card, partial=True)
+                    saved_card = CardsUsers.objects.get(pk=card["id"])
+                    data = {"number": card["number"],
+                            "due_date": card["due_date"]}
+                    if isinstance(card["card"], int):
+                        data["card"] = card["card"]
+                    card_serializer = CardsUsersPostSerializer(saved_card, data=data, partial=True)
+                    if card_serializer.is_valid():
+                        card_serializer.save()
+            cards = json.loads(request.data['deleted'])
+            for card in cards:
+                saved_profile.cards.remove(Cards.objects.get(pk=card["card"]["id"]))
             serializer = UserProfilePostSerializer(saved_profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response({"data": serializer.data, "cards": saved_profile.cards}, status=201)
+                return Response({"data": serializer.data}, status=201)
             else:
                 return Response("Некорректные данные", status=400)
         else:

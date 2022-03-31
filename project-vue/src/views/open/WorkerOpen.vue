@@ -322,6 +322,11 @@
                   <v-autocomplete :items="cards" item-value="id" item-text="name"
                                   v-model="currentProfile.cards[i-1].card"
                                   :rules="reqRules" outlined></v-autocomplete>
+                  <v-col cols="1">
+                    <v-btn icon @click="deleteProfileCard(i)">
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                  </v-col>
                 </v-row>
                 <v-row>
                   <v-text-field v-model="currentProfile.cards[i-1].number" label="Номер карты" :rules="reqRules"
@@ -490,6 +495,7 @@ export default {
       groups: [],
       positions: [],
       cards: [],
+      deletedCards: [],
       cardsQuantity: 0,
       full: false,
       formTitle: "Добавление работника",
@@ -673,12 +679,13 @@ export default {
     },
     addProfileCard() {
       this.cardsQuantity += 1
-      this.currentProfile.cards.push({card: 0, number: '', due_date: ''})
+      this.currentProfile.cards.push({id: 0, card: 0, number: '', due_date: ''})
     },
     editProfile() {
       if (this.$refs.addForm.validate()) {
         this.currentProfile.position = this.currentProfile.position.id
         this.currentProfile.cards = JSON.stringify(this.currentProfile.cards)
+        this.currentProfile.deleted = JSON.stringify(this.deletedCards)
         $.ajax({
           url: this.$hostname + "time-tracking/profiles",
           type: "PUT",
@@ -840,6 +847,13 @@ export default {
           this.alertError = true
         },
       })
+    },
+    deleteProfileCard(i) {
+      if (this.currentProfile.cards[i - 1].id !== 0) {
+        this.deletedCards.push(this.currentProfile.cards[i - 1])
+      }
+      this.cardsQuantity = this.cardsQuantity - 1
+      this.currentProfile.cards.splice(i - 1, 1)
     },
     openEditForm() {
       this.formTitle = "Редактирование работника"
