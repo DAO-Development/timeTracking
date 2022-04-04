@@ -11,11 +11,11 @@
       <div class="documents-all all">
         <v-data-table :headers="headers" :items="documents" item-key="id" @click:row="downloadFile">
           <template v-slot:item.actions="{ item }">
-            <v-icon small class="mr-2" @click="openEditForm(item)"
+            <v-icon small class="mr-2" @click.stop="openEditForm(item)"
                     v-if="id === undefined || $parent.$parent.edit.indexOf('Работники') !== -1">
               mdi-pencil
             </v-icon>
-            <v-icon small @click="openConfirmDeleteDialog(item)"
+            <v-icon small @click.stop="openConfirmDeleteDialog(item)"
                     v-if="id === undefined || $parent.$parent.edit.indexOf('Работники') !== -1">
               mdi-delete
             </v-icon>

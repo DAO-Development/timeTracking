@@ -161,7 +161,7 @@ class ProfilesView(APIView):
     def put(self, request, id=None):
         if check_edit_permissions(request, "Работники"):
             if id is not None:
-                name = '/users/' + request.FILES['image'].name
+                name = '/users/'+ str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -293,39 +293,46 @@ class UserDocumentsView(APIView):
         return Response({"profile": profile_serializer.data, "documents": serializer.data}, status=200)
 
     def put(self, request):
-        # todo Сделать чтобы пользователь добавлял документы только для себя,
-        # либо проверка прав редактирования
         create_date = datetime.date.today()
-        name = ''
-        if len(request.FILES) == 1:
-            name = '/documents/' + request.FILES['document'].name
-            with open('media' + name, 'wb+') as destination:
-                for chunk in request.FILES['document'].chunks():
-                    destination.write(chunk)
+        if request.data['user_profile_id'] == 'undefined' or check_edit_permissions(request, 'Работники'):
+
+            name = ''
+            if len(request.FILES) == 1:
+                name = '/documents/' + str(datetime.datetime.now().timestamp()) + request.FILES['document'].name
+                with open('media' + name, 'wb+') as destination:
+                    for chunk in request.FILES['document'].chunks():
+                        destination.write(chunk)
+            else:
+                name = request.data['path']
+            data = {
+                "user_profile_id": int(request.data['user_profile_id'] if request.data[
+                                                                              'user_profile_id'] != 'undefined' else UserProfile.objects.get(
+                    auth_user_id=request.user.id).id),
+                "name": request.data['name'],
+                "create_date": create_date,
+                "path": name,
+            }
+            if request.data["id"] == "0":
+                serializer = UserDocumentsSerializer(data=data)
+            else:
+                saved_object = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
+                serializer = UserDocumentsSerializer(saved_object, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=201)
+            else:
+                return Response("Некорректные данные", status=400)
         else:
-            name = request.data['path']
-        data = {
-            "user_profile_id": int(request.data['user_profile_id']),
-            "name": request.data['name'],
-            "create_date": create_date,
-            "path": name,
-        }
-        if request.data["id"] == "0":
-            serializer = UserDocumentsSerializer(data=data)
-        else:
-            saved_object = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
-            serializer = UserDocumentsSerializer(saved_object, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=201)
-        else:
-            return Response("Некорректные данные", status=400)
+            return Response("Доступ запрещен", status=403)
 
     def delete(self, request):
-        # todo удаление только своих или с правами редактирования
         document = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
-        document.delete()
-        return Response(status=204)
+        if UserProfile.objects.get(
+                auth_user_id=request.user.id).id == document.user_profile_id or check_edit_permissions(request,                                                                                    'Работники'):
+            document.delete()
+            return Response(status=204)
+        else:
+            return Response("Доступ запрещен", status=403)
 
 
 class UserGroupsView(APIView):
@@ -463,7 +470,7 @@ class NewsView(APIView):
     def post(self, request):
         name = ''
         if len(request.FILES) == 1:
-            name = '/news/' + request.FILES['image'].name
+            name = '/news/'+ str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
             with open('media' + name, 'wb+') as destination:
                 for chunk in request.FILES['image'].chunks():
                     destination.write(chunk)
@@ -486,7 +493,7 @@ class NewsView(APIView):
             "text": request.data["text"]
         }, partial=True)
         if len(request.FILES) == 1:
-            name = '/news/' + request.FILES['image'].name
+            name = '/news/' + str(datetime.datetime.now().timestamp())+ request.FILES['image'].name
             with open('media' + name, 'wb+') as destination:
                 for chunk in request.FILES['image'].chunks():
                     destination.write(chunk)
@@ -546,7 +553,7 @@ class ObjectsView(APIView):
         if check_edit_permissions(request, "Объекты"):
             serializer = None
             if client_id is not None:
-                name = '/objects/' + request.FILES['image'].name
+                name = '/objects/' + str(datetime.datetime.now().timestamp())+ request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -731,7 +738,7 @@ class ClientView(APIView):
             saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
             data = request.data
             if len(request.FILES) == 1:
-                name = '/clients/' + request.FILES['image'].name
+                name = '/clients/' + str(datetime.datetime.now().timestamp())+ request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -850,7 +857,7 @@ class ClientEmployeesView(APIView):
             saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
             data = request.data
             if len(request.FILES) == 1:
-                name = '/contacts/' + request.FILES['image'].name
+                name = '/contacts/'+ str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -1267,7 +1274,7 @@ class ChequeDocumentsView(APIView):
     def post(self, request):
         if len(request.FILES) >= 0:
             for i in range(1, len(request.FILES) + 1):
-                name = '/cheque/' + request.FILES['document' + str(i)].name
+                name = '/cheque/'+ str(datetime.datetime.now().timestamp()) + request.FILES['document' + str(i)].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['document' + str(i)].chunks():
                         destination.write(chunk)
@@ -1308,7 +1315,7 @@ class DocumentsAccountingView(APIView):
             path = ''
             if len(request.FILES) >= 0:
                 for i in range(1, len(request.FILES) + 1):
-                    name = '/accounting/' + request.FILES['document' + str(i)].name
+                    name = '/accounting/'+ str(datetime.datetime.now().timestamp()) + request.FILES['document' + str(i)].name
                     with open('media' + name, 'wb+') as destination:
                         for chunk in request.FILES['document' + str(i)].chunks():
                             destination.write(chunk)
@@ -1371,7 +1378,7 @@ class DocumentsClientView(APIView):
             path = ''
             if len(request.FILES) >= 0:
                 for i in range(1, len(request.FILES) + 1):
-                    name = '/accounting/clients/' + request.FILES['document' + str(i)].name
+                    name = '/accounting/clients/'+ str(datetime.datetime.now().timestamp()) + request.FILES['document' + str(i)].name
                     with open('media' + name, 'wb+') as destination:
                         for chunk in request.FILES['document' + str(i)].chunks():
                             destination.write(chunk)
