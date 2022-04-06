@@ -177,17 +177,6 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-REQUIRED_FIELDS = ['username', 'email']
-
-# smtp
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS: True
-EMAIL_USE_SSL = False
-EMAIL_HOST: 'smtp.yandex.ru'
-EMAIL_HOST_USER: 'polya.bagrowa@yandex.ru'
-EMAIL_HOST_PASSWORD: '7801lfyz'
-EMAIL_PORT: 587
-DEFAULT_FROM_EMAIL: 'polya.bagrowa@yandex.ru'
 
 DJOSER = {
     # 'LOGIN_FIELD': 'email',
@@ -199,8 +188,8 @@ DJOSER = {
 
 django_heroku.settings(locals())
 
-try:
-    from .local_settings import *
-except ImportError:
-    from .prod_settings import *
-# from .prod_settings import *
+# try:
+#     from .local_settings import *
+# except ImportError:
+#     from .prod_settings import *
+from .prod_settings import *

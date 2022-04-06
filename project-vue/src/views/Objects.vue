@@ -265,7 +265,10 @@
             </div>
           </div>
           <div class="objects-open__comments-add">
-            <v-editor v-model="newComment.text" :config="editorConfig"></v-editor>
+            <editor v-model="newComment.text"
+                    api-key="660vq0feuhjyub7s7o01nh9an48e4eq55ucbneldw55cr22l"
+                    :init="editorInit"
+            />
             <div class="objects-open__comments-add-actions">
               <div class="objects-open__comments-add-answerfor" v-if="newComment.object_comments_id != null">
                 <div>Ответ на:
@@ -552,16 +555,12 @@ import $ from 'jquery';
 import BackIcon from "../components/icons/backIcon";
 import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
+import Editor from '@tinymce/tinymce-vue'
 
-// const socket = new WebSocket(
-//     'ws://'
-//     + window.location.host
-//     + '/ws/'
-// );
 
 export default {
   name: "Objects",
-  components: {EditIcon, WasteIcon, BackIcon, /*AddPhotoIcon*/},
+  components: {EditIcon, WasteIcon, BackIcon, 'editor': Editor, /*AddPhotoIcon*/},
   props: {
     idClient: [String, Number, null]
   },
@@ -678,45 +677,73 @@ export default {
       alertError: false,
       alertSuccess: false,
       alertMsg: '',
-      editorConfig: {
-        printLog: false,
-        uploadImgUrl: 'http://localhost:8000/time-tracking/images/upload',
-        menus: [
-          'source',
-          '|',
-          'bold',
-          'underline',
-          'italic',
-          'strikethrough',
-          'eraser',
-          'forecolor',
-          'bgcolor',
-          '|',
-          'quote',
-          'fontfamily',
-          'fontsize',
-          'head',
-          'unorderlist',
-          'orderlist',
-          'alignleft',
-          'aligncenter',
-          'alignright',
-          '|',
-          'link',
-          'unlink',
-          'table',
-          // 'emotion',
-          '|',
-          // 'img',
-          // 'video',
-          'insertcode',
-          '|',
-          'undo',
-          'redo',
-          'fullscreen'
+      editorInit: {
+        height: 500,
+        menubar: false,
+        plugins: [
+          'advlist autolink lists link image charmap print preview anchor',
+          'searchreplace visualblocks code fullscreen',
+          'insertdatetime media table paste code help wordcount'
         ],
-        useLang: 'en',
-        pasteText: true,
+        toolbar:
+            'undo redo | formatselect | bold italic backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist outdent indent | image | removeformat | help',
+        file_picker_types: 'image',
+        relative_urls: false,
+        image_prepend_url: this.$hostname,
+        images_upload_base_path: this.$hostname,
+        image_description: false,
+        // image_dimensions: false,
+        file_picker_callback: function (callback, value, meta) {
+          $(".tox-lock.tox-button").click()
+          console.log(callback)
+          console.log(value)
+          console.log(meta)
+          var input = document.createElement('input');
+          input.setAttribute('type', 'file');
+          input.setAttribute('accept', 'image/*');
+          input.onchange = function () {
+            var file = this.files[0];
+            console.log(file)
+            var reader = new FileReader();
+            reader.onload = function () {
+              const axios = require('axios')
+              // чтение файла в formData
+              let fd = new FormData();
+              if (file !== null) {
+                fd.append('file', file)
+              }
+              axios({
+                method: 'post',
+                // url: "http://127.0.0.1:8000/time-tracking/images/upload",
+                url: "https://shielded-plateau-96200.herokuapp.com/time-tracking/images/upload",
+                headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+                data: fd
+              })
+                  .then(response => {
+                    console.log(response.data.data)
+                    $('.tox-control-wrap .tox-textfield').val(response.data.data)
+                  });
+              /*
+                Note: Now we need to register the blob in TinyMCEs image blob
+                registry. In the next release this part hopefully won't be
+                necessary, as we are looking to handle it internally.
+              */
+              // var id = 'blobid' + (new Date()).getTime();
+              // var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+              // var base64 = reader.result.split(',')[1];
+              // var blobInfo = blobCache.create(id, file, base64);
+              // blobCache.add(blobInfo);
+              //
+              // /* call the callback and populate the Title field with the file name */
+              // cb(blobInfo.blobUri(), {title: file.name});
+            };
+            reader.readAsDataURL(file);
+          };
+
+          input.click();
+        }
       },
     }
   },

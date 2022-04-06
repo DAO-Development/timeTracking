@@ -18,7 +18,6 @@
                 <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
               </div>
               <div class="news-single__title">{{ item.title }}</div>
-              <div class="news-single__text" v-html="item.text"></div>
             </v-card>
             <v-card class="news-single" :key="item.id" color="primary" @click="openNew(item)" v-else>
               <div class="news-single__actions">
@@ -26,7 +25,6 @@
                 <v-icon @click="openEditForm(item.id, item.title, item.text)">$edit</v-icon>
               </div>
               <div class="news-single__title">{{ item.title }}</div>
-              <div class="news-single__text" v-html="item.text"></div>
             </v-card>
           </template>
         </div>
@@ -72,7 +70,10 @@
           <v-form ref="form">
             <v-text-field placeholder="Заголовок" v-model="newNew.title" :rules="titleRules" required
                           outlined></v-text-field>
-            <v-editor v-model="newNew.text" :config="editorConfig"></v-editor>
+            <editor v-model="newNew.text"
+                    api-key="660vq0feuhjyub7s7o01nh9an48e4eq55ucbneldw55cr22l"
+                    :init="editorInit"
+            />
           </v-form>
           <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
             {{ alertMsg }}
@@ -113,12 +114,13 @@ import WasteIcon from "../components/icons/wasteIcon";
 import EditIcon from "../components/icons/editIcon";
 import BackIcon from "../components/icons/backIcon";
 import AddPhotoIcon from "../components/icons/addPhotoIcon"
+import Editor from '@tinymce/tinymce-vue'
 
 //todo добавить loader на процессы добавления и редактирования (картинка тормозит)
 
 export default {
   name: "News",
-  components: {BackIcon, EditIcon, WasteIcon, AddPhotoIcon},
+  components: {BackIcon, EditIcon, WasteIcon, AddPhotoIcon, 'editor': Editor},
   data() {
     return {
       page: 'news',
@@ -148,50 +150,61 @@ export default {
       alertSuccess: false,
       alertMsg: '',
       options: {},
-      editorConfig: {
-        printLog: false,
-        uploadImgUrl: 'http://localhost:2233/api/upload',
-        menus: [
-          'source',
-          '|',
-          'bold',
-          'underline',
-          'italic',
-          'strikethrough',
-          'eraser',
-          'forecolor',
-          'bgcolor',
-          '|',
-          'quote',
-          'fontfamily',
-          'fontsize',
-          'head',
-          'unorderlist',
-          'orderlist',
-          'alignleft',
-          'aligncenter',
-          'alignright',
-          '|',
-          'link',
-          'unlink',
-          'table',
-          // 'emotion',
-          '|',
-          // 'img',
-          // 'video',
-          'insertcode',
-          '|',
-          'undo',
-          'redo',
-          'fullscreen'
+      editorInit: {
+        height: 500,
+        menubar: false,
+        plugins: [
+          'advlist autolink lists link image charmap print preview anchor',
+          'searchreplace visualblocks code fullscreen',
+          'insertdatetime media table paste code help wordcount'
         ],
-        useLang: 'en',
-        pasteText: true,
+        toolbar:
+            'undo redo | formatselect | bold italic backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist outdent indent | image | removeformat | help',
+        file_picker_types: 'image',
+        relative_urls: false,
+        image_prepend_url: this.$hostname,
+        images_upload_base_path: this.$hostname,
+        image_description: false,
+        // image_dimensions: false,
+        file_picker_callback: function (callback, value, meta) {
+          $(".tox-lock.tox-button").click()
+          console.log(callback)
+          console.log(value)
+          console.log(meta)
+          var input = document.createElement('input');
+          input.setAttribute('type', 'file');
+          input.setAttribute('accept', 'image/*');
+          input.onchange = function () {
+            var file = this.files[0];
+            console.log(file)
+            var reader = new FileReader();
+            reader.onload = function () {
+              const axios = require('axios')
+              // чтение файла в formData
+              let fd = new FormData();
+              if (file !== null) {
+                fd.append('file', file)
+              }
+              axios({
+                method: 'post',
+                // url: "http://127.0.0.1:8000/time-tracking/images/upload",
+                url: "https://shielded-plateau-96200.herokuapp.com/time-tracking/images/upload",
+                headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+                data: fd
+              })
+                  .then(response => {
+                    console.log(response.data.data)
+                    $('.tox-control-wrap .tox-textfield').val(response.data.data)
+                  });
+            };
+            reader.readAsDataURL(file);
+          };
+
+          input.click();
+        }
       },
-      disableEditor: {
-        printLog: false,
-        disable: true
-      }
     }
   },
   created() {

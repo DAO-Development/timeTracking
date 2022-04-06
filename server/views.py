@@ -3,6 +3,7 @@ import random
 import zipfile
 
 from django.db.models import Sum, F, ExpressionWrapper, FloatField, Q
+from django.http import HttpResponse
 from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -161,7 +162,7 @@ class ProfilesView(APIView):
     def put(self, request, id=None):
         if check_edit_permissions(request, "Работники"):
             if id is not None:
-                name = '/users/'+ str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
+                name = '/users/' + str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -328,7 +329,8 @@ class UserDocumentsView(APIView):
     def delete(self, request):
         document = get_object_or_404(UserDocuments.objects.all(), id=request.data["id"])
         if UserProfile.objects.get(
-                auth_user_id=request.user.id).id == document.user_profile_id or check_edit_permissions(request,                                                                                    'Работники'):
+                auth_user_id=request.user.id).id == document.user_profile_id or check_edit_permissions(request,
+                                                                                                       'Работники'):
             document.delete()
             return Response(status=204)
         else:
@@ -470,7 +472,7 @@ class NewsView(APIView):
     def post(self, request):
         name = ''
         if len(request.FILES) == 1:
-            name = '/news/'+ str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
+            name = '/news/' + str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
             with open('media' + name, 'wb+') as destination:
                 for chunk in request.FILES['image'].chunks():
                     destination.write(chunk)
@@ -493,7 +495,7 @@ class NewsView(APIView):
             "text": request.data["text"]
         }, partial=True)
         if len(request.FILES) == 1:
-            name = '/news/' + str(datetime.datetime.now().timestamp())+ request.FILES['image'].name
+            name = '/news/' + str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
             with open('media' + name, 'wb+') as destination:
                 for chunk in request.FILES['image'].chunks():
                     destination.write(chunk)
@@ -553,7 +555,7 @@ class ObjectsView(APIView):
         if check_edit_permissions(request, "Объекты"):
             serializer = None
             if client_id is not None:
-                name = '/objects/' + str(datetime.datetime.now().timestamp())+ request.FILES['image'].name
+                name = '/objects/' + str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -738,7 +740,7 @@ class ClientView(APIView):
             saved_client = get_object_or_404(Client.objects.all(), id=request.data["id"])
             data = request.data
             if len(request.FILES) == 1:
-                name = '/clients/' + str(datetime.datetime.now().timestamp())+ request.FILES['image'].name
+                name = '/clients/' + str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -857,7 +859,7 @@ class ClientEmployeesView(APIView):
             saved_employee = get_object_or_404(ClientEmployees.objects.all(), id=request.data["id"])
             data = request.data
             if len(request.FILES) == 1:
-                name = '/contacts/'+ str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
+                name = '/contacts/' + str(datetime.datetime.now().timestamp()) + request.FILES['image'].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['image'].chunks():
                         destination.write(chunk)
@@ -1274,7 +1276,7 @@ class ChequeDocumentsView(APIView):
     def post(self, request):
         if len(request.FILES) >= 0:
             for i in range(1, len(request.FILES) + 1):
-                name = '/cheque/'+ str(datetime.datetime.now().timestamp()) + request.FILES['document' + str(i)].name
+                name = '/cheque/' + str(datetime.datetime.now().timestamp()) + request.FILES['document' + str(i)].name
                 with open('media' + name, 'wb+') as destination:
                     for chunk in request.FILES['document' + str(i)].chunks():
                         destination.write(chunk)
@@ -1315,7 +1317,8 @@ class DocumentsAccountingView(APIView):
             path = ''
             if len(request.FILES) >= 0:
                 for i in range(1, len(request.FILES) + 1):
-                    name = '/accounting/'+ str(datetime.datetime.now().timestamp()) + request.FILES['document' + str(i)].name
+                    name = '/accounting/' + str(datetime.datetime.now().timestamp()) + request.FILES[
+                        'document' + str(i)].name
                     with open('media' + name, 'wb+') as destination:
                         for chunk in request.FILES['document' + str(i)].chunks():
                             destination.write(chunk)
@@ -1378,7 +1381,8 @@ class DocumentsClientView(APIView):
             path = ''
             if len(request.FILES) >= 0:
                 for i in range(1, len(request.FILES) + 1):
-                    name = '/accounting/clients/'+ str(datetime.datetime.now().timestamp()) + request.FILES['document' + str(i)].name
+                    name = '/accounting/clients/' + str(datetime.datetime.now().timestamp()) + request.FILES[
+                        'document' + str(i)].name
                     with open('media' + name, 'wb+') as destination:
                         for chunk in request.FILES['document' + str(i)].chunks():
                             destination.write(chunk)
@@ -1725,7 +1729,6 @@ class TimeReportView(APIView):
             "comment": request.data["comment"]
         }
         serializer = TimeReportPostSerializer(data=data)
-        # return Response({"data": data}, status=201)
         if serializer.is_valid():
             serializer.save()
             return Response(status=201)
@@ -1811,9 +1814,17 @@ class ToZipView(APIView):
         newzip.close()
         return Response({"name": 'media/accounting/' + request.data['name'] + '.zip'})
 
-# class ImagesView(APIView):
-#     """Загрузка изображений из редактора"""
-#     permission_classes = [permissions.AllowAny]
-#
-#     def post(self, request):
-#         return Response({"message": "upload"})
+
+class ImagesView(APIView):
+    """Загрузка изображений из редактора"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        data = []
+        name = ''
+        for i in range(len(request.FILES)):
+            name = 'media/images/' + str(datetime.datetime.now().timestamp()) + request.FILES['file'].name
+            with open('' + name, 'wb+') as destination:
+                for chunk in request.FILES['file'].chunks():
+                    destination.write(chunk)
+        return Response("https://shielded-plateau-96200.herokuapp.com/" + name)

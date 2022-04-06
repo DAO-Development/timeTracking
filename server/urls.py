@@ -72,5 +72,5 @@ urlpatterns = [
 
     path('to-zip', ToZipView.as_view()),
 
-    # path('images/upload', ImagesView.as_view()),
+    path('images/upload', ImagesView.as_view()),
 ]
