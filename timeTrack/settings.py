@@ -177,7 +177,6 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-
 DJOSER = {
     # 'LOGIN_FIELD': 'email',
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
@@ -193,3 +192,4 @@ django_heroku.settings(locals())
 # except ImportError:
 #     from .prod_settings import *
 from .prod_settings import *
+

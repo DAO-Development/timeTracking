@@ -48,6 +48,7 @@ class UserProfile(models.Model):
     shirt = models.IntegerField(verbose_name='Футболка', null=True, blank=True)
 
     cards = models.ManyToManyField("Cards", through="CardsUsers", verbose_name="Карточки")
+    widgets = models.ManyToManyField("Widgets", through="WidgetsUsers", verbose_name="Виджеты")
 
     create_date = models.DateField(verbose_name="Дата создания", null=True)
 
@@ -76,6 +77,30 @@ class CardsUsers(models.Model):
         db_table = "cards_users"
         verbose_name = 'Карточка пользователей'
         verbose_name_plural = 'Карточки пользователей'
+
+
+class Widgets(models.Model):
+    """Виджеты"""
+    type = models.CharField(verbose_name="Название", max_length=60)
+    default_settings = models.JSONField(verbose_name="Настройки по умолчанию", null=True, blank=True)
+    max_count = models.IntegerField(verbose_name="Максимальное количество", null=True, blank=True)
+
+    class Meta:
+        db_table = "widgets"
+        verbose_name = "Виджет"
+        verbose_name_plural = "Виджеты"
+
+
+class WidgetsUsers(models.Model):
+    """Виджеты пользователей"""
+    widget = models.ForeignKey("Widgets", verbose_name="Карточка", on_delete=models.CASCADE)
+    user_profile = models.ForeignKey("UserProfile", verbose_name="Пользователь", on_delete=models.CASCADE)
+    settings = models.JSONField(verbose_name="Настройки", null=True, blank=True)
+
+    class Meta:
+        db_table = "widgets_users"
+        verbose_name = "Виджет пользователя"
+        verbose_name_plural = "Виджеты пользователей"
 
 
 class Functions(models.Model):
@@ -194,7 +219,6 @@ class ClientEmployees(models.Model):
     """Штат фирмы клиента"""
     name = models.CharField(verbose_name='Имя', max_length=45)
     lastname = models.CharField(verbose_name='Фамилия', max_length=45)
-    # position = models.CharField(verbose_name='Должность', max_length=60)
     position = models.ForeignKey('PositionClient', models.RESTRICT, verbose_name='Должность', null=True, blank=True)
     phone = models.CharField(verbose_name='Телефон', max_length=45)
     work_phone = models.CharField(verbose_name='Рабочий телефон', max_length=45, null=True, blank=True)
@@ -538,12 +562,3 @@ class UserSettings(models.Model):
         db_table = "user_settings"
         verbose_name = "Настройки польщователя"
         verbose_name_plural = "Настройки пользователя"
-# class WidgetUser(models.Model):
-#     """Виджеты"""
-#     name = models.CharField(verbose_name="Название виджета", max_length=120)
-#     user = models.ForeignKey("User", models.CASCADE, verbose_name='Пользователь')
-#
-#     class Meta:
-#         db_table = "widget_user"
-#         verbose_name = "Виджет"
-#         verbose_name_plural = "Виджеты"

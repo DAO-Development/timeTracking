@@ -716,8 +716,8 @@ export default {
               }
               axios({
                 method: 'post',
-                // url: "http://127.0.0.1:8000/time-tracking/images/upload",
-                url: "https://shielded-plateau-96200.herokuapp.com/time-tracking/images/upload",
+                url: "http://127.0.0.1:8000/time-tracking/images/upload",
+                // url: "https://shielded-plateau-96200.herokuapp.com/time-tracking/images/upload",
                 headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
                 data: fd
               })

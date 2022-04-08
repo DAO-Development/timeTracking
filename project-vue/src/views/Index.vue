@@ -16,26 +16,54 @@
                 {{ $vuetify.lang.t('$vuetify.index.statistics.news.text') }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.workers.label') }}</span>
-              <span class="today__quantity">{{ statistics.workers.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.workers.all') }}</span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.workers.new') }}: {{ statistics.workers.today }}</span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.workers.text') }} {{ statistics.workers.in_work }}</span>
+              <span class="today__unit bold-text">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.workers.label')
+                }}</span>
+              <span class="today__quantity">{{
+                  statistics.workers.all
+                }} {{ $vuetify.lang.t('$vuetify.index.statistics.workers.all') }}</span>
+              <span class="today__now">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.workers.new')
+                }}: {{ statistics.workers.today }}</span>
+              <span class="today__now">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.workers.text')
+                }} {{ statistics.workers.in_work }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.clients.label') }}</span>
-              <span class="today__quantity">{{ statistics.clients.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.clients.all') }}</span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.clients.new') }}: {{ statistics.clients.today }}</span>
+              <span class="today__unit bold-text">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.clients.label')
+                }}</span>
+              <span class="today__quantity">{{
+                  statistics.clients.all
+                }} {{ $vuetify.lang.t('$vuetify.index.statistics.clients.all') }}</span>
+              <span class="today__now">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.clients.new')
+                }}: {{ statistics.clients.today }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.objects.label') }}</span>
-              <span class="today__quantity">{{ statistics.objects.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.objects.all') }}</span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.objects.text') }}: {{ statistics.objects.in_work }}</span>
+              <span class="today__unit bold-text">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.objects.label')
+                }}</span>
+              <span class="today__quantity">{{
+                  statistics.objects.all
+                }} {{ $vuetify.lang.t('$vuetify.index.statistics.objects.all') }}</span>
+              <span class="today__now">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.objects.text')
+                }}: {{ statistics.objects.in_work }}</span>
             </li>
             <li>
-              <span class="today__unit bold-text">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.label') }}</span>
-              <span class="today__quantity">{{ statistics.calendar.all }} {{ $vuetify.lang.t('$vuetify.index.statistics.calendar.all') }}</span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.week') }}: {{ statistics.calendar.week }}</span>
-              <span class="today__now">{{ $vuetify.lang.t('$vuetify.index.statistics.calendar.today') }}: {{ statistics.calendar.today }}</span>
+              <span class="today__unit bold-text">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.calendar.label')
+                }}</span>
+              <span class="today__quantity">{{
+                  statistics.calendar.all
+                }} {{ $vuetify.lang.t('$vuetify.index.statistics.calendar.all') }}</span>
+              <span class="today__now">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.calendar.week')
+                }}: {{ statistics.calendar.week }}</span>
+              <span class="today__now">{{
+                  $vuetify.lang.t('$vuetify.index.statistics.calendar.today')
+                }}: {{ statistics.calendar.today }}</span>
             </li>
           </ul>
         </div>
@@ -77,6 +105,32 @@
               </div>
             </div>
           </template>
+          <template v-for="(widget, i) in widgetsUsers">
+            <div class="widgets-single" :key="widget.id">
+              <div class="widgets-single__header">
+                <h3>{{ widget.widget.type }} {{ i + 1 }}</h3>
+                <div class="widgets-single__actions">
+                  <v-btn color="error" fab x-small @click="deleteWidget(widget.id)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </div>
+              </div>
+              <div class="widgets-single__content">
+                <div class="note__header" v-if="widget.settings!== null && widget.settings.last_save !== undefined">
+                  {{ $vuetify.lang.t('$vuetify.widgets.lastSave') }}:
+                  <span>{{ widget.settings.last_save }}</span>
+                  <div class="widgets-single__actions">
+                    <v-btn color="secondary" fab x-small @click="newWidget = widget; addWidgetUserForm = true">
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </div>
+                </div>
+                <div class="note__content" v-if="widget.settings!== null && widget.settings.color !== undefined" :style="'background: '+widget.settings.color">
+                  <pre>{{ widget.settings.text }}</pre>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
       </section>
       <div v-if="!auth" class="news-all all">
@@ -106,16 +160,28 @@
         </v-card-title>
         <v-card-text>
           <v-list dense>
-            <v-list-item-group>
-              <v-list-item @click="openAddNote">
-                <v-list-item-icon>
-                  <v-icon>mdi-text</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Блокнот</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
+            <!--            <v-list-item-group>-->
+            <!--              <v-list-item @click="openAddNote">-->
+            <!--                <v-list-item-icon>-->
+            <!--                  <v-icon>mdi-text</v-icon>-->
+            <!--                </v-list-item-icon>-->
+            <!--                <v-list-item-content>-->
+            <!--                  <v-list-item-title>Блокнот</v-list-item-title>-->
+            <!--                </v-list-item-content>-->
+            <!--              </v-list-item>-->
+            <!--            </v-list-item-group>-->
+            <template v-for="item in widgets">
+              <v-list-item-group :key="item.id">
+                <v-list-item @click="openAddWidgetUser(item)">
+                  <v-list-item-icon>
+                    <v-icon>mdi-text</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>{{ item.type }}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+            </template>
           </v-list>
         </v-card-text>
       </v-card>
@@ -138,6 +204,29 @@
         <v-card-actions>
           <v-btn color="secondary" @click="closeNoteForm">Отменить</v-btn>
           <v-btn color="primary" @click="saveNote">Сохранить</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog max-width="500px" v-model="addWidgetUserForm">
+      <v-card>
+        <v-card-text>
+          <h2>{{ addWidgetUserTitle }}</h2>
+          <v-textarea v-if="newWidget.settings.text !== undefined" v-model="newWidget.settings.text" filled
+                      :style="'background: '+(newWidget.settings.color)"></v-textarea>
+          <!--          <v-menu ref="menu_color" v-model="color" :close-on-content-click="true"-->
+          <!--                  :return-value.sync="color"-->
+          <!--                  transition="scale-transition" offset-y min-width="auto">-->
+          <!--            <template v-slot:activator="{ on, attrs }">-->
+          <!--              <v-text-field v-model="color" placeholder="Цвет" readonly v-bind="attrs"-->
+          <!--                            v-on="on" outlined></v-text-field>-->
+          <!--            </template>-->
+          <v-color-picker v-if="newWidget.settings.color !== undefined"
+                          v-model="newWidget.settings.color"></v-color-picker>
+          <!--          </v-menu>-->
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="secondary" @click="addWidgetUserForm=false; addWidgetForm=false">Отменить</v-btn>
+          <v-btn color="primary" @click="addWidgetUser">Сохранить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -173,6 +262,7 @@ export default {
         calendar: {},
       },
       widgets: [],
+      widgetsUsers: [],
       notes: [],
       newNote: {
         id: 0,
@@ -180,9 +270,15 @@ export default {
         text: "",
         last_save: "",
       },
+      newWidget: {
+        widget: "",
+        settings: ""
+      },
       addWidgetForm: false,
       addNoteForm: false,
-      hex: '#FFC6C6',
+      addWidgetUserTitle: "",
+      addWidgetUserForm: false,
+      hex: '#FFFFFF',
     }
   },
   computed: {
@@ -221,6 +317,8 @@ export default {
         })
         this.loadStatistics()
         this.loadNotes()
+        this.loadWidgets()
+        this.loadWidgetsUsers()
       } else {
         $.ajax({
           url: this.$hostname + "time-tracking/news",
@@ -304,6 +402,46 @@ export default {
         },
       })
     },
+    loadWidgets() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/widgets",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          this.widgets = response.data.data
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
+    loadWidgetsUsers() {
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/widgets",
+        type: "GET",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        success: (response) => {
+          this.widgetsUsers = response.data.data
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
     saveNote() {
       this.newNote.color = this.color
       this.newNote.last_save = new Date().toISOString()
@@ -330,6 +468,38 @@ export default {
         })
       else
         this.putNote()
+    },
+    addWidgetUser() {
+      if (this.newWidget.settings.last_save !== undefined){
+        console.log(new Date().toISOString())
+        this.newWidget.settings.last_save = new Date().toDateString()
+      }
+      this.newWidget.settings = JSON.stringify(this.newWidget.settings)
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/widgets",
+        type: "POST",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        data: this.newWidget,
+        success: () => {
+          this.loadWidgetsUsers()
+          this.addWidgetForm = false
+          this.addWidgetUserForm = false
+          this.newWidget = {
+            widget: "",
+            settings: ""
+          }
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
     },
     putNote() {
       $.ajax({
@@ -376,6 +546,27 @@ export default {
         },
       })
     },
+    deleteWidget(id) {
+      $.ajax({
+        url: this.$hostname + "time-tracking/profiles/widgets",
+        type: "DELETE",
+        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        data: {id: id},
+        success: () => {
+          this.loadWidgetsUsers()
+        },
+        error: (response) => {
+          if (response.status === 500) {
+            this.alertMsg = "Ошибка соединения с сервером"
+          } else if (response.status === 401) {
+            this.$refresh()
+          } else {
+            this.alertMsg = "Непредвиденная ошибка"
+          }
+          this.alertError = true
+        },
+      })
+    },
     closeNoteForm() {
       this.addNoteForm = false
       this.newNote = {
@@ -387,6 +578,20 @@ export default {
     openAddNote() {
       this.addWidgetForm = false
       this.addNoteForm = true
+    },
+    openAddWidgetUser(type) {
+      console.log(type)
+      this.newWidget = {
+        widget: type.id,
+        settings: type.default_settings
+      }
+      if (type.default_settings) {
+        this.addWidgetUserTitle = type.type
+        // this.openAddNote()
+        this.addWidgetUserForm = true
+      } else {
+        this.addWidgetUser()
+      }
     },
   }
 }

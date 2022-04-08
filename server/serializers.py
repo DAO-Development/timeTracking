@@ -26,6 +26,12 @@ class UserSerializer(serializers.ModelSerializer):
         # fields = ('id', 'username', 'email', 'password', 'is_staff', 'last_login')
 
     def create(self, validated_data):
+        try:
+            send_mail("Register work24",
+                      "You have been registered at work24. Your password: " + validated_data['password'],
+                      settings.DEFAULT_FROM_EMAIL, [validated_data['email']])
+        except Exception as e:
+            return e
         user = User(
             username=validated_data['username'],
             email=validated_data['email'],
@@ -35,11 +41,8 @@ class UserSerializer(serializers.ModelSerializer):
         # if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
         # user.is_active = False
         # user.save(update_fields=["is_active"])
-        context = {"user": user}
+        # context = {"user": user}
         # to = [user.email]
-        # send_mail("Register work24",
-        #           "You have been registered at work24. Your password: " + validated_data['password'],
-        #           'polya.bagrowa@yandex.ru', [validated_data['email']])
         # if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
         #     settings.DJOSER['EMAIL']['activation'](self.request, context).send(to)
         return user
@@ -88,12 +91,39 @@ class CardsUsersPostSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class WidgetsSerializer(serializers.ModelSerializer):
+    """Сериализация виджетов"""
+
+    class Meta:
+        model = Widgets
+        fields = '__all__'
+
+
+class WidgetsUsersSerializer(serializers.ModelSerializer):
+    """Сериализация виджетов пользователей"""
+
+    widget = WidgetsSerializer()
+
+    class Meta:
+        model = WidgetsUsers
+        fields = '__all__'
+
+
+class WidgetsUsersPostSerializer(serializers.ModelSerializer):
+    """Сериализация виджетов пользователей для POST-запросов"""
+
+    class Meta:
+        model = WidgetsUsers
+        fields = '__all__'
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """Сериализация профилей пользователей"""
 
     auth_user_id = UserSerializer()
     position = PositionProfileSerializer()
     cardsusers_set = CardsUsersSerializer(many=True)
+    widgetsusers_set = WidgetsUsersSerializer(many=True)
 
     class Meta:
         model = UserProfile

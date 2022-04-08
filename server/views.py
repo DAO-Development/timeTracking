@@ -1,9 +1,7 @@
-import json
 import random
 import zipfile
 
 from django.db.models import Sum, F, ExpressionWrapper, FloatField, Q
-from django.http import HttpResponse
 from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -277,6 +275,48 @@ class CardsView(APIView):
     def delete(self, request):
         saved_card = get_object_or_404(Cards.objects.all(), pk=request.data["id"])
         saved_card.delete()
+        return Response(status=204)
+
+
+class WidgetsView(APIView):
+    """Виджеты"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        widgets = Widgets.objects.all().order_by("type")
+        serializer = WidgetsSerializer(widgets, many=True)
+        return Response({"data": serializer.data}, status=200)
+
+
+class WidgetsUsersView(APIView):
+    """Виджеты пользователей"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        widgets = WidgetsUsers.objects.all().filter(
+            user_profile=UserProfile.objects.get(auth_user_id=request.user.id).id).order_by("widget")
+        serializer = WidgetsUsersSerializer(widgets, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        # set = json.loads(request.data["settings"])
+        # if "last_save" in settings:
+        #     set["last_save"] = datetime.datetime.now()
+        # set = json.
+        serializer = WidgetsUsersPostSerializer(data={
+            "widget": request.data["widget"],
+            "user_profile": UserProfile.objects.get(auth_user_id=request.user.id).id,
+            "settings": request.data["settings"]
+        })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=200)
+        else:
+            return Response(status=400)
+
+    def delete(self, request):
+        saved_widget = get_object_or_404(WidgetsUsers.objects.all(), id=request.data["id"])
+        saved_widget.delete()
         return Response(status=204)
 
 
@@ -1827,4 +1867,5 @@ class ImagesView(APIView):
             with open('' + name, 'wb+') as destination:
                 for chunk in request.FILES['file'].chunks():
                     destination.write(chunk)
-        return Response("https://shielded-plateau-96200.herokuapp.com/" + name)
+        return Response("http://127.0.0.1:8000/" + name)
+        # return Response("https://shielded-plateau-96200.herokuapp.com/" + name)

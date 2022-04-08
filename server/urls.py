@@ -12,6 +12,7 @@ urlpatterns = [
     path('profiles/active', ActiveProfilesView.as_view()),
     path('profiles/positions', PositionProfileView.as_view()),
     path('profiles/cards', CardsView.as_view()),
+    path('profiles/widgets', WidgetsUsersView.as_view()),
     path('profiles/<int:id>', ProfilesView.as_view()),
     path('print-profiles/<int:id>', PrintProfile.as_view()),
     path('time-reports', TimeReportView.as_view()),
@@ -45,6 +46,7 @@ urlpatterns = [
     path('documents/worker', UserDocumentsView.as_view()),
     path('documents/worker/<int:id>', UserDocumentsView.as_view()),
     path('notes', NotesView.as_view()),
+    path('widgets', WidgetsView.as_view()),
     path('calendar', CalendarView.as_view()),
 
     path('cheque/categories', ChequeCategoryView.as_view()),

@@ -62,6 +62,11 @@ class ItemsAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
 
+class WidgetsAdmin(admin.ModelAdmin):
+    """Виджеты"""
+    list_display = ('id', 'type')
+
+
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(UserDocuments, UserDocumentsAdmin)
 admin.site.register(Functions, FunctionsAdmin)
@@ -74,3 +79,4 @@ admin.site.register(ObjectComments, ObjectCommentsAdmin)
 admin.site.register(DocumentsMode, DocumentsModeAdmin)
 admin.site.register(Sales, SalesAdmin)
 admin.site.register(Items, ItemsAdmin)
+admin.site.register(Widgets, WidgetsAdmin)
