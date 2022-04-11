@@ -85,18 +85,20 @@
           <ul>
             <li>
               <span class="profile__info-title">Адрес в своей стране</span>
-              <span class="profile__info-content"
-                    v-if="user.address_own.city !== '' && user.address_own.city !== undefined && user.address_own !== undefined">
+              <span class="profile__info-content" v-if="user.address_own != null">
+                <span v-if="user.address_own.city !== '' && user.address_own.city !== undefined">
                 {{ user.address_own.city }}, {{ user.address_own.street }}, д.{{ user.address_own.house }},
-                кв.{{ user.address_own.flat }}
+                                                          кв.{{ user.address_own.flat }}
+                </span>
               </span>
             </li>
             <li>
               <span class="profile__info-title">Адрес в Финляндии</span>
-              <span class="profile__info-content"
-                    v-if="user.address_fin.city !== '' && user.address_fin.city !== undefined && user.address_fin !== undefined">
+              <span class="profile__info-content" v-if="user.address_fin != null">
+                <span v-if="user.address_fin.city !== '' && user.address_fin.city !== undefined ">
                 {{ user.address_fin.city }}, {{ user.address_fin.street }}, д.{{ user.address_fin.house }},
                 кв.{{ user.address_fin.flat }}
+                </span>
               </span>
             </li>
           </ul>
@@ -166,6 +168,7 @@
   </div>
 </template>
 
+
 <script>
 import $ from 'jquery'
 
@@ -177,6 +180,9 @@ export default {
       user: {
         auth_user_id: {
           email: ""
+        },
+        position: {
+          name: ""
         }
       },
       groups: [],

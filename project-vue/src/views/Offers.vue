@@ -215,7 +215,6 @@
 <script>
 import Header from "../components/Header";
 import $ from "jquery";
-
 export default {
   name: "Offers",
   components: {Header},
@@ -670,5 +669,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

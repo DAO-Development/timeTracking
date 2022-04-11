@@ -19,7 +19,8 @@ import Menu from "./components/Menu";
 
 // global.jQuery = global.$ = $;
 // Vue.prototype.$hostname = "https://shielded-plateau-96200.herokuapp.com/";
-Vue.prototype.$hostname = "http://127.0.0.1:8000/";
+Vue.prototype.$hostname = "http://65.21.185.61/";
+// Vue.prototype.$hostname = "http://127.0.0.1:8000/";
 // Vue.prototype.$admin = false
 Vue.prototype.$refresh = function () {
   localStorage.clear()
@@ -58,6 +59,12 @@ export default {
   created() {
     console.log("init App")
     if (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')) {
+      $.ajaxSetup({
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRF-TOKEN": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
+      })
       this.auth = true
       this.loadFunctions()
       this.loadUser()
@@ -88,7 +95,10 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/group",
         type: "GET",
-        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token")),
+          "X-CSRF-TOKEN": $('[name="csrfmiddlewaretoken"]').attr('value')
+        },
         success: (response) => {
           this.read = response.data.read
           this.edit = response.data.edit
@@ -97,8 +107,8 @@ export default {
         error: (response) => {
           if (response.status === 500) {
             console.log("Ошибка соединения с сервером")
-          } else if (response.status === 401) {
-            this.$refresh()
+            // } else if (response.status === 401) {
+            //   this.$refresh()
           } else {
             console.log("Непредвиденная ошибка")
           }
@@ -113,8 +123,8 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
           //todo исправить определение админа по группе
-          // this.admin = response.data.data.auth_user_id.is_staff
-          console.log(response.data)
+          // this.admin = response.data.auth_user_id.is_staff
+          console.log(response)
         },
         error: (response) => {
           if (response.status === 500) {

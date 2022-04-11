@@ -258,7 +258,10 @@ export default {
       // if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
       //   this.$router.push({name: "Index"})
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       this.loadData()
       this.loadGroups()

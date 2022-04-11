@@ -11,7 +11,7 @@
                   :items="languages" @change="putSettings"></v-select>
       </v-row>
       <v-list v-if="$parent.$parent.admin">
-        <v-list-item  @click="$router.push({name: 'Groups'})">
+        <v-list-item @click="$router.push({name: 'Groups'})">
           <v-list-item-icon>
             <v-icon>mdi-plus</v-icon>
           </v-list-item-icon>
@@ -115,7 +115,10 @@ export default {
       this.$emit('set-auth')
       this.$emit('load-functions')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       this.loadSettings()
     } else {

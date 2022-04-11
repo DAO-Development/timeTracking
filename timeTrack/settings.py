@@ -136,9 +136,9 @@ SITE = 1
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_DIR = os.path.join(BASE_DIR, '/static/')
-STATIC_ROOT = os.path.join(BASE_DIR, '/static/')
-STATICFILES_STORAGE = os.path.join(BASE_DIR, '/static/')
+# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_STORAGE = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -178,7 +178,7 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 DJOSER = {
-    # 'LOGIN_FIELD': 'email',
+    'LOGIN_FIELD': 'email',
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
@@ -187,11 +187,11 @@ DJOSER = {
 
 django_heroku.settings(locals())
 
-# try:
-#     from .local_settings import *
-# except ImportError:
-#     from .prod_settings import *
-from .prod_settings import *
+try:
+    from .local_settings import *
+except ImportError:
+    from .prod_settings import *
+# from .prod_settings import *
 
 
 # smtp

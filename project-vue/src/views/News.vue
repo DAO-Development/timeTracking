@@ -189,9 +189,13 @@ export default {
               }
               axios({
                 method: 'post',
-                url: "http://127.0.0.1:8000/time-tracking/images/upload",
+                url: "http://65.21.185.61/time-tracking/images/upload",
+                // url: "http://127.0.0.1:8000/time-tracking/images/upload",
                 // url: "https://shielded-plateau-96200.herokuapp.com/time-tracking/images/upload",
-                headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+                headers: {
+                  "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+                  "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+                },
                 data: fd
               })
                   .then(response => {
@@ -213,7 +217,10 @@ export default {
       this.$emit('set-auth')
       this.$emit('load-functions')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       this.loadData()
     } else {
@@ -264,7 +271,10 @@ export default {
           axios({
             method: 'post',
             url: this.$hostname + "time-tracking/news",
-            headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+            headers: {
+              "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+              "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+            },
             data: fd
           })
               .then(response => {
@@ -294,7 +304,10 @@ export default {
       axios({
         method: 'put',
         url: this.$hostname + "time-tracking/news",
-        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        },
         data: fd
       })
           .then(response => {

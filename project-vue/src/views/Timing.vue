@@ -225,7 +225,10 @@ export default {
       // if (this.$parent.$parent.read.indexOf('Бухгалтерия') === -1)
       //   this.$router.push({name: "Index"})
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       this.loadData()
       this.loadObjects()
@@ -256,7 +259,7 @@ export default {
         url: this.$hostname + url,
         type: "GET",
         success: (response) => {
-          this.timings = response.data.data
+          this.timings = response.data
           this.timings.forEach(timing => {
             timing.start = timing.date + ' ' + timing.time_start
             timing.end = timing.date + ' ' + timing.time_end
@@ -282,7 +285,7 @@ export default {
         url: this.$hostname + "time-tracking/objects",
         type: "GET",
         success: (response) => {
-          this.objects = response.data.data
+          this.objects = response.data
           this.objects.forEach(object => {
             object.label = object.city + ' ' + object.street + ' ' + object.house
           })
@@ -304,7 +307,7 @@ export default {
         url: this.$hostname + "time-tracking/time-reports-positions",
         type: "GET",
         success: (response) => {
-          this.positions = response.data.positions
+          this.positions = response.positions
         },
         error: (response) => {
           if (response.status === 500) {

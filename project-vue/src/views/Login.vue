@@ -10,7 +10,7 @@
       <v-checkbox v-model="checkbox" :label="`Запомнить меня`"></v-checkbox>
       <v-btn color="primary" @click="setLogin">Войти</v-btn>
     </v-form>
-    <button class="login__recover-btn" @click="goRecover">Забыли пароль?</button>
+<!--    <button class="login__recover-btn" @click="goRecover">Забыли пароль?</button>-->
     <v-alert v-model="alertError" close-text="Закрыть" color="error" dismissible>
       {{ alertMsg }}
     </v-alert>
@@ -52,21 +52,25 @@ export default {
   methods: {
     setLogin() {
       if (this.$refs.form.validate()) {
+        var $crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
         $.ajax({
           url: this.$hostname + "auth/token/login",
           type: "POST",
+          headers: {
+            "X-CSRFToken": $crf_token
+          },
           // contentType: "application/json; charset=utf-8",
           data: {
             email: this.authForm.login,
             password: this.authForm.password,
           },
           success: (response) => {
-            this.$emit('set-auth')
-            this.$emit('load-functions')
             if (this.checkbox)
               localStorage.setItem("auth_token", response.data.attributes.auth_token)
             else
               sessionStorage.setItem("auth_token", response.data.attributes.auth_token)
+            this.$emit('set-auth')
+            this.$emit('load-functions')
             this.$router.push({name: "Index"})
           },
           error: (response) => {

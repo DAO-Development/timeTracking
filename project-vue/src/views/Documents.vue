@@ -118,7 +118,10 @@ export default {
       this.$emit('set-auth')
       this.$emit('load-functions')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       this.loadData()
     } else {
@@ -140,8 +143,8 @@ export default {
         url: this.$hostname + url,
         type: "GET",
         success: (response) => {
-          this.documents = response.data.documents
-          this.profile = response.data.profile
+          this.documents = response.documents
+          this.profile = response.profile
         },
         error: (response) => {
           if (response.status === 500) {
@@ -177,11 +180,14 @@ export default {
         axios({
           method: 'put',
           url: this.$hostname + "time-tracking/documents/" + this.type,
-          headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+          headers: {
+            "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+            "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+          },
           data: fd
         })
             .then(response => {
-              console.log(response.data.data)
+              console.log(response.data)
               this.addForm = false
               this.loadData()
             });
@@ -218,7 +224,7 @@ export default {
         method: 'GET',
         responseType: 'blob',
       }).then((response) => {
-        var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        var fileURL = window.URL.createObjectURL(new Blob([response]));
         var fileLink = document.createElement('a');
 
         fileLink.href = fileURL;

@@ -716,9 +716,13 @@ export default {
               }
               axios({
                 method: 'post',
-                url: "http://127.0.0.1:8000/time-tracking/images/upload",
+                url: "http://65.21.185.61/time-tracking/images/upload",
+                // url: "http://127.0.0.1:8000/time-tracking/images/upload",
                 // url: "https://shielded-plateau-96200.herokuapp.com/time-tracking/images/upload",
-                headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+                headers: {
+                  "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+                  "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+                },
                 data: fd
               })
                   .then(response => {
@@ -755,7 +759,10 @@ export default {
       this.$emit('set-auth')
       this.$emit('load-functions')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       this.loadData()
       this.loadClients()
@@ -827,7 +834,7 @@ export default {
         url: this.$hostname + "time-tracking/clients/employees/" + client_id,
         type: "GET",
         success: (response) => {
-          this.contacts = response.data.data
+          this.contacts = response.data
           this.contacts.forEach(contact => {
             contact.label = contact.lastname + ' ' + contact.name + ', ' + contact.position.name
             console.log(contact.label)
@@ -850,7 +857,7 @@ export default {
         url: this.$hostname + "time-tracking/time-reports-positions",
         type: "GET",
         success: (response) => {
-          this.positions = response.data.positions
+          this.positions = response.positions
         },
         error: (response) => {
           if (response.status === 500) {
@@ -973,7 +980,7 @@ export default {
     //     url: this.$hostname + "time-tracking/objects/photos/" + id,
     //     type: "GET",
     //     success: (response) => {
-    //       this.photos = response.data.data
+    //       this.photos = response.data
     //     },
     //     error: (response) => {
     //       if (response.status === 500) {
@@ -992,7 +999,7 @@ export default {
         url: this.$hostname + "time-tracking/objects/employees/" + this.currentObject.id,
         type: "GET",
         success: (response) => {
-          this.objectWorkers = response.data.data
+          this.objectWorkers = response.data
         },
         error: (response) => {
           if (response.status === 500) {
@@ -1009,7 +1016,7 @@ export default {
         url: this.$hostname + "time-tracking/objects/employees",
         type: "GET",
         success: (response) => {
-          this.workers = response.data.data
+          this.workers = response.data
           this.workers.forEach(worker => {
             worker.label = worker.lastname + ' ' + worker.name + ', ' + worker.position
           })
@@ -1032,22 +1039,22 @@ export default {
         type: "GET",
         success: (response) => {
           // console.log(this.comments)
-          // console.log(response.data)
-          // console.log(this.comments.comments.length < response.data.comments.length)
+          // console.log(response)
+          // console.log(this.comments.comments.length < response.comments.length)
           if (!check)
-            this.comments = response.data
+            this.comments = response
           // else if (this.comments !== undefined && check) {
           //   let k = false
-          //   if (this.comments.comments.length < response.data.comments.length
-          //       || this.comments.data.length < response.data.data.length)
+          //   if (this.comments.comments.length < response.comments.length
+          //       || this.comments.data.length < response.data.length)
           //     k = true
           //   else
           //     for (let i = 0; i !== this.comments.data.length; i++) {
-          //       if (this.comments.data[i].length < this.response.data.data[i].length)
+          //       if (this.comments.data[i].length < this.response.data[i].length)
           //         k = true
           //     }
           //   if (k) {
-          //     this.comments = response.data
+          //     this.comments = response
           //     alert("Новый комментарий!")
           //   }
           // }
@@ -1222,14 +1229,17 @@ export default {
       axios({
         method: 'put',
         url: this.$hostname + "time-tracking/objects/" + this.currentObject.id,
-        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        },
         data: fd
       })
           .then(response => {
-            console.log(response.data.data)
+            console.log(response.data)
             this.photoDialog = false
             this.photoField = null
-            this.currentObject.photo_path = response.data.data.name
+            this.currentObject.photo_path = response.data.name
             this.loadData()
           });
     },

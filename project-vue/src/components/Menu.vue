@@ -343,7 +343,10 @@ export default {
       $.ajax({
         url: this.$hostname + "auth/token/logout/",
         type: "POST",
-        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRF-TOKEN": $('[name="csrfmiddlewaretoken"]').attr('value')
+        },
         success: () => {
           localStorage.clear()
           sessionStorage.clear()
@@ -352,7 +355,7 @@ export default {
         error: (response) => {
           this.alertError = true
           this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
+          console.log(response)
         },
       })
     },
@@ -367,9 +370,12 @@ export default {
       $.ajax({
         url: this.$hostname + "time-tracking/user",
         type: "GET",
-        headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRF-TOKEN": $('[name="csrfmiddlewaretoken"]').attr('value')
+        },
         success: (response) => {
-          this.user = response.data.data
+          this.user = response.data
           console.log(this.user.photo_path)
         },
         error: (response) => {

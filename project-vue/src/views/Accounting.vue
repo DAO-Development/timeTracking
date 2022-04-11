@@ -122,7 +122,10 @@ export default {
       this.$emit('set-auth')
       this.$emit('load-functions')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       switch (this.type) {
         case 'reports':
@@ -248,7 +251,10 @@ export default {
         axios({
           method: 'put',
           url: this.$hostname + this.url + "/" + this.mode,
-          headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+          headers: {
+            "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+            "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+          },
           data: fd
         })
             .then(response => {

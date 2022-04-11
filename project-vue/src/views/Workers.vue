@@ -538,7 +538,7 @@ export default {
         error: (response) => {
           this.alertError = true
           this.alertMsg = "Непредвиденная ошибка"
-          console.log(response.data)
+          console.log(response)
         },
       })
     },
@@ -613,14 +613,17 @@ export default {
       axios({
         method: 'put',
         url: this.$hostname + "time-tracking/profiles/" + this.currentProfile.id,
-        headers: {"Authorization": "Token " + (sessionStorage.getItem("auth_token") || localStorage.getItem("auth_token"))},
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        },
         data: fd
       })
           .then(response => {
-            console.log(response.data.data)
+            console.log(response.data)
             this.photoDialog = false
             this.photoField = null
-            this.currentProfile.photo_path = response.data.data.name
+            this.currentProfile.photo_path = response.data.name
             this.loadData()
           });
     },

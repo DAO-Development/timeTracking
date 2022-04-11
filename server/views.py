@@ -299,15 +299,22 @@ class WidgetsUsersView(APIView):
         return Response({"data": serializer.data})
 
     def post(self, request):
-        # set = json.loads(request.data["settings"])
-        # if "last_save" in settings:
-        #     set["last_save"] = datetime.datetime.now()
-        # set = json.
         serializer = WidgetsUsersPostSerializer(data={
             "widget": request.data["widget"],
             "user_profile": UserProfile.objects.get(auth_user_id=request.user.id).id,
             "settings": request.data["settings"]
         })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=200)
+        else:
+            return Response(status=400)
+
+    def put(self, request):
+        saved_widget = get_object_or_404(WidgetsUsers.objects.all(), id=request.data["id"])
+        serializer = WidgetsUsersPostSerializer(saved_widget, data={
+            "settings": request.data["settings"]
+        }, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(status=200)

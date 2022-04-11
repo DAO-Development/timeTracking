@@ -152,7 +152,6 @@
 <script>
 import Header from "../components/Header";
 import $ from "jquery";
-
 export default {
   name: "Waybill",
   components: {Header},
@@ -395,5 +394,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

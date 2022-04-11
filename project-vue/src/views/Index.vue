@@ -76,35 +76,35 @@
           </v-btn>
         </div>
         <div class="index__widgets">
-          <template v-for="(note, i) in notes">
-            <div class="widgets-single" :key="note.id">
-              <div class="widgets-single__header">
-                <h3>{{ $vuetify.lang.t('$vuetify.widgets.noteLabel') }} {{ i + 1 }}</h3>
-                <div class="widgets-single__actions">
-                  <v-btn color="error" fab x-small @click="deleteNote(note.id)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
-                  <v-btn color="primary" fab x-small>
-                    <v-icon>mdi-autorenew</v-icon>
-                  </v-btn>
-                </div>
-              </div>
-              <div class="widgets-single__content">
-                <div class="note__header">
-                  {{ $vuetify.lang.t('$vuetify.widgets.lastSave') }}:
-                  <span>{{ note.last_save }}</span>
-                  <div class="widgets-single__actions">
-                    <v-btn color="secondary" fab x-small @click="newNote = note; addNoteForm = true">
-                      <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-                  </div>
-                </div>
-                <div class="note__content" :style="'background: '+note.color">
-                  <pre>{{ note.text }}</pre>
-                </div>
-              </div>
-            </div>
-          </template>
+          <!--          <template v-for="(note, i) in notes">-->
+          <!--            <div class="widgets-single" :key="note.id">-->
+          <!--              <div class="widgets-single__header">-->
+          <!--                <h3>{{ $vuetify.lang.t('$vuetify.widgets.noteLabel') }} {{ i + 1 }}</h3>-->
+          <!--                <div class="widgets-single__actions">-->
+          <!--                  <v-btn color="error" fab x-small @click="deleteNote(note.id)">-->
+          <!--                    <v-icon>mdi-delete</v-icon>-->
+          <!--                  </v-btn>-->
+          <!--                  <v-btn color="primary" fab x-small>-->
+          <!--                    <v-icon>mdi-autorenew</v-icon>-->
+          <!--                  </v-btn>-->
+          <!--                </div>-->
+          <!--              </div>-->
+          <!--              <div class="widgets-single__content">-->
+          <!--                <div class="note__header">-->
+          <!--                  {{ $vuetify.lang.t('$vuetify.widgets.lastSave') }}:-->
+          <!--                  <span>{{ note.last_save }}</span>-->
+          <!--                  <div class="widgets-single__actions">-->
+          <!--                    <v-btn color="secondary" fab x-small @click="newNote = note; addNoteForm = true">-->
+          <!--                      <v-icon>mdi-pencil</v-icon>-->
+          <!--                    </v-btn>-->
+          <!--                  </div>-->
+          <!--                </div>-->
+          <!--                <div class="note__content" :style="'background: '+note.color">-->
+          <!--                  <pre>{{ note.text }}</pre>-->
+          <!--                </div>-->
+          <!--              </div>-->
+          <!--            </div>-->
+          <!--          </template>-->
           <template v-for="(widget, i) in widgetsUsers">
             <div class="widgets-single" :key="widget.id">
               <div class="widgets-single__header">
@@ -118,14 +118,15 @@
               <div class="widgets-single__content">
                 <div class="note__header" v-if="widget.settings!== null && widget.settings.last_save !== undefined">
                   {{ $vuetify.lang.t('$vuetify.widgets.lastSave') }}:
-                  <span>{{ widget.settings.last_save }}</span>
+                  <span>{{ new Date(widget.settings.last_save).toLocaleDateString() }} {{new Date(widget.settings.last_save).toLocaleTimeString()}}</span>
                   <div class="widgets-single__actions">
                     <v-btn color="secondary" fab x-small @click="newWidget = widget; addWidgetUserForm = true">
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
                   </div>
                 </div>
-                <div class="note__content" v-if="widget.settings!== null && widget.settings.color !== undefined" :style="'background: '+widget.settings.color">
+                <div class="note__content" v-if="widget.settings!== null && widget.settings.color !== undefined"
+                     :style="'background: '+widget.settings.color">
                   <pre>{{ widget.settings.text }}</pre>
                 </div>
               </div>
@@ -316,7 +317,7 @@ export default {
           },
         })
         this.loadStatistics()
-        this.loadNotes()
+        // this.loadNotes()
         this.loadWidgets()
         this.loadWidgetsUsers()
       } else {
@@ -429,6 +430,10 @@ export default {
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         success: (response) => {
           this.widgetsUsers = response.data.data
+          this.widgetsUsers.forEach(widget => {
+            console.log(widget.settings)
+            widget.settings = JSON.parse(widget.settings)
+          })
         },
         error: (response) => {
           if (response.status === 500) {
@@ -470,14 +475,17 @@ export default {
         this.putNote()
     },
     addWidgetUser() {
-      if (this.newWidget.settings.last_save !== undefined){
-        console.log(new Date().toISOString())
-        this.newWidget.settings.last_save = new Date().toDateString()
+      var type = "POST"
+      if (this.newWidget.id !== 0) {
+        type = "PUT"
+      }
+      if (this.newWidget.settings.last_save !== undefined) {
+        this.newWidget.settings.last_save = new Date().toISOString()
       }
       this.newWidget.settings = JSON.stringify(this.newWidget.settings)
       $.ajax({
         url: this.$hostname + "time-tracking/profiles/widgets",
-        type: "POST",
+        type: type,
         headers: {"Authorization": "Token " + (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))},
         data: this.newWidget,
         success: () => {

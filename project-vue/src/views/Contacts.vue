@@ -221,7 +221,10 @@ export default {
       this.$emit('set-auth')
       this.$emit('load-functions')
       $.ajaxSetup({
-        headers: {"Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'))}
+        headers: {
+          "Authorization": "Token " + (localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')),
+          "X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')
+        }
       })
       this.loadData()
       this.loadPositions()
@@ -272,7 +275,7 @@ export default {
         url: this.$hostname + "time-tracking/clients-employees/positions",
         type: "GET",
         success: (response) => {
-          this.selectsPosition = response.data.data
+          this.selectsPosition = response.data
         },
         error: (response) => {
           switch (response.status) {
@@ -300,7 +303,7 @@ export default {
         url: this.$hostname + "time-tracking/clients",
         type: "GET",
         success: (response) => {
-          this.selectsClient = response.data.data
+          this.selectsClient = response.data
         },
         error: (response) => {
           switch (response.status) {
